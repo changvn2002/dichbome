@@ -1,0 +1,34 @@
+{
+  "dependencies": {
+    "cn": "^0.4.0",
+    "lucide-react": "^1.48.0",
+    "next": "16.3.6",
+    "react": "19.2.1",
+    "react-dom": "19.2.1"
+  },
+  "description": "Giải Mã Gia Đình — dịch ý thật đằng sau tin nhắn của bố mẹ, người thân, vợ chồng, sếp... bằng engine rule-based tiếng Việt (không cần AI, không cần đăng nhập).",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^24.5.2",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.3.6",
+    "prettier": "^3.6.2",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.3"
+  },
+  "license": "MIT",
+  "name": "dichbome",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "dev": "next dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
+  },
+  "version": "1.0.0"
+}

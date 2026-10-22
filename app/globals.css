@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+
+@source "../components";
+@source "../lib";
+@source "../app";
+
+:root {
+  color-scheme: light;
+  --ink: #101418;
+  --muted: #5b6570;
+  --line: #e1e4ea;
+  --paper: #f2f4f7;
+  --card: #ffffff;
+  --shadow-card: 0 1px 2px rgba(16, 20, 24, 0.05), 0 8px 24px rgba(16, 20, 24, 0.06);
+  --shadow-lift: 0 2px 4px rgba(16, 20, 24, 0.06), 0 16px 40px rgba(16, 20, 24, 0.1);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+}
+
+html,
+body {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans), 'Be Vietnam Pro', sans-serif;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+}
+
+/* Serif Việt cho tiêu đề (Playfair Display, subset vietnamese, nạp ở layout.tsx).
+   KHÔNG đổi sang Georgia/Times hệ thống: thiếu dấu tiếng Việt tiền tố hợp,
+   chữ bị chồng dấu/lệch dấu trên Windows. */
+.font-serif-vn {
+  font-family: var(--font-serif-vn), 'Be Vietnam Pro', serif;
+}

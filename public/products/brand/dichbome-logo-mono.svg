@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Dịch Tiếng Bố Mẹ — bản đơn sắc">
+  <!-- Bản 1 màu mực trên nền trong suốt: chỉ dùng nét, không mảng màu -->
+  <path d="M24 6h48a18 18 0 0 1 18 18v26a18 18 0 0 1-18 18H53L35 87v-19H24A18 18 0 0 1 6 50V24A18 18 0 0 1 24 6z" fill="none" stroke="#101418" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="32" cy="30" r="4" fill="#101418"/>
+  <path d="M50 30q7-6.5 14 0" fill="none" stroke="#101418" stroke-width="4.2" stroke-linecap="round"/>
+  <path d="M40 39.5q8 6.5 16 0" fill="none" stroke="#101418" stroke-width="4.2" stroke-linecap="round"/>
+  <circle cx="73" cy="22" r="7" fill="none" stroke="#101418" stroke-width="3.6"/>
+  <path d="M78.5 27.5 85 34" stroke="#101418" stroke-width="4" stroke-linecap="round"/>
+  <path d="M48 68C37.5 61 33.5 56.4 33.5 51.6c0-4 3-7.1 6.9-7.1 3 0 5.9 1.9 7.6 4.6 1.7-2.7 4.6-4.6 7.6-4.6 3.9 0 6.9 3.1 6.9 7.1 0 4.8-4 9.4-14.5 16.4z" fill="none" stroke="#101418" stroke-width="3.6" stroke-linejoin="round"/>
+  <circle cx="42.3" cy="52" r="1.9" fill="#101418"/>
+  <circle cx="53.1" cy="52" r="1.9" fill="#101418"/>
+</svg>
