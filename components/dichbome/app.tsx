@@ -8,7 +8,7 @@
  * Thuật toán dịch không đổi — chỉ thêm provenance + cổng trình bày ở đây.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Layers } from 'lucide-react';
+import { ChevronDown, Layers } from 'lucide-react';
 import { createDichbomeApi, resolveDichbomeApiMode } from './api';
 import { Board } from './board';
 import { Composer } from './composer';
@@ -431,6 +431,11 @@ export function DichbomeApp() {
       ? saved.find((s) => s.message === stage.view.message && s.speaker === stage.view.speaker)
       : undefined;
 
+  const openBoard = useCallback((tab: BoardTab) => {
+    setBoardTab(tab);
+    setBoardOpen(true);
+  }, []);
+
   const handleToggleSave = useCallback(() => {
     if (stage.kind !== 'slip') return;
     const view = stage.view;
@@ -438,7 +443,11 @@ export function DichbomeApp() {
       (s) => s.message === view.message && s.speaker === view.speaker,
     );
     if (existing) {
-      startDeletion('saved', new Set([existing.id]), 'Đã xoá một mục khỏi Đã lưu.');
+      // N-5(a) (fix wave 2026-10-23): «Đã lưu» bấm lần 2 KHÔNG còn là toggle bỏ
+      // lưu bất ngờ — nhãn này được người dùng đọc như đường dẫn tới danh sách
+      // (panel #02, D-6/N-5), nên bấm là mở Bảng tab Đã lưu. Bỏ lưu vẫn làm
+      // được trong Bảng bằng nút Xoá (có hoàn tác 8 giây như mọi lần xoá).
+      openBoard('saved');
       return;
     }
     if (savedRef.current.length >= SAVED_MAX) {
@@ -446,6 +455,7 @@ export function DichbomeApp() {
       return;
     }
     if (pendingRef.current?.scope === 'saved') commitPendingDeletion();
+    // (nhánh dưới chỉ chạy khi CHƯA lưu — xem nhánh existing ở trên)
     const item: StoredItem = {
       id: `${Date.now()}`,
       message: view.message,
@@ -462,7 +472,7 @@ export function DichbomeApp() {
       persistCollection('saved', next);
       return next;
     });
-  }, [stage, startDeletion, commitPendingDeletion, persistCollection]);
+  }, [stage, openBoard, commitPendingDeletion, persistCollection]);
 
   const handleCopyReply = useCallback(async (text: string, idx: number) => {
     const ok = await copyText(text);
@@ -520,14 +530,31 @@ export function DichbomeApp() {
     });
   }, [stage, presentSlip]);
 
-  const openBoard = useCallback((tab: BoardTab) => {
-    setBoardTab(tab);
-    setBoardOpen(true);
-  }, []);
-
   const undoBarData = pendingDeletion
     ? { label: pendingDeletion.label, onUndo: undoDeletion }
     : null;
+
+  /* Chỉ báo «còn nội dung ở dưới» (M-3): phiếu điển hình vẫn dài hơn một khung
+   * sân khấu (xem ngân sách thật ở LAYOUT-SPEC §1) — khi người dùng chưa cuộn
+   * tới cuối phiếu, một nút dính đáy sân khấu nói rõ còn phần dưới và bấm là
+   * cuộn xuống. Trước đây không có chỉ báo nào, phần dưới nếp gấp bị mất hút. */
+  const [showMoreHint, setShowMoreHint] = useState(false);
+  const updateMoreHint = useCallback(() => {
+    const el = stageScrollRef.current;
+    if (!el || stage.kind !== 'slip') {
+      setShowMoreHint(false);
+      return;
+    }
+    setShowMoreHint(
+      el.scrollHeight - el.clientHeight > 24 &&
+        el.scrollTop + el.clientHeight < el.scrollHeight - 24,
+    );
+  }, [stage.kind]);
+  useEffect(() => {
+    updateMoreHint();
+    window.addEventListener('resize', updateMoreHint);
+    return () => window.removeEventListener('resize', updateMoreHint);
+  }, [stage, updateMoreHint]);
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
@@ -561,111 +588,134 @@ export function DichbomeApp() {
       ) : null}
 
       <div className="flex min-h-0 flex-1">
-        {/* Cột sân khấu + composer */}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <div ref={stageScrollRef} className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-            <div className="mx-auto w-full max-w-[640px]">
-              {stage.kind === 'idle' ? (
-                <div className="flex flex-col items-center pt-6 text-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/products/brand/dichbome-empty-stage.webp"
-                    alt=""
-                    width={180}
-                    height={180}
-                    className="w-[180px]"
-                  />
-                  <h2 className="mt-4 font-display text-[26px] font-semibold leading-[34px]">
-                    Người nhà vừa nhắn gì thế?
-                  </h2>
-                  <p className="mt-2 max-w-[320px] text-[15px] leading-relaxed text-muted">
-                    Dán câu vào ô dưới, chọn đúng người nhắn — app đọc ý thật và gợi ý câu trả lời
-                    cho êm chuyện.
-                  </p>
-                  <div className="mt-4 flex flex-col items-center gap-2">
-                    {examples.slice(0, 2).map((ex) => (
-                      <button
-                        key={ex.message}
-                        type="button"
-                        onClick={() => fillExample(ex, false)}
-                        className="min-h-11 max-w-full truncate rounded-full border border-line-strong bg-card px-4 text-sm"
-                      >
-                        “{excerpt(ex.message)}”
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {stage.kind === 'loading' ? (
-                <div>
-                  <OriginalBubble
-                    message={stage.input.message}
-                    speaker={stage.input.speaker}
-                    context={stage.input.context}
-                  />
-                  <div className="mt-3">
-                    <TypingBubble />
-                  </div>
-                </div>
-              ) : null}
-
-              {stage.kind === 'slip' ? (
-                <div>
-                  <OriginalBubble
-                    message={stage.view.message}
-                    speaker={stage.view.speaker}
-                    context={stage.view.context}
-                  />
-                  <div className="mt-3">
-                    <StageSlip
-                      view={stage.view}
-                      saved={Boolean(currentSavedItem)}
-                      copiedIdx={copiedIdx}
-                      onCopyReply={handleCopyReply}
-                      onToggleSave={handleToggleSave}
-                      onShare={handleShare}
-                      onTranslateAnother={handleTranslateAnother}
-                      onOpenSavedBoard={() => openBoard('saved')}
-                      strip={strip}
-                      headingRef={slipHeadingRef}
+        {/* Cột sân khấu + composer — landmark <main> cho nội dung chính (N-6) */}
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <div className="relative min-h-0 flex-1">
+            <div
+              ref={stageScrollRef}
+              onScroll={updateMoreHint}
+              className="h-full overflow-y-auto px-4 py-4"
+            >
+              <div className="mx-auto w-full max-w-[640px]">
+                {stage.kind === 'idle' ? (
+                  <div className="flex flex-col items-center pt-6 text-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/products/brand/dichbome-empty-stage.webp"
+                      alt=""
+                      width={180}
+                      height={180}
+                      className="w-[180px]"
                     />
+                    {/* M-4: Stage display về đúng DESIGN-LANGUAGE §3 đã duyệt —
+                      30/37 mobile · 40/48 desktop (trước đây render 26/34 ở cả hai). */}
+                    <h2 className="mt-4 font-display text-[30px] leading-[37px] font-semibold min-[1280px]:text-[40px] min-[1280px]:leading-[48px]">
+                      Người nhà vừa nhắn gì thế?
+                    </h2>
+                    <p className="mt-2 max-w-[320px] text-[15px] leading-relaxed text-muted">
+                      Dán câu vào ô dưới, chọn đúng người nhắn — app đọc ý thật và gợi ý câu trả lời
+                      cho êm chuyện.
+                    </p>
+                    <div className="mt-4 flex flex-col items-center gap-2">
+                      {examples.slice(0, 2).map((ex) => (
+                        <button
+                          key={ex.message}
+                          type="button"
+                          onClick={() => fillExample(ex, false)}
+                          className="min-h-11 max-w-full truncate rounded-full border border-line-strong bg-card px-4 text-sm"
+                        >
+                          “{excerpt(ex.message)}”
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
 
-              {stage.kind === 'not-read' ? (
-                <div>
-                  <OriginalBubble
-                    message={stage.input.message}
-                    speaker={stage.input.speaker}
-                    context={stage.input.context}
-                  />
-                  <div className="mt-3">
-                    <NotReadCard
-                      bodyKind={stage.bodyKind}
+                {stage.kind === 'loading' ? (
+                  <div>
+                    <OriginalBubble
+                      message={stage.input.message}
                       speaker={stage.input.speaker}
-                      onEdit={() => setFocusSignal((n) => n + 1)}
-                      onTryExample={() => openBoard('examples')}
-                      onShowFallback={showFallback}
+                      context={stage.input.context}
                     />
+                    <div className="mt-3">
+                      <TypingBubble />
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
 
-              {stage.kind === 'error' ? (
-                <div>
-                  <OriginalBubble
-                    message={stage.input.message}
-                    speaker={stage.input.speaker}
-                    context={stage.input.context}
-                  />
-                  <div className="mt-3">
-                    <StageErrorCard onRetry={() => void runTranslate(stage.input)} />
+                {stage.kind === 'slip' ? (
+                  <div>
+                    <OriginalBubble
+                      message={stage.view.message}
+                      speaker={stage.view.speaker}
+                      context={stage.view.context}
+                    />
+                    <div className="mt-3">
+                      <StageSlip
+                        view={stage.view}
+                        saved={Boolean(currentSavedItem)}
+                        copiedIdx={copiedIdx}
+                        onCopyReply={handleCopyReply}
+                        onToggleSave={handleToggleSave}
+                        onShare={handleShare}
+                        onTranslateAnother={handleTranslateAnother}
+                        onOpenSavedBoard={() => openBoard('saved')}
+                        strip={strip}
+                        headingRef={slipHeadingRef}
+                      />
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
+
+                {stage.kind === 'not-read' ? (
+                  <div>
+                    <OriginalBubble
+                      message={stage.input.message}
+                      speaker={stage.input.speaker}
+                      context={stage.input.context}
+                    />
+                    <div className="mt-3">
+                      <NotReadCard
+                        bodyKind={stage.bodyKind}
+                        speaker={stage.input.speaker}
+                        onEdit={() => setFocusSignal((n) => n + 1)}
+                        onTryExample={() => openBoard('examples')}
+                        onShowFallback={showFallback}
+                      />
+                    </div>
+                  </div>
+                ) : null}
+
+                {stage.kind === 'error' ? (
+                  <div>
+                    <OriginalBubble
+                      message={stage.input.message}
+                      speaker={stage.input.speaker}
+                      context={stage.input.context}
+                    />
+                    <div className="mt-3">
+                      <StageErrorCard onRetry={() => void runTranslate(stage.input)} />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
             </div>
+            {showMoreHint ? (
+              <button
+                type="button"
+                onClick={() =>
+                  stageScrollRef.current?.scrollBy({
+                    top: stageScrollRef.current.clientHeight * 0.8,
+                    behavior: 'smooth',
+                  })
+                }
+                className="absolute bottom-3 left-1/2 z-10 inline-flex min-h-11 -translate-x-1/2 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-semibold whitespace-nowrap text-paper shadow-[var(--shadow-lift)]"
+              >
+                Còn nội dung ở dưới
+                <ChevronDown className="size-4" aria-hidden />
+              </button>
+            ) : null}
           </div>
 
           {pendingDeletion && !boardOpen ? (
@@ -690,7 +740,7 @@ export function DichbomeApp() {
             error={composerError}
             focusSignal={focusSignal}
           />
-        </div>
+        </main>
 
         {/* Bảng — một instance: sheet toàn màn hình trên mobile, cột phải cố định ≥1280px */}
         <Board

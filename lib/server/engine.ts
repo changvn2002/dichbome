@@ -608,7 +608,7 @@ const ENTRIES: EntryDef[] = [
     warning:
       "Nghe 'tùy' mà quyết luôn trong 5 giây rồi thông báo lại là rất dễ ăn dỗi dài hạn. Hỏi thêm đúng một câu là hạ nhiệt được kha khá.",
     replies: [
-      'Dạ, con cũng đang phân vân. Theo {p} thì cách nào hợp hơn ạ? {p} góp ý cho con rồi con quyết.',
+      'Dạ, con cũng đang phân vân. Theo {p} thì cách nào hợp hơn ạ? {P} góp ý cho con rồi con quyết.',
       'Dạ con cảm ơn {p}. Con đang tính thế này, {p} nghe thử xem có ổn không, thiếu gì {p} bảo con.',
       'Dạ chuyện này con chưa quyết vội đâu. Tối con gọi về, cả nhà mình bàn kỹ rồi con mới làm ạ.',
     ],
@@ -624,7 +624,7 @@ const ENTRIES: EntryDef[] = [
       'bo khong buon',
     ],
     meaning:
-      "Càng khẳng định 'không buồn' thì càng là đang buồn. {p} nói vậy để con khỏi khó xử thôi, chứ trong lòng tủi thân rõ ràng — câu nói ngược kinh điển của phụ huynh Việt.",
+      "Càng khẳng định 'không buồn' thì càng là đang buồn. {P} nói vậy để con khỏi khó xử thôi, chứ trong lòng tủi thân rõ ràng — câu nói ngược kinh điển của phụ huynh Việt.",
     realWant:
       "Muốn con ở lại thêm một lúc, hoặc hứa một dịp cụ thể sẽ về bù. Điều {p} sợ nhất là câu 'hôm nào con về' mà không có ngày tháng.",
     anger: 78,
@@ -640,7 +640,7 @@ const ENTRIES: EntryDef[] = [
     id: 'gia-roi',
     patterns: ['gia roi biet gi', 'gia roi', 'biet gi dau', 'con hon bo me', 'bo me gia roi'],
     meaning:
-      'Câu này nghe như buông xuôi nhưng thực ra là tự ái. {p} thấy ý kiến của mình không được coi trọng nên rút lui bằng một câu rất nhẹ mà rất đau.',
+      'Câu này nghe như buông xuôi nhưng thực ra là tự ái. {P} thấy ý kiến của mình không được coi trọng nên rút lui bằng một câu rất nhẹ mà rất đau.',
     realWant:
       'Muốn con lắng nghe và coi trọng kinh nghiệm của {p} một chút. Không cần làm theo hết, chỉ cần đừng gạt đi ngay.',
     anger: 72,
@@ -663,14 +663,14 @@ const ENTRIES: EntryDef[] = [
       'khong co gi dau',
     ],
     meaning:
-      "'Không sao đâu' là câu cửa miệng khi có sao mà không muốn nói. {p} sợ con lo, sợ con tốn công nên gói hết vào hai chữ 'không sao' — nghe càng thản nhiên càng nên hỏi lại.",
+      "'Không sao đâu' là câu cửa miệng khi có sao mà không muốn nói. {P} sợ con lo, sợ con tốn công nên gói hết vào hai chữ 'không sao' — nghe càng thản nhiên càng nên hỏi lại.",
     realWant:
       "Muốn con hỏi thêm một câu nữa và để ý một chút, chứ đừng tin ngay rồi thôi. Nhiều khi chỉ cần con quan tâm là 'sao' tự hết một nửa.",
     anger: 70,
     warning:
       "Câu này trả lời 'dạ vâng' rồi bỏ qua là dễ bỏ lỡ tín hiệu nhất. Hỏi lại đúng một câu 'thật không ạ?' là biết ngay.",
     replies: [
-      'Thật không ạ? {p} kể con nghe đi, có gì con lo cùng {p}.',
+      'Thật không ạ? {P} kể con nghe đi, có gì con lo cùng {p}.',
       'Dạ, {p} cứ nói thật với con. Con lớn rồi, chuyện gì con cũng nghe được ạ.',
       'Vậy để con gọi về nói chuyện với {p} một lúc nhé, nghe giọng {p} con mới yên tâm.',
     ],
@@ -686,14 +686,14 @@ const ENTRIES: EntryDef[] = [
       'me con du',
     ],
     meaning:
-      'Nói không cần tiền thường là sợ con tốn kém, chứ ít khi là không cần thật. {p} hay tính phần thiệt về mình: con còn phải lo nhà cửa, ăn uống, đủ thứ trên vai.',
+      'Nói không cần tiền thường là sợ con tốn kém, chứ ít khi là không cần thật. {P} hay tính phần thiệt về mình: con còn phải lo nhà cửa, ăn uống, đủ thứ trên vai.',
     realWant:
       'Muốn con giữ tiền lo cho bản thân, nhưng trong lòng vẫn rất vui nếu con nhớ tới. Quan trọng là tấm lòng, số tiền xếp sau.',
     anger: 25,
     replies: [
       'Dạ, con gửi ít thôi, {p} cầm mua gì ngon ngon ăn nhé. Con lo được, {p} đừng lo cho con.',
-      'Tiền này là con biếu {p}, không phải tiền để dành đâu ạ. {p} nhận cho con vui.',
-      'Dạ vậy tháng này con không gửi tiền, con gửi đồ về cho {p} nhé. {p} thích ăn gì con mua.',
+      'Tiền này là con biếu {p}, không phải tiền để dành đâu ạ. {P} nhận cho con vui.',
+      'Dạ vậy tháng này con không gửi tiền, con gửi đồ về cho {p} nhé. {P} thích ăn gì con mua.',
     ],
   },
   {
@@ -770,9 +770,9 @@ const ENTRIES: EntryDef[] = [
       'Muốn biết con ăn uống đàng hoàng và tiện thể nghe giọng con một lúc. Trả lời qua loa một chữ là {p} lại lo thêm.',
     anger: 8,
     replies: [
-      'Dạ con ăn rồi ạ, hôm nay con ăn cơm với cá kho. {p} ăn chưa, nay nhà mình ăn gì ạ?',
+      'Dạ con ăn rồi ạ, hôm nay con ăn cơm với cá kho. {P} ăn chưa, nay nhà mình ăn gì ạ?',
       'Dạ con vừa ăn xong. Để con gọi video, con khoe bữa cơm của con cho {p} xem.',
-      'Dạ con chưa ăn, giờ con đi ăn đây. {p} nhắc là con thấy đói luôn.',
+      'Dạ con chưa ăn, giờ con đi ăn đây. {P} nhắc là con thấy đói luôn.',
     ],
   },
   {
@@ -839,7 +839,7 @@ const FALLBACKS: Record<FallbackCategory, CategoryDef> = {
     replies: [
       'Dạ, {p} nói thật với con đi, đau ở đâu, lâu chưa? Con đặt lịch khám cho {p} nhé.',
       'Để con gọi về hỏi kỹ. Chuyện này không để "kệ nó tự khỏi" được đâu ạ.',
-      'Dạ, cuối tuần con về đưa {p} đi khám. {p} đừng lo chuyện tiền, có con đây.',
+      'Dạ, cuối tuần con về đưa {p} đi khám. {P} đừng lo chuyện tiền, có con đây.',
     ],
   },
   'tinh-cam': {
@@ -850,8 +850,8 @@ const FALLBACKS: Record<FallbackCategory, CategoryDef> = {
     anger: 42,
     replies: [
       'Dạ, chuyện này con có tính rồi ạ. Khi nào chắc chắn con thưa chuyện với {p} đầu tiên.',
-      'Con biết {p} lo cho con. {p} cứ yên tâm, con không để {p} phải nhắc mãi đâu.',
-      'Dạ, để con kể {p} nghe từ từ. {p} nghe xong cho con ý kiến nhé.',
+      'Con biết {p} lo cho con. {P} cứ yên tâm, con không để {p} phải nhắc mãi đâu.',
+      'Dạ, để con kể {p} nghe từ từ. {P} nghe xong cho con ý kiến nhé.',
     ],
   },
   'cong-viec': {
@@ -862,7 +862,7 @@ const FALLBACKS: Record<FallbackCategory, CategoryDef> = {
     anger: 28,
     replies: [
       'Dạ công việc con vẫn ổn ạ. Dạo này con đang làm một việc mới, để con kể {p} nghe.',
-      'Có hơi bận một chút nhưng con lo được. {p} đừng lo, con vẫn ăn ngủ đàng hoàng.',
+      'Có hơi bận một chút nhưng con lo được. {P} đừng lo, con vẫn ăn ngủ đàng hoàng.',
       'Dạ, cảm ơn {p} hỏi. Cuối tuần con gọi về kể {p} nghe kỹ hơn nhé.',
     ],
   },
@@ -872,19 +872,19 @@ const FALLBACKS: Record<FallbackCategory, CategoryDef> = {
     realWant: 'Muốn trò chuyện với con thêm vài câu và biết chắc con đang tự lo cho mình ổn.',
     anger: 12,
     replies: [
-      'Dạ con ổn ạ. {p} nay thế nào, ăn uống có ngon miệng không ạ?',
+      'Dạ con ổn ạ. {P} nay thế nào, ăn uống có ngon miệng không ạ?',
       'Dạ, để con gọi video cho {p} luôn, nói chuyện thế này không đã.',
-      'Con cảm ơn {p}. {p} giữ gìn sức khỏe nhé, con gọi về thường xuyên mà.',
+      'Con cảm ơn {p}. {P} giữ gìn sức khỏe nhé, con gọi về thường xuyên mà.',
     ],
   },
   chung: {
     meaning:
-      'Câu này nghe nhẹ mà thường còn một lớp nghĩa ở dưới. {p} hay nói giảm nói tránh cho con đỡ lo, nên phải nghe cả điều không được nói ra mới hiểu hết.',
+      'Câu này nghe nhẹ mà thường còn một lớp nghĩa ở dưới. {P} hay nói giảm nói tránh cho con đỡ lo, nên phải nghe cả điều không được nói ra mới hiểu hết.',
     realWant:
       'Muốn con hỏi thêm một câu và quan tâm thêm một chút. Với {p}, được con để ý là đã vui rồi.',
     anger: 30,
     replies: [
-      'Dạ, {p} nói vậy là còn chuyện gì nữa không ạ? {p} kể con nghe đi.',
+      'Dạ, {p} nói vậy là còn chuyện gì nữa không ạ? {P} kể con nghe đi.',
       'Con cảm ơn {p}. Có gì {p} cứ nói thẳng với con, con nghe hết ạ.',
       'Dạ, để con gọi về nói chuyện với {p} kỹ hơn nhé.',
     ],
@@ -1139,6 +1139,61 @@ export function getEntryPatterns(): Array<{ patterns: string[]; exact: boolean }
   return ENTRIES.map((e) => ({ patterns: [...e.patterns], exact: e.exact ?? false }));
 }
 
+/** Nhãn hoàn cảnh khớp chữ UI phía client, để output nhắc đúng hoàn cảnh người dùng đã chọn. */
+const CONTEXT_LABELS: Record<DichbomeContext, string> = {
+  tien: 'Xin tiền',
+  've-que': 'Về quê',
+  'cong-viec': 'Công việc',
+  'nguoi-yeu': 'Người yêu',
+  cuoi: 'Cưới hỏi',
+  'suc-khoe': 'Sức khoẻ',
+  'o-chung': 'Ở chung',
+  'con-cai': 'Con cái',
+  khac: 'Khác',
+};
+
+/** M-2 (Panel #02): tin từ mốc này mới coi là "tin dài" để xét độ sâu ở đường mẫu chung. */
+const GENERIC_DEPTH_MIN_MESSAGE = 50;
+/** Tin rất dài mà vẫn không tách được chi tiết riêng: khai báo giới hạn ngay trong Ý thật. */
+const GENERIC_LIMIT_MIN_MESSAGE = 80;
+
+const ALL_ENTRY_PATTERNS: string[] = ENTRIES.flatMap((e) => e.patterns);
+
+/**
+ * Trích một chi tiết riêng nổi bật từ chính tin nhắn: đoạn con dài nhất (tách theo
+ * dấu câu / dấu phẩy) mà sau khi gỡ các mẫu câu đã khớp vẫn còn ít nhất 4 từ riêng.
+ * Trích nguyên văn (chỉ cắt ở biên từ khi quá 90 ký tự) — không bịa thêm nội dung.
+ * Trả null khi tin không có đoạn nào đủ riêng (toàn là mẫu câu lặp lại).
+ */
+function extractSalientDetail(raw: string): string | null {
+  const segments = raw
+    .split(/[.!?…;]+/)
+    .flatMap((part) => part.split(','))
+    .map((s) =>
+      s
+        .trim()
+        .replace(/^["'“”‘’«»]+|["'“”‘’«»]+$/g, '')
+        .trim(),
+    )
+    .filter(Boolean);
+  let best: string | null = null;
+  for (const segment of segments) {
+    if (segment.length < 15) continue;
+    let residual = normalizeVi(segment);
+    for (const pattern of ALL_ENTRY_PATTERNS) residual = residual.split(pattern).join(' ');
+    const residualWords = residual.split(/\s+/).filter(Boolean);
+    if (residualWords.length < 4) continue;
+    if (!best || segment.length > best.length) best = segment;
+  }
+  if (!best) return null;
+  if (best.length > 90) {
+    const cut = best.slice(0, 90);
+    const lastSpace = cut.lastIndexOf(' ');
+    best = `${(lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trim()}…`;
+  }
+  return best;
+}
+
 /**
  * Engine dịch rule-based (port nguyên logic từ Nest module
  * `server/src/products/dichbome/dichbome.service.ts` của repo gốc ChangtoTech —
@@ -1159,7 +1214,7 @@ export function translateDichbome(input: DichbomeTranslateInput): DichbomeTransl
     entry ?? speakerFallback ?? FALLBACKS[detectCategory(norm) ?? categoryFromContext(context)];
 
   const angerLevel = adjustAnger(def.anger, raw, norm);
-  return {
+  const result: DichbomeTranslateResult = {
     meaning: fill(def.meaning, speaker),
     realWant: fill(def.realWant, speaker),
     angerLevel,
@@ -1170,6 +1225,41 @@ export function translateDichbome(input: DichbomeTranslateInput): DichbomeTransl
     })),
     ...(def.warning ? { warning: fill(def.warning, speaker) } : {}),
   };
+
+  // M-2 (Panel #02, D-3): độ sâu cho tin dài ở đường MẪU CHUNG.
+  // Chỉ áp dụng khi kết quả đến từ entry chung (không gắn vai) hoặc fallback —
+  // entry gắn đúng vai giữ nguyên từng byte (corpus vàng khoá ở tests/golden-corpus-parents).
+  // Tin ngắn/điển hình cũng giữ nguyên: chỉ tin dài (>= 50 ký tự) mới được bổ sung
+  // (a) hoàn cảnh đã chọn và (b) một chi tiết riêng trích nguyên văn từ chính tin.
+  // Phân loại tier (chip "Khớp câu mẫu chung") nằm ở classifyDichbomeInput — không đổi.
+  const isGenericPath = entry ? !entry.speakers : true;
+  if (isGenericPath && raw.length >= GENERIC_DEPTH_MIN_MESSAGE) {
+    const detail = extractSalientDetail(raw);
+    const contextLabel = CONTEXT_LABELS[context];
+    if (detail) {
+      result.meaning += ` Chi tiết riêng trong tin này: “${detail}”.`;
+      if (context !== 'khac') {
+        result.meaning += ` Tin thuộc hoàn cảnh “${contextLabel}” bạn đã chọn, nên phần cần đáp lại là chi tiết riêng đó trong đúng hoàn cảnh này, không chỉ là câu mẫu chung.`;
+        result.realWant += ` Khi đáp, nhắc thẳng tới chi tiết “${detail}” và chốt một hướng cụ thể thuộc hoàn cảnh ${contextLabel}, thay vì trả lời chung chung.`;
+      } else {
+        result.realWant += ` Khi đáp, nhắc thẳng tới chi tiết “${detail}” và chốt một hướng cụ thể, thay vì trả lời chung chung.`;
+      }
+      result.replies[0] = {
+        ...result.replies[0],
+        text:
+          result.replies[0].text +
+          fill(` Riêng chuyện “${detail}”, {s} sẽ nói rõ thêm với {p} cho chắc.`, speaker),
+      };
+    } else if (raw.length >= GENERIC_LIMIT_MIN_MESSAGE) {
+      // Không tách được chi tiết riêng: nói rõ giới hạn ngay trong Ý thật thay vì
+      // để phiếu trông như một bản đọc riêng đầy đủ.
+      result.meaning +=
+        context !== 'khac'
+          ? ` Tin này dài nhưng app chưa tách được chi tiết riêng nào ngoài mẫu chung ở hoàn cảnh “${contextLabel}” bạn đã chọn, nên phần đọc trên chỉ chắc ở mức mẫu chung cho hoàn cảnh đó.`
+          : ' Tin này dài nhưng app chưa tách được chi tiết riêng nào ngoài mẫu chung, nên phần đọc trên chỉ chắc ở mức mẫu chung.';
+    }
+  }
+  return result;
 }
 
 export function getDichbomeExamples(): DichbomeExample[] {

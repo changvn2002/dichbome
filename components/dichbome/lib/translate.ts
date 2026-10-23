@@ -1208,6 +1208,46 @@ export function matchRuleInfo(
 /** Toàn bộ keys của RULES (đã bỏ dấu sẵn) — dùng làm từ vựng cho tầng trung thực. */
 export const CLIENT_RULE_KEYS: readonly string[] = RULES.flatMap((r) => r.keys);
 
+/** M-2 (Panel #02): tin từ mốc này mới coi là "tin dài" để xét độ sâu ở đường mẫu chung. */
+const GENERIC_DEPTH_MIN_MESSAGE = 50;
+/** Tin rất dài mà vẫn không tách được chi tiết riêng: khai báo giới hạn ngay trong Ý thật. */
+const GENERIC_LIMIT_MIN_MESSAGE = 80;
+
+/**
+ * Trích một chi tiết riêng nổi bật từ chính tin nhắn: đoạn con dài nhất (tách theo
+ * dấu câu / dấu phẩy) mà sau khi gỡ các khoá mẫu đã khớp vẫn còn ít nhất 4 từ riêng.
+ * Trích nguyên văn (chỉ cắt ở biên từ khi quá 90 ký tự) — không bịa thêm nội dung.
+ * Cùng quy tắc với extractSalientDetail phía server (lib/server/engine.ts).
+ */
+function extractSalientDetail(message: string): string | null {
+  const segments = message
+    .split(/[.!?…;]+/)
+    .flatMap((part) => part.split(','))
+    .map((s) =>
+      s
+        .trim()
+        .replace(/^["'“”‘’«»]+|["'“”‘’«»]+$/g, '')
+        .trim(),
+    )
+    .filter(Boolean);
+  let best: string | null = null;
+  for (const segment of segments) {
+    if (segment.length < 15) continue;
+    let residual = normalizeVi(segment).replace(/[^a-z0-9\s]/g, ' ');
+    for (const key of CLIENT_RULE_KEYS) residual = residual.split(key).join(' ');
+    const residualWords = residual.split(/\s+/).filter(Boolean);
+    if (residualWords.length < 4) continue;
+    if (!best || segment.length > best.length) best = segment;
+  }
+  if (!best) return null;
+  if (best.length > 90) {
+    const cut = best.slice(0, 90);
+    const lastSpace = cut.lastIndexOf(' ');
+    best = `${(lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trim()}…`;
+  }
+  return best;
+}
+
 export function translateParentMessage(input: TranslateInput): TranslateResult {
   const message = (input?.message ?? '').trim();
   const speaker = input?.speaker ?? 'Mẹ';
@@ -1215,7 +1255,8 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
   const addr = ADDRESSES[speaker];
   const normalized = normalizeVi(message);
 
-  const rule: Rule = matchRule(normalized, speaker) ?? {
+  const matchedRule = matchRule(normalized, speaker);
+  const rule: Rule = matchedRule ?? {
     id: 'fallback',
     keys: [],
     ...fallbackFor(speaker),
@@ -1229,7 +1270,7 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
       .replace(/\{s\}/g, addr.selfLower);
   const hint = CONTEXT_HINTS[context];
 
-  return {
+  const result: TranslateResult = {
     meaning: fill(rule.meaning),
     realWant: fill(rule.realWant) + (hint ? fill(hint) : ''),
     angerLevel: rule.angerLevel,
@@ -1237,4 +1278,35 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
     replies: rule.replies.map((r) => ({ label: r.label, text: fill(r.text) })),
     ...(rule.warning ? { warning: fill(rule.warning) } : {}),
   };
+
+  // M-2 (Panel #02, D-3): độ sâu cho tin dài ở đường MẪU CHUNG phía client —
+  // cùng quy tắc server: chỉ rule chung (không gắn vai) hoặc fallback, chỉ tin
+  // dài (>= 50 ký tự); bổ sung (a) hoàn cảnh đã chọn và (b) chi tiết riêng trích
+  // nguyên văn từ chính tin vào Ý thật / Điều muốn nghe / câu trả lời đầu tiên.
+  // Rule gắn đúng vai và tin ngắn giữ nguyên (corpus vàng ở tests/golden-corpus-parents).
+  const isGenericPath = !matchedRule || !matchedRule.roles;
+  if (isGenericPath && message.length >= GENERIC_DEPTH_MIN_MESSAGE) {
+    const detail = extractSalientDetail(message);
+    if (detail) {
+      result.meaning += ` Chi tiết riêng trong tin này: “${detail}”.`;
+      if (context !== 'Khác') {
+        result.meaning += ` Tin thuộc hoàn cảnh “${context}” bạn đã chọn, nên phần cần đáp lại là chi tiết riêng đó trong đúng hoàn cảnh này, không chỉ là câu mẫu chung.`;
+        result.realWant += ` Khi đáp, nhắc thẳng tới chi tiết “${detail}” và chốt một hướng cụ thể thuộc hoàn cảnh ${context}, thay vì trả lời chung chung.`;
+      } else {
+        result.realWant += ` Khi đáp, nhắc thẳng tới chi tiết “${detail}” và chốt một hướng cụ thể, thay vì trả lời chung chung.`;
+      }
+      result.replies[0] = {
+        ...result.replies[0],
+        text:
+          result.replies[0].text +
+          fill(` Riêng chuyện “${detail}”, {s} sẽ nói rõ thêm với {x} cho chắc.`),
+      };
+    } else if (message.length >= GENERIC_LIMIT_MIN_MESSAGE) {
+      result.meaning +=
+        context !== 'Khác'
+          ? ` Tin này dài nhưng app chưa tách được chi tiết riêng nào ngoài mẫu chung ở hoàn cảnh “${context}” bạn đã chọn, nên phần đọc trên chỉ chắc ở mức mẫu chung cho hoàn cảnh đó.`
+          : ' Tin này dài nhưng app chưa tách được chi tiết riêng nào ngoài mẫu chung, nên phần đọc trên chỉ chắc ở mức mẫu chung.';
+    }
+  }
+  return result;
 }

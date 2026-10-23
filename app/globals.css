@@ -67,7 +67,11 @@ body {
   font-family: var(--font-display), 'Fraunces', serif;
 }
 
-/* Focus discipline (DESIGN.md): mọi phần tử tương tác có ring này. */
+/* Focus discipline (DESIGN.md): mọi phần tử tương tác có ring này.
+   Rule này cố ý KHÔNG nằm trong layer: nó thắng mọi utility đã-layer của
+   Tailwind v4 (kể cả outline-none) — vì vậy đừng thêm class dập outline ở
+   component; N-2 (Panel #02) đã dọn một class outline-none chết trong
+   slip.tsx vì lý do này. Muốn đổi hành vi ring thì đổi tại đây. */
 :focus-visible {
   outline: 2px solid var(--crimson);
   outline-offset: 2px;

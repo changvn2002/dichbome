@@ -86,8 +86,11 @@ export function StageSlip({
   strip,
   headingRef,
 }: StageSlipProps) {
-  const [expandedMeaning, setExpandedMeaning] = useState(false);
-  const [expandedWant, setExpandedWant] = useState(false);
+  // MỘT cơ chế «còn nữa» duy nhất cho cả phiếu (fix wave 2026-10-23, M-3):
+  // trước đây Ý thật và Điều muốn nghe có hai nút «Đọc tiếp» riêng, chồng thêm
+  // cơ chế cuộn nội bộ — nay một nút duy nhất mở/thu toàn bộ phần bị rút gọn
+  // (Ý thật + Điều muốn nghe + từng câu trả lời).
+  const [expandedAll, setExpandedAll] = useState(false);
   const [warningOpen, setWarningOpen] = useState(false);
   const { result } = view;
   const time = formatTime(view.at);
@@ -118,6 +121,11 @@ export function StageSlip({
               {sourceLabel}
               {time ? ` · ${time}` : ''}
             </span>
+            {view.source === 'server' ? (
+              // Nhãn phụ dễ hiểu cạnh nhãn nguồn (N-5): nhãn chuẩn «Nguồn: Máy chủ»
+              // giữ nguyên thường trực + trung thực; gloss chỉ giải thích thêm.
+              <span className="text-muted">(dịch qua mạng)</span>
+            ) : null}
             {view.tier === 'generic' ? (
               <span className="rounded-full bg-crimson-tint px-2 py-0.5 font-semibold text-crimson-ink">
                 Khớp câu mẫu chung
@@ -142,7 +150,11 @@ export function StageSlip({
         </div>
 
         <div className="anim-slip-block mt-3" style={{ '--i': 1 } as CSSProperties}>
-          <h2 ref={headingRef} tabIndex={-1} className="text-sm font-semibold outline-none">
+          {/* N-2: không còn class outline-none (trước đây là code CHẾT — rule
+              :focus-visible không-layer trong globals.css luôn thắng utility
+              đã-layer của Tailwind v4). Ring đến từ rule toàn cục như mọi phần
+              tử khác; hành vi focus modality giữ nguyên (keep-list panel). */}
+          <h2 ref={headingRef} tabIndex={-1} className="text-sm font-semibold">
             Ý thật
           </h2>
           {view.tier === 'low' ? (
@@ -152,44 +164,41 @@ export function StageSlip({
             </p>
           ) : null}
           <p
+            // Slip serif theo DESIGN-LANGUAGE §3: Fraunces 560 (trước đây render
+            // 400 vì không khai weight — M-4, đưa code về đúng spec đã duyệt).
+            style={{ fontWeight: 560 }}
             className={`font-display mt-1 text-[17px] leading-[26px] text-ink${
-              expandedMeaning ? '' : ' line-clamp-4'
+              expandedAll ? '' : ' line-clamp-3'
             }`}
           >
             {result.meaning}
           </p>
-          {result.meaning.length > 150 ? (
-            <button
-              type="button"
-              onClick={() => setExpandedMeaning((v) => !v)}
-              className="min-h-11 text-sm font-semibold text-crimson-ink"
-            >
-              {expandedMeaning ? 'Thu gọn' : 'Đọc tiếp'}
-            </button>
-          ) : null}
         </div>
 
         <div
-          className="anim-slip-block mt-4 border-t border-line pt-4"
+          className="anim-slip-block mt-3 border-t border-line-strong pt-3"
           style={{ '--i': 2 } as CSSProperties}
         >
           <h3 className="text-sm font-semibold">Điều {roleName(view.speaker)} muốn nghe</h3>
-          <p className={`mt-1 text-base leading-relaxed${expandedWant ? '' : ' line-clamp-2'}`}>
+          <p className={`mt-1 text-base leading-relaxed${expandedAll ? '' : ' line-clamp-2'}`}>
             {result.realWant}
           </p>
-          {result.realWant.length > 110 ? (
+          {result.meaning.length > 115 ||
+          result.realWant.length > 110 ||
+          result.replies.some((r) => r.text.length > 80) ? (
             <button
               type="button"
-              onClick={() => setExpandedWant((v) => !v)}
+              aria-expanded={expandedAll}
+              onClick={() => setExpandedAll((v) => !v)}
               className="min-h-11 text-sm font-semibold text-crimson-ink"
             >
-              {expandedWant ? 'Thu gọn' : 'Đọc tiếp'}
+              {expandedAll ? 'Thu gọn' : 'Đọc tiếp'}
             </button>
           ) : null}
         </div>
 
         <div
-          className="anim-slip-block mt-4 border-t border-line pt-4"
+          className="anim-slip-block mt-3 border-t border-line-strong pt-3"
           style={{ '--i': 3 } as CSSProperties}
         >
           {view.tier === 'low' ? (
@@ -211,7 +220,9 @@ export function StageSlip({
                 aria-valuemax={5}
                 aria-label="Mức căng thẳng"
               >
-                <div className="h-2 rounded-full bg-line">
+                {/* N-6: track gauge nâng từ --line (1.32:1) lên --line-strong
+                    như mọi biên phân định còn lại của hệ (đọc chặt WCAG §1.4.11). */}
+                <div className="h-2 rounded-full bg-line-strong">
                   <div
                     className="gauge-fill h-full rounded-full bg-crimson"
                     style={{ width: `${result.angerLevel * 20}%` }}
@@ -234,7 +245,7 @@ export function StageSlip({
         </div>
 
         {result.warning ? (
-          <div className="mt-4 border-t border-line pt-2">
+          <div className="mt-3 border-t border-line-strong pt-2">
             <button
               type="button"
               aria-expanded={warningOpen}
@@ -249,13 +260,13 @@ export function StageSlip({
         ) : null}
 
         <div
-          className="anim-slip-block mt-4 border-t border-line pt-4"
+          className="anim-slip-block mt-3 border-t border-line-strong pt-3"
           style={{ '--i': 4 } as CSSProperties}
         >
           <h3 className="text-sm font-semibold">Câu trả lời gợi ý</h3>
-          <div className="divide-y divide-line">
+          <div className="divide-y divide-line-strong">
             {result.replies.map((reply, idx) => (
-              <div key={`${reply.label}-${idx}`} className="py-3">
+              <div key={`${reply.label}-${idx}`} className="py-2">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm font-semibold">{reply.label}</span>
                   <button
@@ -271,7 +282,13 @@ export function StageSlip({
                     {copiedIdx === idx ? 'Đã sao chép' : 'Sao chép'}
                   </button>
                 </div>
-                <p className="mt-1 text-[15px] leading-[22px]">{reply.text}</p>
+                {/* Xem trước tối đa 2 dòng khi phiếu thu gọn; nút Sao chép luôn
+                    chép TOÀN VĂN, và cơ chế «Đọc tiếp» duy nhất ở trên mở trọn. */}
+                <p
+                  className={`mt-1 text-[15px] leading-[22px]${expandedAll ? '' : ' line-clamp-2'}`}
+                >
+                  {reply.text}
+                </p>
               </div>
             ))}
           </div>
@@ -316,11 +333,14 @@ export function StageSlip({
           </div>
         ) : null}
 
-        <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-4">
+        <div className="mt-3 flex flex-wrap gap-2 border-t border-line-strong pt-3">
+          {/* N-5(a): nút này không còn là toggle — khi đã lưu, bấm «Đã lưu» MỞ
+              Bảng tab Đã lưu (đúng kỳ vọng «nhãn = đường dẫn tới danh sách»);
+              bỏ lưu thực hiện trong Bảng qua nút Xoá có hoàn tác. Xem app.tsx. */}
           <button
             type="button"
-            aria-pressed={saved}
             onClick={onToggleSave}
+            aria-label={saved ? 'Đã lưu. Mở Bảng, tab Đã lưu' : undefined}
             className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
           >
             {saved ? (
@@ -383,31 +403,35 @@ export function NotReadCard({
               ? 'Chuỗi này không có từ nào app nhận ra là tiếng Việt trong nhà mình vẫn nói. Kiểm tra lại chính tả, hoặc thử một câu khác.'
               : 'App chưa có câu này trong dữ liệu câu mẫu, nên chưa dám đoán ý. Bạn có thể xem cách đọc chung theo vai, hoặc thử một câu mẫu.'}
           </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={onEdit}
-              className="min-h-11 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
-            >
-              Sửa câu
-            </button>
-            <button
-              type="button"
-              onClick={onTryExample}
-              className="min-h-11 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
-            >
-              Thử một câu mẫu
-            </button>
-            <button
-              type="button"
-              onClick={onShowFallback}
-              className="min-h-11 rounded-xl border border-crimson bg-crimson-tint px-4 text-sm font-semibold text-crimson-ink"
-            >
-              Xem cách đọc chung theo vai {speaker}
-            </button>
-          </div>
         </div>
       </div>
+      {/* N-1: thứ bậc hành động — hai lối ra chính là nút có khung; lối fallback
+          độ-tin-cậy-thấp hạ xuống nút chữ yên tĩnh (không nền tint, không viền
+          crimson) ở hàng riêng full-width, nhãn nằm trọn một dòng, không còn
+          chữ vai rơi mồ côi ở dòng 2 như bản panel #02 đo. */}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={onEdit}
+          className="min-h-11 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
+        >
+          Sửa câu
+        </button>
+        <button
+          type="button"
+          onClick={onTryExample}
+          className="min-h-11 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
+        >
+          Thử một câu mẫu
+        </button>
+      </div>
+      <button
+        type="button"
+        onClick={onShowFallback}
+        className="mt-1 min-h-11 px-2 text-left text-sm font-semibold text-crimson-ink underline underline-offset-4"
+      >
+        Xem cách đọc chung theo <span className="whitespace-nowrap">vai {speaker}</span>
+      </button>
     </div>
   );
 }

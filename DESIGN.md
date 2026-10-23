@@ -97,11 +97,16 @@ pattern); 11px text anywhere; a third font family.
 
 Pattern: **Conversation Stage** — one `100dvh` frame, no page scroll. App bar
 52 (mobile) / 56 (desktop) pinned top; composer pinned bottom of the stage
-column; only the stage region scrolls internally, only for over-budget results
-(display caps in LAYOUT-SPEC §3 make the typical flow fit 795/844px on
-390×844). Desktop ≥1280px: stage column (max 640) centered + Board column
-380px at right, independently scrolling; below that the Board is a full
-sheet. Spacing scale (only these): 4 · 8 · 12 · 16 · 24 · 32 · 48.
+column; only the stage region scrolls internally. Scroll budget (revised
+2026-10-23 after Panel #02 measured the shipped slip at stage 1325/579px —
+the original "typical flow fits 795/844" estimate was wrong and is retired):
+the first stage frame holds the whole "reading" part of a typical slip
+(bubble + source row + Ý thật + Điều muốn nghe + full tension gauge);
+replies + actions scroll internally under a sticky «Còn nội dung ở dưới»
+indicator. Full budget, typical-case definition and measured baseline:
+LAYOUT-SPEC §1 (revised). Desktop ≥1280px: stage column (max 640) centered +
+Board column 380px at right, independently scrolling; below that the Board
+is a full sheet. Spacing scale (only these): 4 · 8 · 12 · 16 · 24 · 32 · 48.
 Radius: bubbles 18 · slip 16 · Board cards 14 · controls/composer 12 · chips 999.
 Shadows: `--shadow-card: 0 1px 2px rgba(16,20,24,.05), 0 8px 24px rgba(16,20,24,.06)`;
 `--shadow-lift: 0 2px 4px rgba(16,20,24,.06), 0 16px 40px rgba(16,20,24,.10)` —
@@ -121,10 +126,18 @@ by hairlines; reply rows are flat rows inside the slip.
 - **Original bubble:** left-aligned, crimson, white text, meta line above it
   («{vai} nhắn · Hoàn cảnh: {context}»), max 2 lines preview, tap to expand.
 - **Stage Slip (signature):** source meta row first (see Engine honesty),
-  Ý thật (serif, 4-line preview + in-place expand), Điều {vai} muốn nghe
-  (2-line preview + expand), tension gauge, optional warning disclosure
-  (closed by default), 3 reply rows, confirmation strip, actions
-  (Lưu kết quả · Chia sẻ · Dịch câu khác).
+  Ý thật (serif 560, 3-line preview), Điều {vai} muốn nghe (2-line preview),
+  tension gauge, optional warning disclosure (closed by default), 3 reply
+  rows (2-line preview each; copy always copies the full text), confirmation
+  strip, actions (Lưu kết quả · Chia sẻ · Dịch câu khác). ONE shared
+  «Đọc tiếp»/«Thu gọn» control expands every clamped block at once (revised
+  2026-10-23, Panel #02 M-3 — the previous two separate expand buttons plus
+  internal scroll were two competing "there is more" mechanisms). Internal
+  section dividers and the gauge track use `--line-strong` (revised
+  2026-10-23, N-6 — was the decorative `--line` at 1.32:1). Once saved, the
+  «Đã lưu» action opens the Board's Saved tab instead of un-saving
+  (revised 2026-10-23, N-5a; un-save lives on the Board card's delete +
+  8s undo).
 - **Tension gauge:** printed ruler — ticks 0–5 in ink, crimson fill by level,
   text at both ends («nhẹ nhàng» / «rất căng») and a text value
   («Mức 3/5 · {dangerLabel}»). One term everywhere: **«Mức căng thẳng»**.

@@ -46,6 +46,20 @@ function historySourceShort(item: StoredItem): string {
   return 'Đã lưu';
 }
 
+/**
+ * N-5 (Panel #02): teaser không được cắt «…» giữa ý. Nguồn dữ liệu có teaser kết
+ * thúc bằng «...» khi ý còn dở (vd bản máy chủ) — cắt lui về ranh giới cụm gần
+ * nhất (dấu phẩy hoặc mệnh đề «thì») để dòng hiện trên thẻ luôn trọn ý. Teaser
+ * đã trọn ý giữ nguyên từng chữ.
+ */
+function wholeTeaser(tease: string): string {
+  const trimmed = tease.trim();
+  if (!/(?:\.\.\.|…)$/.test(trimmed)) return trimmed;
+  const body = trimmed.replace(/(?:\.\.\.|…)+$/, '').trim();
+  const cut = Math.max(body.lastIndexOf(','), body.lastIndexOf(' thì '));
+  return cut > 0 ? body.slice(0, cut).trim() : body;
+}
+
 /** Khung trạng thái trống dùng chung cho các tab (LAYOUT-SPEC §5) — chữ và hành động riêng từng tab. */
 function BoardEmptyState({
   title,
@@ -136,7 +150,12 @@ export function Board({
       <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-line px-4">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/products/brand/dichbome-logo.svg" alt="" className="size-6 shrink-0" />
-        <h2 className="text-[17px] font-bold text-ink">Bảng</h2>
+        {/* N-6 (Panel #02): tiêu đề là div, không phải h2 — Board là aside
+            luôn mounted (ẩn bằng visibility khi đóng sheet ở mobile) nên
+            một h2 thường trú sẽ thành "heading rỗng đang ẩn" trong cây
+            trợ năng; aside đã có aria-label="Bảng" và tablist tự mang
+            cấu trúc, thị giác không đổi. */}
+        <div className="text-[17px] font-bold text-ink">Bảng</div>
         <div className="flex-1" />
         <button
           type="button"
@@ -243,19 +262,25 @@ export function Board({
                   <p className="mt-1.5 text-xs text-muted">
                     {ex.speaker} · {ex.context}
                   </p>
-                  <p className="mt-1 text-[13px] text-muted">{ex.tease}</p>
-                  <div className="mt-2.5 flex items-center gap-2">
+                  <p className="mt-1 text-[13px] text-muted">{wholeTeaser(ex.tease)}</p>
+                  {/* S-1 (Panel #02): xếp dọc hai hành động full-width trong thẻ.
+                      Hàng ngang cũ bó nút chính còn ~60px (nút phụ chữ trần chiếm
+                      ~75px + gap trong cột masonry ~145px) nên nhãn vỡ 3 dòng ở
+                      mọi viewport. Một hệ nút thống nhất: cùng bề rộng, cùng
+                      min-h-11/bo góc/cỡ chữ, khác nhau chỉ ở nền (đặc = chính,
+                      quiet = phụ); nhãn nowrap nguyên vẹn một dòng. */}
+                  <div className="mt-2.5 flex flex-col gap-1.5">
                     <button
                       type="button"
                       onClick={() => onUseExample(ex, false)}
-                      className="min-h-11 flex-1 rounded-lg bg-crimson px-3 text-sm font-semibold text-white hover:bg-crimson-deep"
+                      className="min-h-11 w-full whitespace-nowrap rounded-lg bg-crimson px-2 text-sm font-semibold text-white hover:bg-crimson-deep"
                     >
                       Dùng câu này
                     </button>
                     <button
                       type="button"
                       onClick={() => onUseExample(ex, true)}
-                      className="min-h-11 px-2 text-sm font-semibold text-crimson-ink"
+                      className="min-h-11 w-full whitespace-nowrap rounded-lg px-2 text-sm font-semibold text-crimson-ink hover:bg-crimson-tint"
                     >
                       Dịch ngay
                     </button>

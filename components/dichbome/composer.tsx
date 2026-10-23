@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { ArrowRight, Check, ChevronDown, ClipboardPaste, Eraser } from 'lucide-react';
 import {
   PARENT_CONTEXTS,
@@ -45,6 +45,10 @@ type ComposerProps = {
   focusSignal?: number;
 };
 
+/** Thứ tự chip phẳng để roving-tabindex di chuyển bằng phím mũi tên (N-6). */
+const FLAT_ROLES: RelationRole[] = RELATION_GROUPS.flatMap((g) => g.roles);
+const SWIPE_HINT_KEY = 'dichbome_swipe_hint_seen_v1';
+
 export function Composer({
   message,
   onMessageChange,
@@ -60,8 +64,50 @@ export function Composer({
 }: ComposerProps) {
   const [contextOpen, setContextOpen] = useState(false);
   const [pasteHint, setPasteHint] = useState<string | null>(null);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
   const chipRowRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  // Gợi ý vuốt dải chip vai — CHỈ lần dùng đầu tiên (N-5b): hiện cho tới khi
+  // người dùng cuộn ngang dải chip lần đầu, rồi ghi nhớ vĩnh viễn trên thiết bị.
+  useEffect(() => {
+    try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- chủ đích: đọc localStorage sau mount, tránh hydration mismatch (cùng pattern ở app.tsx)
+      if (!window.localStorage.getItem(SWIPE_HINT_KEY)) setShowSwipeHint(true);
+    } catch {
+      // Không đọc được localStorage: không hiện gợi ý (tránh lặp lại gây phiền).
+    }
+  }, []);
+
+  const dismissSwipeHint = () => {
+    if (!showSwipeHint) return;
+    setShowSwipeHint(false);
+    try {
+      window.localStorage.setItem(SWIPE_HINT_KEY, '1');
+    } catch {
+      // Không lưu được thì gợi ý chỉ sống trong phiên này — chấp nhận được.
+    }
+  };
+
+  // Roving-tabindex cho hàng chip vai (N-6, mẫu APG toolbar): chỉ chip đang
+  // chọn là điểm dừng Tab; phím ←/→/Home/End di chuyển FOCUS giữa các chip
+  // (không đổi lựa chọn — chọn vẫn bằng Enter/Space/bấm như cũ, hành vi chọn
+  // vai hiện tại không đổi).
+  const handleChipRowKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (!['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) return;
+    const chips = Array.from(
+      chipRowRef.current?.querySelectorAll<HTMLElement>('[data-role-chip]') ?? [],
+    );
+    const current = chips.indexOf(document.activeElement as HTMLElement);
+    if (current < 0) return;
+    e.preventDefault();
+    let next = current;
+    if (e.key === 'ArrowRight') next = (current + 1) % chips.length;
+    if (e.key === 'ArrowLeft') next = (current - 1 + chips.length) % chips.length;
+    if (e.key === 'Home') next = 0;
+    if (e.key === 'End') next = chips.length - 1;
+    chips[next]?.focus();
+  };
 
   const currentRole = roleName(speaker);
   const placeholder = ROLE_PLACEHOLDERS[speaker] ?? `Ví dụ: câu ${currentRole} vừa nhắn…`;
@@ -112,7 +158,14 @@ export function Composer({
       }}
     >
       <div className="flex items-center justify-between gap-3">
-        <span className="text-sm font-semibold">Ai vừa nhắn?</span>
+        <span className="text-sm font-semibold">
+          Ai vừa nhắn?
+          {showSwipeHint ? (
+            <span className="ml-2 text-xs font-normal text-muted">
+              Vuốt ngang để xem thêm vai →
+            </span>
+          ) : null}
+        </span>
         <span
           className="inline-block w-14 shrink-0 text-right text-xs text-muted"
           aria-live="polite"
@@ -126,6 +179,10 @@ export function Composer({
         className="mt-1 flex items-center gap-2 overflow-x-auto pb-1"
         role="group"
         aria-label="Ai vừa nhắn?"
+        onScroll={(e) => {
+          if (e.currentTarget.scrollLeft > 8) dismissSwipeHint();
+        }}
+        onKeyDown={handleChipRowKeyDown}
       >
         <span className="sr-only">Ai vừa nhắn?</span>
         {RELATION_GROUPS.map((group, groupIdx) => (
@@ -138,6 +195,8 @@ export function Composer({
               <button
                 key={role}
                 type="button"
+                data-role-chip={FLAT_ROLES.indexOf(role)}
+                tabIndex={speaker === role ? 0 : -1}
                 aria-pressed={speaker === role}
                 onClick={() => onSpeakerChange(role)}
                 className={
@@ -169,7 +228,7 @@ export function Composer({
           onInput={autoGrow}
           maxLength={500}
           placeholder={placeholder}
-          className={`mt-2 w-full resize-none rounded-xl border bg-card px-4 py-3 text-base leading-relaxed text-ink outline-none placeholder:text-placeholder focus:border-crimson-ink ${
+          className={`mt-2 w-full resize-none rounded-xl border bg-card px-4 py-3 text-base leading-relaxed text-ink placeholder:text-placeholder focus:border-crimson-ink ${
             error ? 'border-crimson-ink' : 'border-line-strong'
           }`}
         />
