@@ -15,9 +15,9 @@
 Repository: https://github.com/changvn2002/dichbome
 
 <p align="center">
-  <img src="docs/screenshots/dichbome-desktop.png" alt="Giải Mã Gia Đình — main screen" width="900">
+  <img src="docs/screenshots/dichbome-desktop.png" alt="Giải Mã Gia Đình — màn hình đã dịch xong câu “Tùy con, mẹ sao cũng được.”" width="900">
 </p>
-<p align="center"><em>Paste a family message → get the real meaning, tension level and safe replies.</em></p>
+<p align="center"><em>Mẹ nhắn “Tùy con, mẹ sao cũng được.” — app dịch ra ý thật, điều mẹ muốn nghe, mức độ không hài lòng 3/5 và gợi ý sẵn câu trả lời. Ảnh chụp thật từ bản production, không phải mockup.</em></p>
 
 **Tóm tắt (Tiếng Việt):** Dán một câu bố mẹ, con cái, mẹ chồng, nàng dâu, vợ chồng hay sếp
 vừa nhắn — app cho bạn biết câu đó *thật ra nghĩa là gì*, người nhắn *đang muốn gì*, mức độ
@@ -43,13 +43,51 @@ liệu đi đâu.
 
 ## 🖼️ Screenshots
 
-Real screenshots of the production deployment at https://dichbome.vercel.app:
+Tất cả ảnh dưới đây được chụp trực tiếp từ bản production
+[https://dichbome.vercel.app](https://dichbome.vercel.app) khi app đang ở trạng thái
+**đã dịch xong một tin nhắn thật** — đúng những gì người dùng nhìn thấy sau khi bấm
+“Dịch ý”, không phải màn hình trống lúc mới mở app hay ảnh mockup.
 
-| Desktop (1440×900)                                                                 | Mobile (390×844)                                                                |
-| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| ![Desktop](docs/screenshots/dichbome-desktop.png)                                  | ![Mobile](docs/screenshots/dichbome-mobile.png)                                 |
-| Social / link-preview size (1280×640)                                              |                                                                                 |
-| ![Social preview](docs/screenshots/dichbome-social.png)                            |                                                                                 |
+### Kết quả dịch — giá trị cốt lõi của app
+
+![Desktop 1440×900 — kết quả dịch câu “Tùy con, mẹ sao cũng được.”](docs/screenshots/dichbome-desktop.png)
+
+_Trên desktop: bên trái là câu mẹ vừa nhắn và các nhóm quan hệ để chọn người gửi; bên
+phải là kết quả dịch đầy đủ — **Ý thật** (“mẹ đã có sẵn một đáp án trong đầu”), **Điều
+mẹ muốn nghe**, **Mức độ không hài lòng 3/5** (“Giận ngầm — cần hạ nhiệt sớm”) kèm
+**Lưu ý** thực tế, và ngay bên dưới là các câu trả lời gợi ý._
+
+| Mobile (390×844)                                                                 | Social / link-preview (1280×640)                                              |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| ![Mobile — thẻ kết quả dịch trên điện thoại](docs/screenshots/dichbome-mobile.png) | ![Social — bản xem trước khi chia sẻ liên kết](docs/screenshots/dichbome-social.png) |
+| _Trên điện thoại, thẻ kết quả xếp dọc ngay dưới ô nhập: ý thật, điều mẹ muốn nghe và thang đo mức độ đọc rõ trong một màn hình._ | _Khung 1280×640 dùng cho ảnh xem trước khi gửi link app qua Zalo/Facebook — vẫn thấy trọn thẻ kết quả dịch._ |
+
+### Theo từng bước sử dụng
+
+**Bước 1 — Dán tin nhắn và chọn đúng người nhắn.** App có sẵn 16 vai trong 5 nhóm
+quan hệ (Bố mẹ & con, Thông gia, Vợ chồng & người yêu, Anh em & bạn, Công việc) và thư
+viện câu mẫu để thử ngay.
+
+![Bước 1 — dán tin nhắn, chọn vai và hoàn cảnh](docs/screenshots/gallery-01-dan-tin-chon-vai.png)
+
+**Bước 2 — Đọc ý thật và mức độ căng thẳng.** Mỗi kết quả gồm ý thật phía sau câu nói,
+điều người nhắn thật sự muốn nghe, thang đo mức độ không hài lòng 0–5 có nhãn cảnh báo,
+và lưu ý tình huống nếu câu nói tiềm ẩn rủi ro.
+
+![Bước 2 — thẻ kết quả: ý thật, điều muốn nghe, mức độ và lưu ý](docs/screenshots/gallery-02-y-that-va-muc-do.png)
+
+**Bước 3 — Sao chép một câu trả lời êm chuyện.** Ba gợi ý theo ba tông — *Ngoan nhất*,
+*Khéo nhất*, *An toàn nhất* — viết đúng cách xưng hô của mối quan hệ đã chọn, bấm một
+chạm để sao chép rồi gửi lại ngay.
+
+![Bước 3 — ba câu trả lời gợi ý sẵn để sao chép](docs/screenshots/gallery-03-cau-tra-loi-goi-y.png)
+
+**Không chỉ dịch bố mẹ — cả mẹ chồng, nàng dâu, vợ chồng và sếp.** Cùng một thao tác,
+đổi người nhắn là ý nghĩa và câu gợi ý đổi theo đúng nếp của mối quan hệ đó. Ví dụ dưới
+đây: mẹ chồng nhắn “Để đấy mẹ làm cho, con cứ nghỉ đi.” trong hoàn cảnh ở chung — app
+nhận ra đây là quan tâm là chính (mức độ 1/5) nhưng ngồi nghỉ luôn thì mất điểm khéo.
+
+![Ví dụ khác — dịch câu của mẹ chồng trong hoàn cảnh ở chung](docs/screenshots/gallery-04-me-chong-o-chung.png)
 
 ## 🧭 How it works
 
