@@ -225,7 +225,7 @@ export function Composer({
           onInput={autoGrow}
           maxLength={500}
           placeholder={placeholder}
-          className={`mt-2 w-full resize-none rounded-xl border bg-card px-4 py-3 text-base leading-relaxed text-ink placeholder:text-placeholder focus:border-crimson-ink ${
+          className={`mt-2 w-full resize-none rounded-xl border bg-card py-3 pr-24 pl-4 text-base leading-relaxed text-ink placeholder:text-placeholder focus:border-crimson-ink ${
             error ? 'border-crimson-ink' : 'border-line-strong'
           }`}
         />

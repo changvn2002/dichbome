@@ -6,6 +6,30 @@ phiên bản theo [SemVer](https://semver.org/). Mỗi bản phát hành trên
 production tương ứng một git tag `vX.Y.Z` — xem
 `docs/RUNBOOK-ROLLBACK.md` cho bảng ghép đôi tag ↔ deployment.
 
+## [1.3.0] — 2026-10-24 — optimization sprint 2 (Panel #04: N-04-3 + N-04-4)
+
+### Changed
+
+- N-04-3 (độ sâu nội dung engine): câu trả lời gợi ý nay CHỐT bằng
+  hành động cụ thể theo chi tiết đã trích (5 họ đuôi chốt × 3 thái
+  độ, ở cả 2 engine) — ca chuẩn 115 ký tự: chốt 0/3 → 3/3, đuôi hẹn
+  lảng «sẽ nói rõ thêm» 8/12 → 0/12, mẫu trần 4/12 → 0/12.
+- Biến thể theo vai (`roleVariants`) cho 2 entry generic: vai ngoài
+  gia đình (Đồng nghiệp / Sếp / Người yêu / Bạn thân) hết rò văn
+  phong gia đình — rò server 7/9 → 0, client 1/9 → 0; hint ngữ cảnh
+  phía client chỉ còn nối cho vai bố/mẹ.
+- Corpus vàng 89 ca phụ huynh giữ byte-identical (differ 0/53 +
+  0/36, angerLevel 0 dòng diff); parity client↔server 9/9.
+
+### Fixed
+
+- N-04-4: placeholder ô nhập ở khổ 390px bị nút «Dán» ăn 16,9px ở
+  đuôi — nay gãy sạch, quét 48/48 ô (16 placeholder × 3 khung
+  390/360/320) giao 0, khoảng cách tối thiểu ≥ 8px.
+- KI-C1 (Người yêu + «Không sao đâu» dính marker gia đình): PASS
+  thật, bỏ cờ todo thành khoá hồi quy. Suite 95 = 93 pass / 0 fail
+  / 2 todo (còn KI-PERF-1/2 có chủ đích).
+
 ## [1.2.0] — 2026-10-24 — fix wave 4 (Panel #03 §10) + hotfix SEC-10
 
 ### Added

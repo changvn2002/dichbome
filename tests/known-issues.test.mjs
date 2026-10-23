@@ -27,17 +27,15 @@ import {
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-test(
-  'KI-C1: vai người yêu không được nhận output văn phong bố mẹ (rule generic rò)',
-  { todo: 'Backlog C1 — chặn rò rule generic sang lover; cần corpus vàng + mirror 2 engine' },
-  () => {
-    const r = translateDichbome({ message: 'Không sao đâu', speaker: 'lover', context: 'khac' });
-    const all = [r.meaning, r.realWant, ...r.replies.map((x) => x.text)].join(' ');
-    for (const marker of ['con lo', 'Con lớn rồi', 'để con gọi về']) {
-      assert.ok(!all.includes(marker), `output lover chứa dấu vết văn phong bố mẹ: "${marker}"`);
-    }
-  },
-);
+// ĐÃ SỬA ở Sprint 2 (S2 — biến thể theo vai gắn trên entry generic, 2026-10-24):
+// bỏ cờ todo — test thành khoá hồi quy.
+test('KI-C1: vai người yêu không được nhận output văn phong bố mẹ (rule generic rò)', () => {
+  const r = translateDichbome({ message: 'Không sao đâu', speaker: 'lover', context: 'khac' });
+  const all = [r.meaning, r.realWant, ...r.replies.map((x) => x.text)].join(' ');
+  for (const marker of ['con lo', 'Con lớn rồi', 'để con gọi về']) {
+    assert.ok(!all.includes(marker), `output lover chứa dấu vết văn phong bố mẹ: "${marker}"`);
+  }
+});
 
 // ĐÃ SỬA ở fix wave 3 (CQ-14, 2026-10-23): bỏ cờ todo — test thành khoá hồi quy.
 test('KI-PARITY-1: normalizeVi hai engine cho cùng một chuỗi', () => {

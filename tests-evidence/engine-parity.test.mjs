@@ -120,6 +120,32 @@ test('engine validation: translateParentMessage rejects empty message like the l
   assert.throws(() => translateParentMessage({ message: '   ', speaker: 'Mẹ', context: 'Khác' }));
 });
 
+test('parity: role variants (Sprint 2 S2) — non-family generic entries give identical meaning/realWant/replies', () => {
+  // Biến thể theo vai của 2 entry generic (tuy-con, khong-sao/khong-sao-dau)
+  // dùng CÙNG văn bản ở 2 engine (chỉ khác placeholder {p}↔{x}) — ở hoàn
+  // cảnh Khác (không CONTEXT_HINTS phía client) output phải trùng toàn phần.
+  const cases = [
+    { message: 'Không sao đâu', speaker: 'Người yêu' },
+    { message: 'Không sao đâu', speaker: 'Đồng nghiệp' },
+    { message: 'Tùy con, mẹ sao cũng được.', speaker: 'Đồng nghiệp' },
+  ];
+  for (const c of cases) {
+    const s = translateDichbome({
+      message: c.message,
+      speaker: SPEAKER[c.speaker],
+      context: 'khac',
+    });
+    const cl = translateParentMessage({ message: c.message, speaker: c.speaker, context: 'Khác' });
+    assert.equal(cl.meaning, s.meaning, `meaning lệch cho "${c.message}" × ${c.speaker}`);
+    assert.equal(cl.realWant, s.realWant, `realWant lệch cho "${c.message}" × ${c.speaker}`);
+    assert.deepEqual(
+      cl.replies.map((r) => r.text),
+      s.replies.map((r) => r.text),
+      `replies lệch cho "${c.message}" × ${c.speaker}`,
+    );
+  }
+});
+
 test('canonicalSpeaker folds mom/dad/parents aliases', () => {
   assert.equal(canonicalSpeaker('mom'), 'me');
   assert.equal(canonicalSpeaker('dad'), 'bo');

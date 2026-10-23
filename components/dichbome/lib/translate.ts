@@ -248,6 +248,16 @@ type Rule = {
   wordKeys?: string[];
   /** Nếu khai báo: rule chỉ áp dụng khi người nhắn thuộc các vai này. Không khai = mọi vai. */
   roles?: RelationRole[];
+  /**
+   * Thân thay thế theo vai (Sprint 2, S2 — mirror cơ chế roleVariants phía
+   * server): chỉ dùng khi rule là generic (không roles), vai thuộc nhóm
+   * ngoài gia đình (Người yêu/Đồng nghiệp/Sếp/Bạn thân) và rule có biến thể
+   * cho vai đó. Biến thể chỉ thay TEXT của meaning/realWant/replies — nhãn
+   * replies giữ nguyên của rule gốc theo từng index, anger giữ nguyên.
+   */
+  roleVariants?: Partial<
+    Record<RelationRole, { meaning: string; realWant: string; replies: [string, string, string] }>
+  >;
   meaning: string;
   realWant: string;
   angerLevel: number;
@@ -815,6 +825,54 @@ const RULES: Rule[] = [
       },
     ],
     warning: 'Đừng trả lời "vậy thôi kệ ạ" — mức giận sẽ tăng vọt ngay lập tức.',
+    // Sprint 2 (S2): thân riêng theo vai ngoài gia đình — CÙNG văn bản với
+    // roleVariants của entry tuy-con phía server, chỉ khác {x} thay {p}.
+    roleVariants: {
+      'Đồng nghiệp': {
+        meaning:
+          "'Tùy bạn' từ đồng nghiệp thường không phải thờ ơ: đồng nghiệp này đã có sẵn một phương án nghiêng về hơn, nhưng muốn nghe ý bạn trước để tránh quyết một mình rồi lệch ý cả nhóm. Đây cũng là cách giữ hoà khí — nhường quyền chốt cho bạn nhưng vẫn chờ bạn hỏi lại một câu.",
+        realWant:
+          'Muốn bạn góp ý thẳng vào phương án, hoặc ít nhất hỏi lại một câu cho rõ tiêu chí trước khi chốt — điều đồng nghiệp này ngại nhất là quyết xong mới phát hiện lệch ý nhau rồi phải làm lại.',
+        replies: [
+          '{S} cũng đang phân vân thật. {X} thấy phương án nào hợp hơn thì góp ý cho {s} một tiếng, {s} theo ý {x} cũng được.',
+          'Cảm ơn {x}. {S} đang nghiêng về một cách rồi, {s} nói {x} nghe thử nhé — thấy chỗ nào chưa ổn {x} chỉ {s} luôn.',
+          'Chuyện này {s} chưa chốt vội đâu. {S} xem lại một lượt rồi chiều nay nhắn lại {x} một câu chốt hẳn, khỏi để {x} phải chờ lâu.',
+        ],
+      },
+      'Người yêu': {
+        meaning:
+          "'Tùy mình' từ người yêu hiếm khi là không có ý kiến: người ấy thường đã nghiêng về một đáp án rồi, nhưng muốn được hỏi han và cùng bàn chứ không muốn quyết hộ trong im lặng. Nhường quyền chốt ở đây là một phép thử nhẹ — xem bạn có để tâm tới ý của người ấy không.",
+        realWant:
+          'Muốn bạn hỏi thêm một câu và rủ người ấy cùng chọn, để quyết định là của hai đứa chứ không phải một người gánh hết. Được lắng nghe và được rủ rê mới là phần người ấy cần nhất.',
+        replies: [
+          '{S} cũng đang phân vân nè. {X} thấy cách nào hợp hơn thì nói {s} nghe, {x} chọn giúp {s} một cái đi.',
+          'Cảm ơn {x} đã để {s} quyết. {S} đang tính thế này, {x} nghe thử xem có ổn không, thiếu gì {x} bảo {s} nhé.',
+          '{S} chưa quyết vội đâu. Tối nay {s} gọi cho {x}, hai đứa mình bàn với nhau một lúc rồi {s} chốt luôn, nghe {x}.',
+        ],
+      },
+      Sếp: {
+        meaning:
+          "'Tùy em' từ sếp là giao quyền kèm trách nhiệm: sếp của bạn muốn xem bạn tự cân nhắc và dám chốt, nhưng vẫn chờ một phương án trình lên để duyệt chứ không phải quyết xong rồi mới báo. Nói là tuỳ, nhưng tiêu chí của sếp vẫn là thước đo cuối cùng.",
+        realWant:
+          'Muốn bạn chủ động đề xuất một phương án có lý do rõ ràng, kèm mốc hoàn thành cụ thể để sếp duyệt nhanh — điều sếp cần là sự yên tâm rằng việc đã có người nắm chắc, không phải thêm một câu hỏi ngược.',
+        replies: [
+          'Dạ, {s} cũng đang phân vân ạ. {X} thấy phương án nào hợp hơn thì cho {s} xin ý kiến, {s} theo chỉ đạo của {x}.',
+          'Dạ cảm ơn {x} đã tin tưởng ạ. {S} đang nghiêng về một phương án, {s} trình {x} nghe thử trong hôm nay — chỗ nào chưa ổn {x} chỉ {s} sửa ngay.',
+          'Dạ chuyện này {s} chưa chốt vội ạ. {S} rà lại một lượt rồi báo lại {x} trước cuối giờ hôm nay một câu chốt hẳn.',
+        ],
+      },
+      'Bạn thân': {
+        meaning:
+          "'Tùy cậu' từ bạn thân thường là tin tưởng thật, nhưng cũng có khi người bạn này đã có ý riêng mà lười tranh luận. Bạn bè nói tuỳ nhau là nhường quyền chốt, kèm kỳ vọng bạn hỏi lại một câu cho có qua có lại chứ không quyết trong im lặng.",
+        realWant:
+          'Muốn bạn hỏi lại một câu cho vui và chốt sao cũng được, miễn là chốt xong báo lại một tiếng — điều bạn của bạn cần là cảm giác hai đứa vẫn tính cùng nhau, không ai bị bỏ ngoài cuộc.',
+        replies: [
+          '{S} cũng đang phân vân đây. {X} thấy cách nào hợp hơn thì phán giúp {s} một câu đi.',
+          'Cảm ơn {x} đã nhường {s} quyết. {S} đang tính thế này, {x} nghe thử nhé — thấy chỗ nào chưa ổn thì {x} nói thẳng luôn.',
+          'Chuyện này {s} chưa chốt vội đâu. Tối {s} gọi buôn với {x} một lúc, hai đứa ngồi lại tính với nhau rồi {s} chốt.',
+        ],
+      },
+    },
   },
   {
     id: 'khong-sao-dau',
@@ -838,6 +896,54 @@ const RULES: Rule[] = [
         text: 'Con biết {x} hay giấu cho con yên tâm. Có gì {x} cứ nói thật với con, con lớn rồi mà ạ.',
       },
     ],
+    // Sprint 2 (S2): thân riêng theo vai ngoài gia đình — CÙNG văn bản với
+    // roleVariants của entry khong-sao phía server, chỉ khác {x} thay {p}.
+    roleVariants: {
+      'Đồng nghiệp': {
+        meaning:
+          '“Không sao đâu” ở đây nhiều khả năng là câu giữ kẽ. Đồng nghiệp này nói vậy để bạn khỏi phải dừng việc của mình lại, và cũng vì chưa muốn thừa nhận phần việc của họ đang quá tải hoặc đang vướng ở đâu đó. Ý thật thường không nằm ở chữ “không sao” mà ở cách họ nói: trả lời nhanh, né chi tiết, chuyển chủ đề sang việc của bạn. Càng trả lời gọn bao nhiêu, khả năng họ đang tự gồng bấy nhiêu — đây không hẳn là giận bạn, mà là chưa sẵn sàng mở lời nhờ hỗ trợ trong quan hệ công việc.',
+        realWant:
+          'Muốn nghe một lời mở cửa cụ thể thay vì một câu hỏi chung chung: bạn sẵn sàng nghe, và sẵn sàng san sẻ đúng phần việc nào nếu họ cần. “Có gì cần mình hỗ trợ phần nào thì cứ nói” chạm tới họ hơn “có sao không” rất nhiều, vì nó cho họ một cách nhận hỗ trợ mà không mất mặt.',
+        replies: [
+          'Thật không {x}? Có chuyện gì {x} cứ kể {s} nghe, {s} nghe hết — cần thì {s} hỗ trợ trong phần việc của {s}.',
+          '{X} cứ nói thật với {s} nhé. Chuyện liên quan tới việc chung thì {s} càng cần biết đúng để còn xử lý cùng {x}.',
+          'Vậy để {s} gọi cho {x} nói chuyện một lúc nhé. Nghe {x} nói rõ đầu đuôi {s} mới yên tâm là không còn gì vướng.',
+        ],
+      },
+      'Người yêu': {
+        meaning:
+          '“Không sao đâu” từ người yêu thường là có sao mà không muốn nói thẳng: người ấy sợ bạn lo, sợ làm nặng thêm một ngày đã mệt, nhưng trong lòng vẫn chờ được hỏi tới thêm một câu. Nói không sao mà trả lời nhanh, né ánh mắt hay đổi chủ đề thì phần giấu mới là phần cần được nghe.',
+        realWant:
+          'Muốn nghe bạn hỏi lại một câu thật lòng và ở lại nghe cho hết, thay vì tin ngay hai chữ “không sao” rồi thôi. Người ấy cần cảm giác được quan tâm đúng lúc, và được quyền yếu lòng một chút mà không phải xin.',
+        replies: [
+          'Thật không {x}? Có gì {x} cứ kể {s} nghe đi, {s} ở đây nghe {x} hết, không để {x} giữ trong lòng một mình đâu.',
+          '{X} cứ nói thật với {s} nhé. Chuyện gì {s} cũng nghe được — miễn là {x} đừng giấu {s} rồi tự chịu một mình.',
+          'Vậy tối nay {s} gọi cho {x} một lúc nhé. Nghe giọng {x} {s} mới yên tâm được.',
+        ],
+      },
+      Sếp: {
+        meaning:
+          '“Không sao đâu” từ sếp thường là cách giữ uy: sếp của bạn quen quyết một mình, không muốn lộ phần đang vướng trước cấp dưới, và càng không muốn team lo theo. Câu nói càng gọn, càng có khả năng phía sau là một việc đang kẹt mà sếp muốn tự xử lý trước khi mở lời.',
+        realWant:
+          'Muốn nghe một lời mở cửa kín đáo và cụ thể: bạn sẵn sàng hỗ trợ đúng phần việc nào, báo lại vào mốc nào — để sếp nhận hỗ trợ mà không mất mặt và không phải giải thích dài dòng trước team.',
+        replies: [
+          'Dạ thật không ạ? Có phần nào đang vướng, {x} cứ nói {s} nghe — {s} hỗ trợ được phần nào {s} làm ngay.',
+          'Dạ {x} cứ nói thật với {s} ạ. Việc chung mà {s} biết đúng tình hình thì mới xử lý kịp cùng {x} được.',
+          'Dạ vậy để {s} báo lại {x} trong hôm nay sau khi rà lại phần việc liên quan ạ. Nghe {x} nói rõ đầu đuôi {s} mới yên tâm là không còn gì vướng.',
+        ],
+      },
+      'Bạn thân': {
+        meaning:
+          '“Không sao đâu” từ bạn thân hay là sĩ diện bạn bè: người bạn này sợ bị thương hại, quen tự xử lý mọi chuyện một mình, và chỉ mở lời khi thấy bạn hỏi thật lòng chứ không hỏi xã giao. Càng cười trừ cho qua, càng có khả năng đang gồng.',
+        realWant:
+          'Muốn nghe một câu hỏi thẳng kiểu bạn bè và một lời hứa có mặt khi cần — không thương hại, không giảng giải. Bạn của bạn chỉ cần biết là mở lời ra sẽ có người nghe hết, không bị phán xét.',
+        replies: [
+          'Thật không {x}? Có chuyện gì {x} cứ kể {s} nghe, {s} nghe hết — bạn bè mà giấu nhau là {s} giận thật đấy.',
+          '{X} cứ nói thật với {s} nhé. Chuyện gì {s} cũng nghe được — đừng giấu rồi tự chịu một mình, nghe chưa.',
+          'Vậy tối {s} gọi buôn với {x} một lúc nhé. Nghe giọng {x} {s} mới yên tâm là không còn gì vướng.',
+        ],
+      },
+    },
   },
   {
     id: 'khong-buon-dau',
@@ -1550,6 +1656,259 @@ function extractSalientDetails(
   };
 }
 
+/**
+ * Sprint 2 (N-04-3, S1) — ĐUÔI CHỐT phía client: mirror cùng logic với
+ * closingTail phía server (lib/server/engine.ts), chỉ khác placeholder
+ * {x} thay {p}, vai bố/mẹ là nhãn 'Mẹ'/'Bố'/'Cả hai' và hoàn cảnh
+ * 'Về quê'. Thiết kế: Lens 1 §2 — 5 họ khung (A về nhà/ăn cơm · B sự
+ * kiện/giờ · C vật dụng/nhắc nhở · D tiền bạc — slot Ngoan chỉ nhận phần
+ * tăng thêm · E mặc định) × 3 slot (0 Ngoan chốt thuận · 1 Khéo chốt
+ * ngược + bù đắp · 2 An toàn chốt mốc); chọn họ theo từng chi tiết:
+ * hoàn cảnh 'Về quê' → A, rồi từ khoá ưu tiên D > C > B > A, mặc định E;
+ * vai ngoài gia đình và mọi vai còn lại luôn E; từ khoá bị phủ định
+ * trong ~4 từ phía trước thì họ đó bị loại; {time} chỉ lấy cụm giờ có
+ * sẵn trong chi tiết/cả tin; chi tiết > 60 ký tự dùng bản rút gọn.
+ */
+type ClosingFamily = 'A' | 'B' | 'C' | 'D' | 'E';
+type ClosingSlot = 0 | 1 | 2;
+
+const CLOSING_FAMILY_SPEAKERS: RelationRole[] = ['Mẹ', 'Bố', 'Cả hai'];
+const CLOSING_TIME_PATTERN =
+  /(cuối tuần này|chủ nhật này|thứ [a-zà-ỹ]+ này|tuần sau|tuần này|cuối tháng này|tháng này|chiều nay|tối nay|sáng nay|ngày mai|sáng mai|chiều mai|tối mai)/i;
+const CLOSING_KEYWORDS: Record<Exclude<ClosingFamily, 'E'>, string[]> = {
+  D: ['hoa don', 'tien dien', 'tien nuoc', 'dong tien', 'tang gia', 'tien', 'trieu', 'nghin'],
+  C: ['ao mua', 'giay to', 'chia khoa', 'troi mua', 'sap mua', 'nho mang', 'mang', 'thuoc'],
+  B: ['di kham', 'kham benh', 'phau thuat', 'mo mat', 'kham', 'mo', 'don', 'dua di', 'lich hen', 'hen'],
+  A: ['ve que', 've nha', 'an com', 'qua nha', 'ghe nha', 'bua com', 've an'],
+};
+const CLOSING_NEGATIONS = [
+  'dung co',
+  'khong phai',
+  'khong duoc',
+  'chang phai',
+  'dung',
+  'khong',
+  'chang',
+];
+
+function closingKeywordIndex(norm: string, keyword: string): number {
+  if (keyword.includes(' ')) return norm.indexOf(keyword);
+  const idx = ` ${norm} `.indexOf(` ${keyword} `);
+  return idx < 0 ? -1 : idx;
+}
+
+function closingNegated(norm: string, keywordIndex: number): boolean {
+  const before = norm
+    .slice(0, Math.max(0, keywordIndex))
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(-4)
+    .join(' ');
+  return CLOSING_NEGATIONS.some((n) => ` ${before} `.includes(` ${n} `));
+}
+
+function pickClosingFamily(
+  detail: string,
+  speaker: RelationRole,
+  context: ParentContext,
+): ClosingFamily {
+  if (!CLOSING_FAMILY_SPEAKERS.includes(speaker)) return 'E';
+  const norm = normalizeVi(detail);
+  const firstIndex = (fam: Exclude<ClosingFamily, 'E'>): number => {
+    let best = -1;
+    for (const kw of CLOSING_KEYWORDS[fam]) {
+      const i = closingKeywordIndex(norm, kw);
+      if (i >= 0 && (best < 0 || i < best)) best = i;
+    }
+    return best;
+  };
+  const idx: Record<Exclude<ClosingFamily, 'E'>, number> = {
+    A: firstIndex('A'),
+    B: firstIndex('B'),
+    C: firstIndex('C'),
+    D: firstIndex('D'),
+  };
+  const blocked = (fam: Exclude<ClosingFamily, 'E'>): boolean =>
+    idx[fam] >= 0 && closingNegated(norm, idx[fam]);
+  if (context === 'Về quê' && !blocked('A')) return 'A';
+  for (const fam of ['D', 'C', 'B', 'A'] as const) {
+    if (idx[fam] >= 0 && !blocked(fam)) return fam;
+  }
+  return 'E';
+}
+
+/** Chủ thể người có thể là bệnh nhân trong chi tiết (Phụ lục R, R3). */
+const CLOSING_EVENT_SUBJECTS = [
+  'bố',
+  'mẹ',
+  'ông',
+  'bà',
+  'anh',
+  'chị',
+  'em',
+  'con',
+  'cháu',
+  'vợ',
+  'chồng',
+  'bác',
+  'cô',
+  'dì',
+  'chú',
+];
+
+/**
+ * Trích cụm «<người> mổ / phẫu thuật» từ chính chi tiết (vd «bố mổ» →
+ * «bố mổ»). Không trích được chủ thể có tên người rõ ràng thì trả null để
+ * khung dùng dạng trung tính — TUYỆT ĐỐI không mặc định là {x}.
+ */
+function surgerySubjectPhrase(detail: string): string | null {
+  const tokens = detail
+    .toLowerCase()
+    .split(/\s+/)
+    .map((t) => t.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''))
+    .filter(Boolean);
+  for (let i = 0; i < tokens.length; i += 1) {
+    const isMo = tokens[i] === 'mổ';
+    const isPhauThuat = tokens[i] === 'phẫu' && tokens[i + 1] === 'thuật';
+    if (!isMo && !isPhauThuat) continue;
+    const verb = isMo ? 'mổ' : 'phẫu thuật';
+    const prev = tokens[i - 1];
+    if (!prev) return null;
+    if (
+      (prev === 'ngoại' || prev === 'nội') &&
+      i >= 2 &&
+      (tokens[i - 2] === 'ông' || tokens[i - 2] === 'bà')
+    ) {
+      return `${tokens[i - 2]} ${prev} ${verb}`;
+    }
+    if (CLOSING_EVENT_SUBJECTS.includes(prev)) return `${prev} ${verb}`;
+    return null;
+  }
+  return null;
+}
+
+function closingAction(
+  detail: string,
+  speaker: RelationRole,
+): { full: string; stem: string } {
+  const norm = normalizeVi(detail);
+  if (closingKeywordIndex(norm, 'kham') >= 0) {
+    // R3: «đưa {x} đi khám» CHỈ khi chi tiết nêu chính người được gọi là
+    // người đi khám (vd «mẹ đi khám» khi {x} là mẹ); chủ thể là người thứ
+    // ba (vd «bố đi khám» do mẹ gửi) → dạng có mặt trung tính.
+    const pNorm = normalizeVi((ADDRESSES[speaker] ?? { lower: 'mẹ' }).lower);
+    if (` ${norm} `.includes(` ${pNorm} di kham `)) {
+      return { full: '{s} đưa {x} đi khám', stem: 'đưa {x} đi khám' };
+    }
+    return { full: '{s} có mặt ở buổi khám', stem: 'có mặt ở buổi khám' };
+  }
+  if (closingKeywordIndex(norm, 'mo') >= 0 || norm.includes('phau thuat')) {
+    // R3: chủ thể mổ lấy từ chính chi tiết khi chi tiết nêu tên người mổ;
+    // không trích được thì dùng dạng trung tính «đúng ngày mổ».
+    const subjectPhrase = surgerySubjectPhrase(detail);
+    if (subjectPhrase) {
+      return {
+        full: `{s} có mặt ở bệnh viện hôm ${subjectPhrase}`,
+        stem: 'có mặt ở bệnh viện',
+      };
+    }
+    return { full: '{s} có mặt ở bệnh viện đúng ngày mổ', stem: 'có mặt ở bệnh viện' };
+  }
+  if (closingKeywordIndex(norm, 'don') >= 0) {
+    return { full: '{s} đón đúng giờ đã hẹn', stem: 'đón đúng giờ' };
+  }
+  return { full: '{s} có mặt đúng giờ đã hẹn', stem: 'có mặt đúng giờ' };
+}
+
+/** Mệnh đề chốt hoàn chỉnh (đã gồm tiền tố trích chi tiết, chưa qua fill). */
+function closingTailTemplate(
+  detail: string,
+  slot: ClosingSlot,
+  speaker: RelationRole,
+  context: ParentContext,
+  raw: string,
+): string {
+  const family = pickClosingFamily(detail, speaker, context);
+  const timeMatch = detail.match(CLOSING_TIME_PATTERN) ?? raw.match(CLOSING_TIME_PATTERN);
+  const time = timeMatch ? `${timeMatch[1]} ` : '';
+  const short = detail.length > 60;
+  let clause: string;
+  switch (family) {
+    case 'A':
+      if (slot === 0)
+        clause = short
+          ? `{s} chốt luôn: ${time}{s} về ăn cơm với {x}.`
+          : `{s} chốt luôn: ${time}{s} về ăn cơm với {x}, việc của {s}, {s} tự xếp lại được, {x} đừng ăn một mình.`;
+      else if (slot === 1)
+        clause = short
+          ? `{s} nói thật: ${time}{s} không về được vì kẹt việc, nhưng {s} sẽ gọi cho {x} một lúc.`
+          : `{s} nói thật: ${time}{s} không về được vì kẹt việc, nhưng {s} sẽ gọi cho {x} một lúc, và tuần sau {s} về bù với {x} một bữa.`;
+      else
+        clause = short
+          ? `{s} chưa dám hứa là về được hay không, nhưng {s} hứa một điều chắc: tối nay {s} xem lại lịch rồi nhắn chốt hẳn với {x} trước 9 giờ.`
+          : `{s} chưa dám hứa là về được hay không, nhưng {s} hứa một điều chắc: tối nay {s} xem lại lịch rồi nhắn chốt hẳn với {x} trước 9 giờ, {x} không phải đoán nữa.`;
+      break;
+    case 'B': {
+      const action = closingAction(detail, speaker);
+      if (slot === 0)
+        clause = short
+          ? `{s} chốt luôn: ${time}${action.full}, {s} đã ghi vào lịch rồi.`
+          : `{s} chốt luôn: ${time}${action.full}, {s} đã ghi vào lịch rồi, {x} không phải lo phần đó.`;
+      else if (slot === 1)
+        clause = short
+          ? `{s} nói thật: buổi đó {s} kẹt giờ làm, chưa ${action.stem} được; {s} báo lại {x} ngay tối nay chứ không để tới nơi mới hay.`
+          : `{s} nói thật: buổi đó {s} kẹt giờ làm, chưa ${action.stem} được; {s} sẽ tìm cách sắp xếp người thay {s}, sắp xếp không được thì {s} báo lại {x} ngay tối nay chứ không để tới nơi mới hay.`;
+      else
+        clause = short
+          ? `{s} chưa hứa chắc giờ giấc được, nhưng tối nay {s} nhắn chốt lại với {x}.`
+          : `{s} chưa hứa chắc giờ giấc được, nhưng tối nay {s} nhắn chốt lại với {x}; {x} cho {s} biết thêm giờ và nơi chốn cụ thể để {s} xếp lịch cho đúng.`;
+      break;
+    }
+    case 'C':
+      if (slot === 0)
+        clause = short
+          ? `{s} nghe lời {x}: {s} làm ngay bây giờ, ra khỏi nhà là có sẵn.`
+          : `{s} nghe lời {x}: {s} làm ngay bây giờ, ra khỏi nhà là có sẵn, {x} khỏi phải nhắc lại.`;
+      else if (slot === 1)
+        clause = short
+          ? `phần đó {s} lo được rồi: {s} có sẵn trên xe.`
+          : `phần đó {s} lo được rồi: {s} có sẵn trên xe; gặp mưa to thì {s} tấp vào chỗ có mái che, đợi ngớt mới đi tiếp.`;
+      else
+        clause = short
+          ? `{s} chưa nhớ rõ để ở đâu, {s} kiểm tra ngay trước khi ra khỏi nhà.`
+          : `{s} chưa nhớ rõ để ở đâu, {s} kiểm tra ngay trước khi ra khỏi nhà; không thấy thì {s} ở lại đợi ngớt chứ không đội mưa đi.`;
+      break;
+    case 'D':
+      if (slot === 0)
+        clause = short
+          ? `{s} chốt luôn: khoản tăng thêm tháng này để {s} lo cho {x}.`
+          : `{s} chốt luôn: khoản tăng thêm tháng này để {s} lo cho {x}, {x} không phải lo phần tăng thêm đó.`;
+      else if (slot === 1)
+        clause = short
+          ? `{s} nói thật: tháng này {s} cũng đang kẹt, {s} lo một nửa với {x} nhé.`
+          : `{s} nói thật: tháng này {s} cũng đang kẹt, {s} lo một nửa với {x} nhé; {x} gửi {s} số tiền trên hoá đơn, tối nay {s} chuyển phần của {s} luôn.`;
+      else
+        clause = short
+          ? `{s} chưa hứa lo được bao nhiêu khi chưa thấy hoá đơn; tối nay {s} xem xong nhắn lại chốt hẳn phần {s} lo được.`
+          : `{s} chưa hứa lo được bao nhiêu khi chưa thấy hoá đơn; {x} chụp hoá đơn gửi {s}, tối nay {s} xem xong nhắn lại chốt hẳn phần {s} lo được.`;
+      break;
+    default:
+      if (slot === 0)
+        clause = short
+          ? `{s} nhận luôn chuyện này: {s} lo trong hôm nay.`
+          : `{s} nhận luôn chuyện này: {s} lo trong hôm nay và nhắn lại cho {x} khi xong.`;
+      else if (slot === 1)
+        clause = short
+          ? `{s} nói thật là {s} chưa theo ngay được như {x} dặn.`
+          : `{s} nói thật là {s} chưa theo ngay được như {x} dặn; {s} xin làm vào ngày mai, xong {s} báo lại {x} liền.`;
+      else
+        clause = short
+          ? `{s} chưa chốt vội ở đây; tối nay {s} nhắn lại {x} một câu chốt hẳn.`
+          : `{s} chưa chốt vội ở đây; tối nay {s} nhắn lại {x} một câu chốt hẳn, và {s} chỉ cần {x} nói thêm một ý: {x} muốn {s} ưu tiên phần nào trước.`;
+  }
+  return ` Riêng chuyện “${detail}”, ${clause}`;
+}
+
 export function translateParentMessage(input: TranslateInput): TranslateResult {
   const message = (input?.message ?? '').trim();
   // Validation ở tầng engine (KI-VAL-2, fix wave 3): engine tự chặn message
@@ -1573,15 +1932,37 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
       .replace(/\{x\}/g, addr.lower)
       .replace(/\{S\}/g, addr.selfUpper)
       .replace(/\{s\}/g, addr.selfLower);
-  const hint = CONTEXT_HINTS[context];
+  // Sprint 2 (Phụ lục R, R1): CONTEXT_HINTS là văn khung bố mẹ–con — chỉ nối
+  // vào realWant khi người nhắn thuộc vai bố/mẹ (Mẹ/Bố/Cả hai, đúng tập
+  // CLOSING_FAMILY_SPEAKERS); mọi vai khác nhận hint này đều là rò khung.
+  const hint = CLOSING_FAMILY_SPEAKERS.includes(speaker) ? CONTEXT_HINTS[context] : undefined;
+
+  // Sprint 2 (S2): biến thể thân theo vai — chỉ khi rule là generic (không
+  // roles), vai ngoài gia đình và rule có biến thể cho vai đó (biến thể chỉ
+  // khai cho Người yêu/Đồng nghiệp/Sếp/Bạn thân nên tra theo speaker là đủ
+  // điều kiện vai). Biến thể chỉ thay TEXT replies, giữ nhãn của rule gốc
+  // theo từng index; meaning/realWant thay cả câu; anger/warning giữ nguyên.
+  const roleVariant =
+    matchedRule && !matchedRule.roles ? matchedRule.roleVariants?.[speaker] : undefined;
+  const effectiveRule: Rule = roleVariant
+    ? {
+        ...rule,
+        meaning: roleVariant.meaning,
+        realWant: roleVariant.realWant,
+        replies: rule.replies.map((r, i) => ({
+          label: r.label,
+          text: roleVariant.replies[i],
+        })) as Rule['replies'],
+      }
+    : rule;
 
   const result: TranslateResult = {
-    meaning: fill(rule.meaning),
-    realWant: fill(rule.realWant) + (hint ? fill(hint) : ''),
-    angerLevel: rule.angerLevel,
-    dangerLabel: dangerLabelFor(rule.angerLevel),
-    replies: rule.replies.map((r) => ({ label: r.label, text: fill(r.text) })),
-    ...(rule.warning ? { warning: fill(rule.warning) } : {}),
+    meaning: fill(effectiveRule.meaning),
+    realWant: fill(effectiveRule.realWant) + (hint ? fill(hint) : ''),
+    angerLevel: effectiveRule.angerLevel,
+    dangerLabel: dangerLabelFor(effectiveRule.angerLevel),
+    replies: effectiveRule.replies.map((r) => ({ label: r.label, text: fill(r.text) })),
+    ...(effectiveRule.warning ? { warning: fill(effectiveRule.warning) } : {}),
   };
 
   // M-2 (Panel #02, D-3): độ sâu cho tin ở đường MẪU CHUNG phía client —
@@ -1609,11 +1990,15 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
       } else {
         result.realWant += ` Khi đáp, nhắc thẳng tới chi tiết “${detail}” và chốt một hướng cụ thể, thay vì trả lời chung chung.`;
       }
+      // Sprint 2 (S1): đuôi CHỐT theo từng chi tiết (closingTailTemplate)
+      // thay đuôi hẹn lảng cũ ở cả 3 slot — replies[0] theo detail,
+      // replies[1] theo detail2 (chỉ khi có detail2), replies[2] theo
+      // detail (nối kể cả khi không có detail2; áp cả đường fallback ≥80).
       result.replies[0] = {
         ...result.replies[0],
         text:
           result.replies[0].text +
-          fill(` Riêng chuyện “${detail}”, {s} sẽ nói rõ thêm với {x} cho chắc.`),
+          fill(closingTailTemplate(detail, 0, speaker, context, message)),
       };
       if (detail2) {
         result.meaning += ` Tin còn một vế riêng nữa: “${detail2}”. Mức căng thẳng chấm theo vế chính của câu — vế riêng là chi tiết cá nhân, app nhắc lại để bạn đáp cho trúng chứ không tính vào mức.`;
@@ -1621,9 +2006,15 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
           ...result.replies[1],
           text:
             result.replies[1].text +
-            fill(` Riêng chuyện “${detail2}”, {s} sẽ nói rõ thêm với {x} cho chắc.`),
+            fill(closingTailTemplate(detail2, 1, speaker, context, message)),
         };
       }
+      result.replies[2] = {
+        ...result.replies[2],
+        text:
+          result.replies[2].text +
+          fill(closingTailTemplate(detail, 2, speaker, context, message)),
+      };
     } else if (message.length >= GENERIC_LIMIT_MIN_MESSAGE) {
       result.meaning +=
         context !== 'Khác'
