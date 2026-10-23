@@ -36,7 +36,33 @@ liệu đi đâu.
 - **No account needed, large touch targets** — readable type and ≥44px buttons, designed so older family members can use it too.
 - **Two run modes** — `http` (default: the UI calls the Next.js route handlers built into this repo) or fully offline in the browser, where the same rule-based engine runs locally with zero backend. If the HTTP call fails, the UI automatically falls back to the offline engine and tells the user.
 
-> 📸 Screenshot pack sẽ được chụp lại trên bản redesign sau khi deploy.
+## 📸 Screenshots
+
+Ảnh chụp trực tiếp từ bản live https://dichbome.vercel.app (redesign «Sân Khấu Hội Thoại») — mọi ảnh đều là app đang chạy thật với kết quả giải mã thật, không phải mockup.
+
+![Sân khấu hội thoại trên mobile: bong bóng câu gốc và phiếu giải mã có nhãn nguồn “Máy chủ”, ý thật, điều mẹ muốn nghe và mức căng thẳng 3/5](docs/screenshots/dichbome-mobile.png)
+
+_Phiếu giải mã ngay dưới bong bóng câu gốc: nhãn nguồn cho biết kết quả đến từ máy chủ hay dịch ngay trên máy, kèm ý thật, điều người nhắn muốn nghe và thang căng thẳng 0–5._
+
+![Bản desktop: sân khấu giải mã bên trái, Bảng (câu mẫu, đã lưu, lịch sử) cố định ở cột phải](docs/screenshots/dichbome-desktop.png)
+
+_Desktop: sân khấu ở giữa, cột Bảng bên phải luôn hiện thư viện câu mẫu và các tab Đã lưu / Lịch sử._
+
+![Phiếu giải mã cho câu của mẹ chồng trong hoàn cảnh ở chung, mức căng thẳng 1/5](docs/screenshots/gallery-01-phieu-giai-ma-me-chong.png)
+
+_Đổi người nhắn và hoàn cảnh thì cách đọc cũng đổi: câu “Để đấy mẹ làm cho…” của mẹ chồng ở hoàn cảnh ở chung được đọc là quan tâm là chính, giận chỉ một ít._
+
+![Trạng thái trung thực: app nói thẳng “Câu này app chưa đọc được” khi gặp chuỗi vô nghĩa](docs/screenshots/gallery-02-cau-chua-doc-duoc.png)
+
+_Gặp câu app không nhận ra (ví dụ gõ bừa “asdf qwer zxcv 123”), app nói thẳng là chưa đọc được và gợi ý sửa câu hoặc thử câu mẫu — không bịa bản dịch cho có._
+
+![Bảng — tab Đã lưu với các kết quả đã lưu trên thiết bị](docs/screenshots/gallery-03-bang-da-luu.png)
+
+_Bảng, tab Đã lưu: giữ tối đa 20 kết quả ngay trên thiết bị, mở lại lên sân khấu hoặc xoá từng mục._
+
+![Bảng — tab Lịch sử với các câu vừa dịch gần đây](docs/screenshots/gallery-04-bang-lich-su.png)
+
+_Bảng, tab Lịch sử: các câu đã dịch gần đây kèm người nhắn, hoàn cảnh và mức căng thẳng — chạm vào để xem lại phiếu._
 
 ## 🧭 How it works
 
@@ -178,7 +204,7 @@ Returns `{ examples: [{ message, speaker, context, tease }] }` — the static sa
 │   ├── icons/                     # PWA icons 192/512, maskable 512, apple-touch-icon 180
 │   └── products/brand/            # Official logo/banner SVGs (see BRAND.md)
 ├── docs/
-│   └── screenshots/               # Old-UI production screenshots — no longer shown in this README; pack is recaptured on the redesign after deploy
+│   └── screenshots/               # Production screenshots of the live redesign — shown in the Screenshots section above
 ├── BRAND.md                       # Brand kit: colours, logo, usage rules
 ├── CONTENT.md                     # Content/video shooting script
 ├── EXTRACT.md                     # Original extraction notes from the source monorepo
