@@ -1,6 +1,6 @@
 /**
  * Câu hỏi thường gặp về Giải Mã Gia Đình — nguồn sự thật duy nhất cho cả
- * section FAQ hiển thị trên trang chủ (components/seo/InfoSections.tsx) và
+ * section FAQ hiển thị trong tab «Tìm hiểu» của Bảng (components/dichbome/find-out.tsx) và
  * FAQPage JSON-LD (app/layout.tsx). Hai nơi PHẢI dùng chung dữ liệu này để
  * structured data khớp đúng nội dung người dùng nhìn thấy (yêu cầu của Google).
  *

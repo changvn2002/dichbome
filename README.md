@@ -14,11 +14,6 @@
 **🔴 Live app: https://dichbome.vercel.app** — no account, no sign-up, just paste a message.
 Repository: https://github.com/changvn2002/dichbome
 
-<p align="center">
-  <img src="docs/screenshots/dichbome-desktop.png" alt="Giải Mã Gia Đình — màn hình đã dịch xong câu “Tùy con, mẹ sao cũng được.”" width="900">
-</p>
-<p align="center"><em>Mẹ nhắn “Tùy con, mẹ sao cũng được.” — app dịch ra ý thật, điều mẹ muốn nghe, mức độ không hài lòng 3/5 và gợi ý sẵn câu trả lời. Ảnh chụp thật từ bản production đang chạy.</em></p>
-
 **Tóm tắt (Tiếng Việt):** Dán một câu bố mẹ, con cái, mẹ chồng, nàng dâu, vợ chồng hay sếp
 vừa nhắn — app cho bạn biết câu đó *thật ra nghĩa là gì*, người nhắn *đang muốn gì*, mức độ
 căng thẳng tới đâu, và gợi ý sẵn 3 câu trả lời cho êm chuyện. Engine dịch là **rule-based
@@ -36,58 +31,12 @@ liệu đi đâu.
 - **Tension meter** — an anger/tension level from 0–5 with a plain-language danger label.
 - **3 safe reply suggestions** — ready to copy and send, in the right tone for the relationship (most obedient / smoothest / safest).
 - **Examples library** — classic lines like “tùy con” (“up to you”) and “không sao đâu” (“it's fine”) pre-loaded so you can try instantly.
-- **Save & share results** — share via the Web Share API (or copy a summary), keep up to 20 favourites in `localStorage`, plus a recent-history list on-device.
-- **Works offline** — an offline banner appears when the network drops and decoding continues on the local rule-based engine.
+- **Save & share results** — share via the Web Share API (or copy a summary), keep up to 20 saved results in `localStorage`, plus a recent-history list on-device.
+- **Works offline** — a hand-written service worker (`public/sw.js`) caches the app shell, and the rule-based engine also runs on-device, so the app opens and keeps decoding when the network drops. The server engine is the only path that needs a network, and the UI degrades to the on-device engine automatically when it is unreachable.
 - **No account needed, large touch targets** — readable type and ≥44px buttons, designed so older family members can use it too.
 - **Two run modes** — `http` (default: the UI calls the Next.js route handlers built into this repo) or fully offline in the browser, where the same rule-based engine runs locally with zero backend. If the HTTP call fails, the UI automatically falls back to the offline engine and tells the user.
 
-## 🖼️ Screenshots
-
-Tất cả ảnh dưới đây được chụp trực tiếp từ bản production
-[https://dichbome.vercel.app](https://dichbome.vercel.app) khi app đang ở trạng thái
-**đã dịch xong một tin nhắn thật** — đúng những gì người dùng nhìn thấy sau khi bấm
-“Dịch ý”, không phải màn hình trống lúc mới mở app hay ảnh dựng sẵn.
-
-### Kết quả dịch — giá trị cốt lõi của app
-
-![Desktop 1440×900 — kết quả dịch câu “Tùy con, mẹ sao cũng được.”](docs/screenshots/dichbome-desktop.png)
-
-_Trên desktop: bên trái là câu mẹ vừa nhắn và các nhóm quan hệ để chọn người gửi; bên
-phải là kết quả dịch đầy đủ — **Ý thật** (“mẹ đã có sẵn một đáp án trong đầu”), **Điều
-mẹ muốn nghe**, **Mức độ không hài lòng 3/5** (“Giận ngầm — cần hạ nhiệt sớm”) kèm
-**Lưu ý** thực tế, và ngay bên dưới là các câu trả lời gợi ý._
-
-| Mobile (390×844)                                                                 | Social / link-preview (1280×640)                                              |
-| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| ![Mobile — thẻ kết quả dịch trên điện thoại](docs/screenshots/dichbome-mobile.png) | ![Social — bản xem trước khi chia sẻ liên kết](docs/screenshots/dichbome-social.png) |
-| _Trên điện thoại, thẻ kết quả xếp dọc ngay dưới ô nhập: ý thật, điều mẹ muốn nghe và thang đo mức độ đọc rõ trong một màn hình._ | _Khung 1280×640 dùng cho ảnh xem trước khi gửi link app qua Zalo/Facebook — vẫn thấy trọn thẻ kết quả dịch._ |
-
-### Theo từng bước sử dụng
-
-**Bước 1 — Dán tin nhắn và chọn đúng người nhắn.** App có sẵn 16 vai trong 5 nhóm
-quan hệ (Bố mẹ & con, Thông gia, Vợ chồng & người yêu, Anh em & bạn, Công việc) và thư
-viện câu mẫu để thử ngay.
-
-![Bước 1 — dán tin nhắn, chọn vai và hoàn cảnh](docs/screenshots/gallery-01-dan-tin-chon-vai.png)
-
-**Bước 2 — Đọc ý thật và mức độ căng thẳng.** Mỗi kết quả gồm ý thật phía sau câu nói,
-điều người nhắn thật sự muốn nghe, thang đo mức độ không hài lòng 0–5 có nhãn cảnh báo,
-và lưu ý tình huống nếu câu nói tiềm ẩn rủi ro.
-
-![Bước 2 — thẻ kết quả: ý thật, điều muốn nghe, mức độ và lưu ý](docs/screenshots/gallery-02-y-that-va-muc-do.png)
-
-**Bước 3 — Sao chép một câu trả lời êm chuyện.** Ba gợi ý theo ba tông — *Ngoan nhất*,
-*Khéo nhất*, *An toàn nhất* — viết đúng cách xưng hô của mối quan hệ đã chọn, bấm một
-chạm để sao chép rồi gửi lại ngay.
-
-![Bước 3 — ba câu trả lời gợi ý sẵn để sao chép](docs/screenshots/gallery-03-cau-tra-loi-goi-y.png)
-
-**Không chỉ dịch bố mẹ — cả mẹ chồng, nàng dâu, vợ chồng và sếp.** Cùng một thao tác,
-đổi người nhắn là ý nghĩa và câu gợi ý đổi theo đúng nếp của mối quan hệ đó. Ví dụ dưới
-đây: mẹ chồng nhắn “Để đấy mẹ làm cho, con cứ nghỉ đi.” trong hoàn cảnh ở chung — app
-nhận ra đây là quan tâm là chính (mức độ 1/5) nhưng ngồi nghỉ luôn thì mất điểm khéo.
-
-![Ví dụ khác — dịch câu của mẹ chồng trong hoàn cảnh ở chung](docs/screenshots/gallery-04-me-chong-o-chung.png)
+> 📸 Screenshot pack sẽ được chụp lại trên bản redesign sau khi deploy.
 
 ## 🧭 How it works
 
@@ -100,7 +49,7 @@ nhận ra đây là quan tâm là chính (mức độ 1/5) nhưng ngồi nghỉ 
 | Layer     | Technology                                                                                                                        |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | Framework | [Next.js 16](https://nextjs.org) (App Router) + React 19 + TypeScript 5.9 (strict)                                                |
-| Styling   | Tailwind CSS 4 (via `@tailwindcss/postcss`), fonts Be Vietnam Pro / Playfair Display (Vietnamese subsets)                         |
+| Styling   | Tailwind CSS 4 (via `@tailwindcss/postcss`), fonts Be Vietnam Pro / Fraunces (Vietnamese subsets)                         |
 | Icons     | lucide-react                                                                                                                      |
 | Engine    | Pure rule-based Vietnamese decoder in TypeScript (`lib/server/engine.ts` + client copy in `components/dichbome/lib/translate.ts`) |
 | API       | Next.js Route Handlers (`app/api/products/dichbome/*`)                                                                            |
@@ -158,7 +107,7 @@ The standalone ships with a complete SEO + PWA pack, no extra configuration need
 - **`app/robots.ts` + `app/sitemap.ts`** → `/robots.txt` and `/sitemap.xml` (`/api/` disallowed, sitemap points at the homepage).
 - **JSON-LD** `WebApplication` (schema.org) embedded in the layout — only truthful fields (name, description, `applicationCategory`, `inLanguage: vi`); no ratings/prices/reviews.
 - **Installable PWA**: `app/manifest.ts` generates `/manifest.webmanifest` (`standalone` display, cream background `#FAF6EF`, theme `#C22A44`) with 192/512 icons + a 512 maskable icon; iOS uses a 180×180 `apple-touch-icon`.
-- **Icons/OG are PNGs rasterised from the official brand SVGs** by `scripts/generate-brand-pngs.mjs` (using `@resvg/resvg-js`, usage notes at the top of the script). The artwork itself is untouched: the script only rasterises the original logo for icons, and for `og.png` scales the official 1600×900 banner proportionally into the 1200×630 frame on the banner's own background colour (`#F6F1E7`) — no cropping, no recolouring. Maskable/iOS icons centre the original logo on the cream `#FAF6EF` background because those platforms reject transparency.
+- **Icons/OG are v2 assets built from source SVGs in the redesign asset pack**: `public/og.png` (1200×630) and the PWA icons are rasterised from the pack's hand-built SVG sources with its `build-assets` script (resvg) — real product artwork (a two-bubble conversation scene with real text set in Fraunces + Be Vietnam Pro), not a scaled banner. Maskable/iOS icons keep the mark intact on the cream `#FAF6EF` background because those platforms reject transparency.
 
 ## 🔌 API contract
 
@@ -223,13 +172,13 @@ Returns `{ examples: [{ message, speaker, context, tease }] }` — the static sa
 │   ├── utils.ts                   # cn()
 │   └── server/engine.ts           # Server-side engine (ported from the original Nest module)
 ├── scripts/
-│   └── generate-brand-pngs.mjs    # Generate og.png + icon PNGs from brand SVGs (see SEO & PWA)
+│   └── generate-brand-pngs.mjs    # Legacy brand-PNG generator — v2 og.png/icons come from the redesign asset pack (see SEO & PWA)
 ├── public/
-│   ├── og.png                     # Open Graph image 1200×630 (from the official banner)
+│   ├── og.png                     # Open Graph image 1200×630 (v2 asset, built from the redesign pack's SVG source)
 │   ├── icons/                     # PWA icons 192/512, maskable 512, apple-touch-icon 180
 │   └── products/brand/            # Official logo/banner SVGs (see BRAND.md)
 ├── docs/
-│   └── screenshots/               # Production screenshots used in this README
+│   └── screenshots/               # Old-UI production screenshots — no longer shown in this README; pack is recaptured on the redesign after deploy
 ├── BRAND.md                       # Brand kit: colours, logo, usage rules
 ├── CONTENT.md                     # Content/video shooting script
 ├── EXTRACT.md                     # Original extraction notes from the source monorepo

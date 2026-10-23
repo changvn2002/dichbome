@@ -16,4 +16,4 @@ export const SITE_NAME = 'Giải Mã Gia Đình';
 export const SITE_TITLE = 'Giải Mã Gia Đình — Dịch ý thật sau tin nhắn của người thân';
 
 export const SITE_DESCRIPTION =
-  'Dán bất kỳ câu nào người nhà nhắn — bố mẹ, con cái, mẹ chồng, nàng dâu, vợ chồng, sếp — app dịch ra ý thật, đo mức độ căng thẳng và gợi ý sẵn 3 câu trả lời cho êm chuyện. Engine rule-based tiếng Việt, không cần đăng nhập.';
+  'Dán câu người nhà vừa nhắn — bố mẹ, mẹ chồng, vợ chồng, sếp — xem ý thật, mức căng thẳng và 3 câu trả lời cho êm chuyện. Không cần đăng nhập.';

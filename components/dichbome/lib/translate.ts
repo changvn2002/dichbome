@@ -1191,6 +1191,23 @@ function matchRule(normalized: string, speaker: RelationRole): Rule | null {
   return matched.find((r) => r.roles?.includes(speaker)) ?? matched.find((r) => !r.roles) ?? null;
 }
 
+/**
+ * Metadata phân loại cho tầng trung thực (redesign-v2) — KHÔNG đổi thuật toán dịch.
+ * Trả null khi không khớp rule nào (tức translateParentMessage rơi xuống fallbackFor).
+ * roleSpecific = rule khớp có khai roles và roles chứa speaker; rule chung (không khai roles) = false.
+ */
+export function matchRuleInfo(
+  message: string,
+  speaker: RelationRole,
+): { ruleId: string; roleSpecific: boolean } | null {
+  const matched = matchRule(normalizeVi(message), speaker);
+  if (!matched) return null;
+  return { ruleId: matched.id, roleSpecific: matched.roles?.includes(speaker) ?? false };
+}
+
+/** Toàn bộ keys của RULES (đã bỏ dấu sẵn) — dùng làm từ vựng cho tầng trung thực. */
+export const CLIENT_RULE_KEYS: readonly string[] = RULES.flatMap((r) => r.keys);
+
 export function translateParentMessage(input: TranslateInput): TranslateResult {
   const message = (input?.message ?? '').trim();
   const speaker = input?.speaker ?? 'Mẹ';

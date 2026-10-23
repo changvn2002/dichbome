@@ -18,6 +18,9 @@ import type {
   TranslateResult,
   TranslationReply,
 } from '../lib/translate';
+// TranslateMeta được định nghĩa ở lib/honesty (hướng import một chiều: honesty KHÔNG import api/types,
+// nên api/types -> lib/honesty không tạo vòng lặp).
+import type { TranslateMeta } from '../lib/honesty';
 
 export type {
   ParentContext,
@@ -28,8 +31,9 @@ export type {
   TranslateResult,
   TranslationReply,
 };
+export type { TranslateMeta };
 
 export type DichbomeApi = {
-  translate: (input: TranslateInput) => Promise<TranslateResult>;
+  translate: (input: TranslateInput) => Promise<TranslateResult & { meta?: TranslateMeta }>;
   examples: () => Promise<{ examples: ParentExample[] }>;
 };

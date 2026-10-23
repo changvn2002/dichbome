@@ -1,17 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Dịch Tiếng Bố Mẹ — bong bóng chat biết ý">
-  <!-- Bong bóng chat đỏ đậm -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Giải Mã Gia Đình — bong bóng chat biết ý và bong bóng lời đáp">
+  <!-- TIẾN HOÁ V2 (Conversation Stage): hình học mascot gốc của BRAND.md giữ NGUYÊN 1:1
+       (bong bóng, mắt mở / mắt nháy, miệng, kính lúp, tim + ngoặc kép — không vẽ lại mặt).
+       Phần tử MỚI duy nhất: bong bóng lời đáp nhỏ ở góc dưới phải — "lời đáp" mà app
+       giúp người dùng gửi lại. Xem ASSETS.md mục "Lập luận tiến hoá". -->
+  <!-- Bong bóng chat đỏ đậm (gốc, không đổi) -->
   <path d="M24 6h48a18 18 0 0 1 18 18v26a18 18 0 0 1-18 18H53L35 87v-19H24A18 18 0 0 1 6 50V24A18 18 0 0 1 24 6z" fill="#C22A44"/>
-  <!-- Mắt trái: chấm tròn kem -->
+  <!-- Mắt trái: chấm tròn kem (gốc) -->
   <circle cx="32" cy="30" r="4.6" fill="#FBEEDB"/>
-  <!-- Mắt phải: nháy mắt -->
+  <!-- Mắt phải: nháy mắt (gốc) -->
   <path d="M50 30q7-6.5 14 0" fill="none" stroke="#FBEEDB" stroke-width="4.2" stroke-linecap="round"/>
-  <!-- Miệng cười -->
+  <!-- Miệng cười (gốc) -->
   <path d="M40 39.5q8 6.5 16 0" fill="none" stroke="#FBEEDB" stroke-width="4.2" stroke-linecap="round"/>
-  <!-- Kính lúp kem (soi ý) ở góc trên phải -->
+  <!-- Kính lúp kem (soi ý) ở góc trên phải (gốc) -->
   <circle cx="73" cy="22" r="7" fill="none" stroke="#FBEEDB" stroke-width="3.6"/>
   <path d="M78.5 27.5 85 34" stroke="#FBEEDB" stroke-width="4" stroke-linecap="round"/>
-  <!-- Trái tim trắng chứa dấu ngoặc kép -->
+  <!-- Trái tim trắng chứa dấu ngoặc kép (gốc) -->
   <path d="M48 68C37.5 61 33.5 56.4 33.5 51.6c0-4 3-7.1 6.9-7.1 3 0 5.9 1.9 7.6 4.6 1.7-2.7 4.6-4.6 7.6-4.6 3.9 0 6.9 3.1 6.9 7.1 0 4.8-4 9.4-14.5 16.4z" fill="#FFFFFF"/>
   <path d="M40.6 58.6c-1.5 0-2.7-1.2-2.7-2.7 0-2.3 1.9-4.4 4.2-5 .5-.1 1 .3 1 .8 0 .4-.2.7-.6.9-1 .4-1.6 1.1-1.7 1.9.2-.1.5-.2.8-.2 1.4 0 2.5 1.1 2.5 2.5s-1.1 2.8-3.5 2.8z" fill="#C22A44"/>
   <path d="M51.4 58.6c-1.5 0-2.7-1.2-2.7-2.7 0-2.3 1.9-4.4 4.2-5 .5-.1 1 .3 1 .8 0 .4-.2.7-.6.9-1 .4-1.6 1.1-1.7 1.9.2-.1.5-.2.8-.2 1.4 0 2.5 1.1 2.5 2.5s-1.1 2.8-3.5 2.8z" fill="#C22A44"/>
+  <!-- MỚI V2 — bong bóng lời đáp: nền sân khấu (#FFFDF8), viền crimson-ink, 3 chấm mực
+       = câu trả lời đang được soạn. Đặt ở vùng trống dưới-phải của bong bóng lớn,
+       không chạm tim (tim kết thúc ở x=62.5), không che mặt/kính lúp. -->
+  <path d="M67 66h20a6 6 0 0 1 6 6v7a6 6 0 0 1-6 6H74l-6 5v-5h-1a6 6 0 0 1-6-6v-7a6 6 0 0 1 6-6z" fill="#FFFDF8" stroke="#8C1D31" stroke-width="2.6" stroke-linejoin="round"/>
+  <circle cx="70.5" cy="75.5" r="2.1" fill="#101418"/>
+  <circle cx="77.5" cy="75.5" r="2.1" fill="#101418"/>
+  <circle cx="84.5" cy="75.5" r="2.1" fill="#101418"/>
 </svg>

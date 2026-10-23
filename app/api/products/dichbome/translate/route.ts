@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
-import { translateDichbome, type DichbomeContext, type DichbomeSpeaker } from '@/lib/server/engine';
+import {
+  classifyDichbomeInput,
+  translateDichbome,
+  type DichbomeContext,
+  type DichbomeSpeaker,
+} from '@/lib/server/engine';
 
 /**
  * POST /api/products/dichbome/translate
@@ -83,10 +88,11 @@ export async function POST(request: Request) {
   }
   if (errors.length > 0) return badRequest(errors);
 
-  const result = translateDichbome({
+  const parsedInput = {
     message: dto.message as string,
     speaker: dto.speaker as DichbomeSpeaker | undefined,
     context: dto.context as DichbomeContext | undefined,
-  });
-  return NextResponse.json(result);
+  };
+  const result = translateDichbome(parsedInput);
+  return NextResponse.json({ ...result, meta: classifyDichbomeInput(parsedInput) });
 }

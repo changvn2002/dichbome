@@ -1119,6 +1119,27 @@ function matchEntry(norm: string, speaker: DichbomeSpeaker): EntryDef | null {
 }
 
 /**
+ * Metadata phân loại cho tầng trung thực (redesign-v2) — KHÔNG đổi thuật toán dịch.
+ * Tái dùng đúng đường matchEntry/canonicalSpeaker của translateDichbome:
+ * khớp entry -> 'entry', ngược lại -> 'fallback'.
+ */
+export function classifyDichbomeInput(input: DichbomeTranslateInput): {
+  matchKind: 'entry' | 'fallback';
+  roleSpecific: boolean;
+} {
+  const speaker = canonicalSpeaker(input.speaker ?? 'me');
+  const norm = normalizeVi((input.message ?? '').trim());
+  const entry = norm ? matchEntry(norm, speaker) : null;
+  if (!entry) return { matchKind: 'fallback', roleSpecific: false };
+  return { matchKind: 'entry', roleSpecific: entry.speakers?.includes(speaker) ?? false };
+}
+
+/** Trích patterns của ENTRIES cho snapshot phía client (exact mặc định false nếu không khai). */
+export function getEntryPatterns(): Array<{ patterns: string[]; exact: boolean }> {
+  return ENTRIES.map((e) => ({ patterns: [...e.patterns], exact: e.exact ?? false }));
+}
+
+/**
  * Engine dịch rule-based (port nguyên logic từ Nest module
  * `server/src/products/dichbome/dichbome.service.ts` của repo gốc ChangtoTech —
  * bản standalone bỏ NestJS, route handlers của Next gọi trực tiếp 2 hàm này).

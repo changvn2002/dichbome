@@ -4,23 +4,45 @@
 @source "../lib";
 @source "../app";
 
+/* Token hệ ấm duy nhất của app — nguồn sự thật: DESIGN.md (gốc repo).
+   Hệ lạnh cũ của host không được xuất hiện trên bất kỳ bề mặt nào. */
 :root {
   color-scheme: light;
-  --ink: #101418;
-  --muted: #5b6570;
-  --line: #e1e4ea;
-  --paper: #f2f4f7;
+  --crimson: #c22a44;
+  --crimson-deep: #a8243b;
+  --crimson-ink: #8c1d31;
+  --crimson-tint: #f7e3e7;
+  --paper: #faf6ef;
+  --stage: #fffdf8;
   --card: #ffffff;
+  --ink: #101418;
+  --muted: #49525c;
+  --placeholder: #6b5f52;
+  --line: #e7ddd0;
+  --line-strong: #8a744a;
+  --warn-bg: #fff6d8;
+  --warn-ink: #8a6414;
+  --confirm-bg: #f3ead3;
   --shadow-card: 0 1px 2px rgba(16, 20, 24, 0.05), 0 8px 24px rgba(16, 20, 24, 0.06);
   --shadow-lift: 0 2px 4px rgba(16, 20, 24, 0.06), 0 16px 40px rgba(16, 20, 24, 0.1);
 }
 
 @theme inline {
+  --color-crimson: var(--crimson);
+  --color-crimson-deep: var(--crimson-deep);
+  --color-crimson-ink: var(--crimson-ink);
+  --color-crimson-tint: var(--crimson-tint);
+  --color-paper: var(--paper);
+  --color-stage: var(--stage);
+  --color-card: var(--card);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
+  --color-placeholder: var(--placeholder);
   --color-line: var(--line);
-  --color-paper: var(--paper);
-  --color-card: var(--card);
+  --color-line-strong: var(--line-strong);
+  --color-warn-bg: var(--warn-bg);
+  --color-warn-ink: var(--warn-ink);
+  --color-confirm-bg: var(--confirm-bg);
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);
 }
@@ -38,13 +60,97 @@ body {
   overflow-x: hidden;
 }
 
+/* Display serif duy nhất: Fraunces (nạp ở layout.tsx, subset vietnamese).
+   Fallback là serif thường của hệ — không dùng serif hệ thống có tên riêng
+   vì thiếu glyph tiền hợp tiếng Việt. */
 .font-display {
-  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-family: var(--font-display), 'Fraunces', serif;
 }
 
-/* Serif Việt cho tiêu đề (Playfair Display, subset vietnamese, nạp ở layout.tsx).
-   KHÔNG đổi sang Georgia/Times hệ thống: thiếu dấu tiếng Việt tiền tố hợp,
-   chữ bị chồng dấu/lệch dấu trên Windows. */
-.font-serif-vn {
-  font-family: var(--font-serif-vn), 'Be Vietnam Pro', serif;
+/* Focus discipline (DESIGN.md): mọi phần tử tương tác có ring này. */
+:focus-visible {
+  outline: 2px solid var(--crimson);
+  outline-offset: 2px;
+}
+
+/* Motion — danh sách đặt tên duy nhất của DESIGN.md, chỉ transform/opacity. */
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-bubble-in {
+  animation: bubble-in 160ms ease-out;
+}
+
+@keyframes slip-block {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-slip-block {
+  animation: slip-block 220ms ease-out;
+  animation-delay: calc(var(--i, 0) * 60ms);
+  animation-fill-mode: both;
+}
+
+@keyframes board-sheet {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-board-sheet {
+  animation: board-sheet 220ms ease-out;
+}
+
+@keyframes typing-blink {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+.typing-dot {
+  animation: typing-blink 1.2s infinite;
+  animation-delay: calc(var(--i, 0) * 0.2s);
+}
+
+.gauge-fill {
+  transition: width 400ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-bubble-in,
+  .anim-slip-block,
+  .anim-board-sheet {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+  }
+
+  .typing-dot {
+    animation: none;
+    opacity: 0.55;
+  }
 }

@@ -1,5 +1,6 @@
 import { api } from '@/lib/api';
 import type { ParentContext, RelationRole } from '../lib/translate';
+import type { TranslateMeta } from '../lib/honesty';
 import type { DichbomeApi, ParentExample, TranslateResult } from './types';
 
 const base = '/api/products/dichbome';
@@ -50,9 +51,16 @@ const CONTEXT_BY_CODE: Record<string, ParentContext> = Object.fromEntries(
 ) as Record<string, ParentContext>;
 
 /** Server trả angerLevel 0–100; UI/mock dùng thang 0–5. Chuẩn hoá tại đây để hai chế độ khớp nhau. */
-function normalizeResult(raw: TranslateResult & { angerLevel: number }): TranslateResult {
+function normalizeResult(
+  raw: TranslateResult & { angerLevel: number; meta?: TranslateMeta },
+): TranslateResult & { meta?: TranslateMeta } {
   const level = raw.angerLevel > 5 ? Math.round((raw.angerLevel / 100) * 5) : raw.angerLevel;
-  return { ...raw, angerLevel: Math.min(5, Math.max(0, level)) };
+  // Giữ lại meta (phân loại trung thực) từ raw.meta — spread raw đã mang theo, ghi rõ ở đây để không bị mất khi chuẩn hoá.
+  return {
+    ...raw,
+    angerLevel: Math.min(5, Math.max(0, level)),
+    ...(raw.meta ? { meta: raw.meta } : {}),
+  };
 }
 
 type ServerExample = { message: string; speaker: string; context: string; tease: string };

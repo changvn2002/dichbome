@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Be_Vietnam_Pro, Outfit, Playfair_Display } from 'next/font/google';
+import { Be_Vietnam_Pro, Fraunces } from 'next/font/google';
+import RegisterServiceWorker from '@/components/dichbome/register-sw';
 import { FAQS } from '@/lib/faq';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from '@/lib/site';
 import './globals.css';
@@ -11,21 +12,14 @@ const sans = Be_Vietnam_Pro({
   display: 'swap',
 });
 
-const display = Outfit({
-  subsets: ['latin'],
-  weight: ['500', '600', '700'],
+/* Display serif duy nhất của app (DESIGN.md): Fraunces variable —
+   không ghim weight tĩnh; chỉ mở trục opsz, WONK/SOFT giữ mặc định 0.
+   Cấm serif hệ thống: thiếu glyph tiền hợp tiếng Việt. */
+const display = Fraunces({
+  subsets: ['latin', 'vietnamese'],
   variable: '--font-display',
   display: 'swap',
-});
-
-/* Serif có đủ dấu tiếng Việt (subset vietnamese) cho tiêu đề.
-   Tuyệt đối không dùng Georgia/Times hệ thống: thiếu glyph tiền tố hợp,
-   dấu tiếng Việt bị chồng/lệch trên Windows. */
-const serifVn = Playfair_Display({
-  subsets: ['latin', 'vietnamese'],
-  weight: ['500', '600', '700'],
-  variable: '--font-serif-vn',
-  display: 'swap',
+  axes: ['opsz'],
 });
 
 export const viewport: Viewport = {
@@ -140,13 +134,14 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={`${sans.variable} ${display.variable} ${serifVn.variable}`}>
+    <html lang="vi" className={`${sans.variable} ${display.variable}`}>
       <body className="font-sans antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
         />
         {children}
+        <RegisterServiceWorker />
       </body>
     </html>
   );
