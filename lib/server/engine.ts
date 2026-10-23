@@ -1363,7 +1363,18 @@ const CLOSING_TIME_PATTERN =
 const CLOSING_KEYWORDS: Record<Exclude<ClosingFamily, 'E'>, string[]> = {
   D: ['hoa don', 'tien dien', 'tien nuoc', 'dong tien', 'tang gia', 'tien', 'trieu', 'nghin'],
   C: ['ao mua', 'giay to', 'chia khoa', 'troi mua', 'sap mua', 'nho mang', 'mang', 'thuoc'],
-  B: ['di kham', 'kham benh', 'phau thuat', 'mo mat', 'kham', 'mo', 'don', 'dua di', 'lich hen', 'hen'],
+  B: [
+    'di kham',
+    'kham benh',
+    'phau thuat',
+    'mo mat',
+    'kham',
+    'mo',
+    'don',
+    'dua di',
+    'lich hen',
+    'hen',
+  ],
   A: ['ve que', 've nha', 'an com', 'qua nha', 'ghe nha', 'bua com', 've an'],
 };
 const CLOSING_NEGATIONS = [
@@ -1473,10 +1484,7 @@ function surgerySubjectPhrase(detail: string): string | null {
 }
 
 /** Biến {action} của họ B theo loại sự kiện trong chi tiết (Lens 1 §2.3 họ B). */
-function closingAction(
-  detail: string,
-  speaker: DichbomeSpeaker,
-): { full: string; stem: string } {
+function closingAction(detail: string, speaker: DichbomeSpeaker): { full: string; stem: string } {
   const norm = normalizeVi(detail);
   if (closingKeywordIndex(norm, 'kham') >= 0) {
     // R3: «đưa {p} đi khám» CHỈ khi chi tiết nêu chính người được gọi là

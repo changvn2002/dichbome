@@ -1678,7 +1678,18 @@ const CLOSING_TIME_PATTERN =
 const CLOSING_KEYWORDS: Record<Exclude<ClosingFamily, 'E'>, string[]> = {
   D: ['hoa don', 'tien dien', 'tien nuoc', 'dong tien', 'tang gia', 'tien', 'trieu', 'nghin'],
   C: ['ao mua', 'giay to', 'chia khoa', 'troi mua', 'sap mua', 'nho mang', 'mang', 'thuoc'],
-  B: ['di kham', 'kham benh', 'phau thuat', 'mo mat', 'kham', 'mo', 'don', 'dua di', 'lich hen', 'hen'],
+  B: [
+    'di kham',
+    'kham benh',
+    'phau thuat',
+    'mo mat',
+    'kham',
+    'mo',
+    'don',
+    'dua di',
+    'lich hen',
+    'hen',
+  ],
   A: ['ve que', 've nha', 'an com', 'qua nha', 'ghe nha', 'bua com', 've an'],
 };
 const CLOSING_NEGATIONS = [
@@ -1787,10 +1798,7 @@ function surgerySubjectPhrase(detail: string): string | null {
   return null;
 }
 
-function closingAction(
-  detail: string,
-  speaker: RelationRole,
-): { full: string; stem: string } {
+function closingAction(detail: string, speaker: RelationRole): { full: string; stem: string } {
   const norm = normalizeVi(detail);
   if (closingKeywordIndex(norm, 'kham') >= 0) {
     // R3: «đưa {x} đi khám» CHỈ khi chi tiết nêu chính người được gọi là
@@ -1997,8 +2005,7 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
       result.replies[0] = {
         ...result.replies[0],
         text:
-          result.replies[0].text +
-          fill(closingTailTemplate(detail, 0, speaker, context, message)),
+          result.replies[0].text + fill(closingTailTemplate(detail, 0, speaker, context, message)),
       };
       if (detail2) {
         result.meaning += ` Tin còn một vế riêng nữa: “${detail2}”. Mức căng thẳng chấm theo vế chính của câu — vế riêng là chi tiết cá nhân, app nhắc lại để bạn đáp cho trúng chứ không tính vào mức.`;
@@ -2012,8 +2019,7 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
       result.replies[2] = {
         ...result.replies[2],
         text:
-          result.replies[2].text +
-          fill(closingTailTemplate(detail, 2, speaker, context, message)),
+          result.replies[2].text + fill(closingTailTemplate(detail, 2, speaker, context, message)),
       };
     } else if (message.length >= GENERIC_LIMIT_MIN_MESSAGE) {
       result.meaning +=

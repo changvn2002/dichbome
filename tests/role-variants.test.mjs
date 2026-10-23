@@ -38,10 +38,7 @@ function assertNoLeak(r, label) {
     for (const marker of LEAK_MARKERS) {
       assert.ok(!text.includes(marker), `${label} ${field} còn marker "${marker}": ${text}`);
     }
-    assert.ok(
-      !SELF_CON_PATTERN.test(text),
-      `${label} ${field} còn tự xưng «con»: ${text}`,
-    );
+    assert.ok(!SELF_CON_PATTERN.test(text), `${label} ${field} còn tự xưng «con»: ${text}`);
   }
 }
 
@@ -66,7 +63,11 @@ test('Sprint2/S2: replies biến thể khớp nguyên văn Lens 1 §3.3 (Đồng
       'Chuyện này mình chưa chốt vội đâu. Mình xem lại một lượt rồi chiều nay nhắn lại bạn một câu chốt hẳn, khỏi để bạn phải chờ lâu.',
     ],
   );
-  const loverStub = translateParentMessage({ message: STUB, speaker: 'Người yêu', context: 'Khác' });
+  const loverStub = translateParentMessage({
+    message: STUB,
+    speaker: 'Người yêu',
+    context: 'Khác',
+  });
   assert.deepEqual(
     loverStub.replies.map((x) => x.text),
     [
@@ -88,7 +89,11 @@ test('Sprint2/S2: replies biến thể khớp nguyên văn Lens 1 §3.3 (Đồng
       'Vậy để mình gọi cho bạn nói chuyện một lúc nhé. Nghe bạn nói rõ đầu đuôi mình mới yên tâm là không còn gì vướng.',
     ],
   );
-  const loverNoSao = translateDichbome({ message: 'Không sao đâu', speaker: 'lover', context: 'khac' });
+  const loverNoSao = translateDichbome({
+    message: 'Không sao đâu',
+    speaker: 'lover',
+    context: 'khac',
+  });
   assert.deepEqual(
     loverNoSao.replies.map((x) => x.text),
     [
@@ -107,7 +112,9 @@ test('Sprint2/R2: xưng hô nhất quán trong thân biến thể Người yêu 
     'Anh chưa quyết vội đâu. Tối nay anh gọi cho em, hai đứa mình bàn với nhau một lúc rồi anh chốt luôn, nghe em.',
   ];
   assert.deepEqual(
-    translateDichbome({ message: STUB, speaker: 'lover', context: 'khac' }).replies.map((x) => x.text),
+    translateDichbome({ message: STUB, speaker: 'lover', context: 'khac' }).replies.map(
+      (x) => x.text,
+    ),
     loverTuyCon,
   );
   const loverKhongSao = [
@@ -116,9 +123,11 @@ test('Sprint2/R2: xưng hô nhất quán trong thân biến thể Người yêu 
     'Vậy tối nay anh gọi cho em một lúc nhé. Nghe giọng em anh mới yên tâm được.',
   ];
   assert.deepEqual(
-    translateParentMessage({ message: 'Không sao đâu', speaker: 'Người yêu', context: 'Khác' }).replies.map(
-      (x) => x.text,
-    ),
+    translateParentMessage({
+      message: 'Không sao đâu',
+      speaker: 'Người yêu',
+      context: 'Khác',
+    }).replies.map((x) => x.text),
     loverKhongSao,
   );
   // Bạn thân: tự xưng «mình», gọi đối phương «bạn» (không còn «tớ/cậu»).
@@ -128,11 +137,15 @@ test('Sprint2/R2: xưng hô nhất quán trong thân biến thể Người yêu 
     'Chuyện này mình chưa chốt vội đâu. Tối mình gọi buôn với bạn một lúc, hai đứa ngồi lại tính với nhau rồi mình chốt.',
   ];
   assert.deepEqual(
-    translateDichbome({ message: STUB, speaker: 'friend', context: 'khac' }).replies.map((x) => x.text),
+    translateDichbome({ message: STUB, speaker: 'friend', context: 'khac' }).replies.map(
+      (x) => x.text,
+    ),
     friendTuyCon,
   );
   assert.deepEqual(
-    translateParentMessage({ message: STUB, speaker: 'Bạn thân', context: 'Khác' }).replies.map((x) => x.text),
+    translateParentMessage({ message: STUB, speaker: 'Bạn thân', context: 'Khác' }).replies.map(
+      (x) => x.text,
+    ),
     friendTuyCon,
   );
   const friendKhongSao = [
@@ -141,19 +154,27 @@ test('Sprint2/R2: xưng hô nhất quán trong thân biến thể Người yêu 
     'Vậy tối mình gọi buôn với bạn một lúc nhé. Nghe giọng bạn mình mới yên tâm là không còn gì vướng.',
   ];
   assert.deepEqual(
-    translateDichbome({ message: 'Không sao đâu', speaker: 'friend', context: 'khac' }).replies.map((x) => x.text),
+    translateDichbome({ message: 'Không sao đâu', speaker: 'friend', context: 'khac' }).replies.map(
+      (x) => x.text,
+    ),
     friendKhongSao,
   );
   assert.deepEqual(
-    translateParentMessage({ message: 'Không sao đâu', speaker: 'Bạn thân', context: 'Khác' }).replies.map(
-      (x) => x.text,
-    ),
+    translateParentMessage({
+      message: 'Không sao đâu',
+      speaker: 'Bạn thân',
+      context: 'Khác',
+    }).replies.map((x) => x.text),
     friendKhongSao,
   );
 });
 
 test('Sprint2/R1: CONTEXT_HINTS client chỉ nối cho vai bố/mẹ — Người yêu + Về quê không rò khung bố mẹ', () => {
-  const lover = translateParentMessage({ message: PANEL115, speaker: 'Người yêu', context: 'Về quê' });
+  const lover = translateParentMessage({
+    message: PANEL115,
+    speaker: 'Người yêu',
+    context: 'Về quê',
+  });
   assert.ok(!lover.realWant.includes('bố mẹ nghe ngày tháng'), lover.realWant);
   const mother = translateParentMessage({ message: PANEL115, speaker: 'Mẹ', context: 'Về quê' });
   assert.ok(mother.realWant.includes('bố mẹ nghe ngày tháng'), mother.realWant);

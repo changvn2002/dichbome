@@ -284,7 +284,13 @@ const CLOSING_CASES = [
     detail: PANEL03_DETAIL_1,
     detail2: PANEL03_DETAIL_2,
   },
-  { message: SHORT43_MESSAGE, ctxS: 'khac', ctxC: 'Khác', detail: 'Tối nay con bận', detail2: null },
+  {
+    message: SHORT43_MESSAGE,
+    ctxS: 'khac',
+    ctxC: 'Khác',
+    detail: 'Tối nay con bận',
+    detail2: null,
+  },
   {
     message: 'Sao cũng được. Thứ bảy này mẹ đi khám.',
     ctxS: 'khac',
@@ -326,7 +332,10 @@ function assertClosingShape(r, c, engineLabel) {
   const texts = r.replies.map((x) => x.text);
   assert.ok(texts[0].includes(c.detail), `${engineLabel} replies[0] thiếu chi tiết: ${texts[0]}`);
   if (c.detail2) {
-    assert.ok(texts[1].includes(c.detail2), `${engineLabel} replies[1] thiếu chi tiết 2: ${texts[1]}`);
+    assert.ok(
+      texts[1].includes(c.detail2),
+      `${engineLabel} replies[1] thiếu chi tiết 2: ${texts[1]}`,
+    );
   }
   for (const t of texts) {
     for (const p of HEN_LANG_PATTERNS) {
@@ -334,7 +343,10 @@ function assertClosingShape(r, c, engineLabel) {
     }
   }
   // replies[2] kết thúc bằng đuôi chốt theo detail (chứa «Riêng chuyện»).
-  assert.ok(texts[2].includes('Riêng chuyện'), `${engineLabel} replies[2] thiếu đuôi chốt: ${texts[2]}`);
+  assert.ok(
+    texts[2].includes('Riêng chuyện'),
+    `${engineLabel} replies[2] thiếu đuôi chốt: ${texts[2]}`,
+  );
   assert.ok(texts[2].includes(c.detail), `${engineLabel} replies[2] thiếu chi tiết: ${texts[2]}`);
 }
 
@@ -418,9 +430,24 @@ test('Sprint2/S1: chi tiết phủ định quanh từ khoá → đuôi rơi họ
 
 test('Sprint2/S1: khoá biên ngưỡng generic 29/30/31 + fallback 79/80/81 (2 engine)', () => {
   const genericBand = [
-    { message: 'Tùy con. Tối nay con bận lắm.', len: 29, depth: false, detail: 'Tối nay con bận lắm' },
-    { message: 'Tùy con. Tối nay con bận thật.', len: 30, depth: true, detail: 'Tối nay con bận thật' },
-    { message: 'Tùy con. Tối nay con bận quá ạ.', len: 31, depth: true, detail: 'Tối nay con bận quá ạ' },
+    {
+      message: 'Tùy con. Tối nay con bận lắm.',
+      len: 29,
+      depth: false,
+      detail: 'Tối nay con bận lắm',
+    },
+    {
+      message: 'Tùy con. Tối nay con bận thật.',
+      len: 30,
+      depth: true,
+      detail: 'Tối nay con bận thật',
+    },
+    {
+      message: 'Tùy con. Tối nay con bận quá ạ.',
+      len: 31,
+      depth: true,
+      detail: 'Tối nay con bận quá ạ',
+    },
   ];
   for (const c of genericBand) {
     assert.equal(c.message.length, c.len);
@@ -439,8 +466,7 @@ test('Sprint2/S1: khoá biên ngưỡng generic 29/30/31 + fallback 79/80/81 (2 
       }
     }
   }
-  const fbBase =
-    'Hôm nay trời mưa buổi chiều, đường ngập nước khắp nơi, xe cộ kẹt cứng một tiếng';
+  const fbBase = 'Hôm nay trời mưa buổi chiều, đường ngập nước khắp nơi, xe cộ kẹt cứng một tiếng';
   const fallbackBand = [
     { message: fbBase, len: 79, depth: false },
     { message: `${fbBase}!`, len: 80, depth: true },
