@@ -57,6 +57,8 @@ trên máy người dùng (localStorage) đọc được qua các bản nhờ ad
 
 | Tag     | Commit  | Vercel deployment | Ngày       | Ghi chú                        |
 | ------- | ------- | ----------------- | ---------- | ------------------------------ |
+| v1.2.0 | 29a08a2 | production (GitHub-linked, tự deploy khi push) | 2026-10-24 | Fix wave 4 + SEC-10 (next 16.4.2) |
+| v1.1.0 | 066dc88 | production (GitHub-linked) | 2026-10-23 | Fix wave 3 |
 | (chưa có tag — parent tạo ở lần deploy kế tiếp) | be4a721 | bản live redesign-v2 + fix wave Panel #02 | 2026-10-23 | Tag hồi tố do parent quyết định |
 
 _Bảng này cập nhật ở MỖI lần deploy._
