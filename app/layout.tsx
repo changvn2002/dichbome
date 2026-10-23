@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Be_Vietnam_Pro, Outfit, Playfair_Display } from 'next/font/google';
+import { FAQS } from '@/lib/faq';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from '@/lib/site';
 import './globals.css';
 
@@ -44,10 +45,14 @@ export const metadata: Metadata = {
     'giải mã gia đình',
     'dịch tiếng bố mẹ',
     'dịch ý thật tin nhắn',
+    'giải mã tin nhắn',
     'hiểu ý bố mẹ',
+    'hiểu ý bố mẹ qua tin nhắn',
     'tin nhắn bố mẹ',
     'mẹ chồng nàng dâu',
+    'hiểu ý mẹ chồng',
     'tin nhắn vợ chồng',
+    'cách trả lời tin nhắn bố mẹ',
     'gợi ý câu trả lời',
     'ứng dụng gia đình việt',
   ],
@@ -108,14 +113,29 @@ export const metadata: Metadata = {
  */
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'WebApplication',
-  name: SITE_NAME,
-  alternateName: 'dichbome',
-  url: `${SITE_URL}/`,
-  description: SITE_DESCRIPTION,
-  inLanguage: 'vi',
-  applicationCategory: 'LifestyleApplication',
-  operatingSystem: 'Any',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: SITE_NAME,
+      alternateName: 'dichbome',
+      url: `${SITE_URL}/`,
+      description: SITE_DESCRIPTION,
+      inLanguage: 'vi',
+      applicationCategory: 'LifestyleApplication',
+      operatingSystem: 'Any',
+    },
+    {
+      // FAQPage phải khớp từng câu với section FAQ hiển thị trên trang chủ —
+      // cả hai cùng đọc từ lib/faq.ts nên không thể lệch nhau.
+      '@type': 'FAQPage',
+      inLanguage: 'vi',
+      mainEntity: FAQS.map((faq) => ({
+        '@type': 'Question',
+        name: faq.question,
+        acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+      })),
+    },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
