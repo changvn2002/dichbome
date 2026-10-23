@@ -995,7 +995,7 @@ export function DichbomeApp() {
           </button>
           <button
             type="button"
-            onClick={() => scrollToSection('saved')}
+            onClick={() => scrollToSection('history')}
             className="flex min-h-16 flex-col items-center justify-center gap-1 text-[11px] font-medium text-muted"
           >
             <History className="size-5" aria-hidden />
