@@ -1,0 +1,4 @@
+Contact: https://github.com/changvn2002/dichbome/security/advisories/new
+Expires: 2027-10-23T00:00:00.000Z
+Preferred-Languages: vi, en
+Canonical: https://dichbome.vercel.app/.well-known/security.txt

@@ -1,11 +1,11 @@
 // Honesty layer (redesign-v2) — W2: tầng trung thực engine.
 // Chạy: pnpm test
 // Các module lá (engine server, translate client, server-patterns) không có import nội bộ
-// nên import tĩnh bằng đường dẫn .ts như tests cũ. honesty.ts và api/mock.ts dùng import
+// nên import tĩnh bằng đường dẫn .ts như tests cũ. honesty.ts và api/local.ts dùng import
 // nội bộ không đuôi đúng chuẩn codebase Next/TS ('./translate', '../lib/translate') —
 // Node ESM không tự resolve kiểu đó, nên test này đăng ký một loader ESM nhỏ (chỉ trong
 // tiến trình test) để resolve specifier tương đối không đuôi sang file .ts/.tsx tương ứng,
-// rồi import động honesty/mock SAU khi đăng ký. Code production không bị ảnh hưởng.
+// rồi import động honesty/local SAU khi đăng ký. Code production không bị ảnh hưởng.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { register } from 'node:module';
@@ -51,7 +51,7 @@ const {
   gateForServer,
   gateForDevice,
 } = await import('../components/dichbome/lib/honesty.ts');
-const { createMockDichbomeApi } = await import('../components/dichbome/api/mock.ts');
+const { createLocalDichbomeApi } = await import('../components/dichbome/api/local.ts');
 
 test('honesty: chuỗi vô nghĩa -> match null, không có token nào được nhận biết, gate not-read', () => {
   const r = evaluateClient('asdf qwer zxcv 123', 'Mẹ');
@@ -165,8 +165,8 @@ test('honesty: drift — snapshot SERVER_ENTRY_PATTERNS khớp getEntryPatterns(
   assert.deepEqual(snapExact, liveExact);
 });
 
-test('honesty: mock API trả kèm meta từ matchRuleInfo phía client', async () => {
-  const api = createMockDichbomeApi();
+test('honesty: local API trả kèm meta từ matchRuleInfo phía client', async () => {
+  const api = createLocalDichbomeApi();
   const hit = await api.translate({
     message: 'Tùy con, mẹ sao cũng được.',
     speaker: 'Mẹ',

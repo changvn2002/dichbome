@@ -176,7 +176,7 @@ by hairlines; reply rows are flat rows inside the slip.
 
 ## Motion
 
-Named list only: `bubble-in` 160ms · `slip-answer` stagger 60ms per block ·
+Named list only: `bubble-in` 160ms · `slip-block` stagger 60ms per block ·
 `gauge-fill` 400ms · `typing-dots` (loading — the logo's reply-bubble dots,
 never the framework's default pulse skeleton) · `board-sheet` 220ms. All
 transform/opacity. `prefers-reduced-motion`: instant/fade-minimal, dots static.

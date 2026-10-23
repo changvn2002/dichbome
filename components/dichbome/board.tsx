@@ -72,7 +72,7 @@ function BoardEmptyState({
 }) {
   return (
     <div className="py-4">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
       <img src="/products/brand/dichbome-empty-stage.webp" alt="" className="w-[120px]" />
       <p className="mt-3 font-semibold text-ink">{title}</p>
       {description ? (
@@ -148,7 +148,7 @@ export function Board({
       )}
     >
       <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-line px-4">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
         <img src="/products/brand/dichbome-logo.svg" alt="" className="size-6 shrink-0" />
         {/* N-6 (Panel #02): tiêu đề là div, không phải h2 — Board là aside
             luôn mounted (ẩn bằng visibility khi đóng sheet ở mobile) nên

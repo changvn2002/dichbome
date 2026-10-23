@@ -20,9 +20,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files
-.env*.local
-.env
+# env files (ARC-02, fix wave 3: chặn MỌI biến thể .env*, chỉ chừa mẫu công khai)
+.env*
+!.env.example
 
 # typescript
 *.tsbuildinfo

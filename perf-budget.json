@@ -1,0 +1,15 @@
+{
+  "budgetBytes": 190000,
+  "codeSplitEvidence": "Trang là một route duy nhất; engine local nằm trong chunk trang (đo bằng script scripts/check-bundle-budget.mjs sau build).",
+  "enforcedBy": "scripts/check-bundle-budget.mjs trong CI (.github/workflows/ci.yml)",
+  "fontPolicy": "Preload chỉ dành cho font hiển thị Fraunces (2 file vietnamese+latin); Be Vietnam Pro không preload (ADR-002).",
+  "growthLock": "10%/release — tăng ngân sách phải kèm ADR mới",
+  "hardCapBytes": 307200,
+  "item": "PERF-08",
+  "measuredAtDeclare": "2026-10-23 (bản live be4a721, bộ bằng chứng hiệu năng của hồ sơ chấm vòng 3)",
+  "measuredBytesAfterWave": 178747,
+  "measuredAfterWaveNote": "Đo lại sau fix wave 3 bằng cùng định nghĩa của bộ bằng chứng (trừ polyfill nomodule): +2.197 B (+1,24%) so với trước wave — trong khoá tăng trưởng 10%/release. Số do script ngân sách của wave và một phép đo độc lập của kiểm chứng viên B cho cùng một kết quả 178.747 B (đồng bộ tại commit của parent 2026-10-23).",
+  "measuredBytesBeforeWave": 176550,
+  "tier": "B",
+  "tierRationale": "Công cụ tương tác dùng được offline (bản đồ Tier của checklist v1.0 mục PERF-08): first-load chứa stage + composer + engine trên máy; Tier A 170 KB dành cho trang nội dung/marketing."
+}

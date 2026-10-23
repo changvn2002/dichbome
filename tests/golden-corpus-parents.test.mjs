@@ -4,6 +4,14 @@
 // Quy tắc: mọi ca ở đây là input NGẮN/điển hình của pattern riêng hoặc fallback của
 // vai bố/mẹ — M-2 chỉ được đổi output cho tin DÀI giàu chi tiết ở đường mẫu chung,
 // nên toàn bộ corpus này phải giữ nguyên từng byte. Đỏ ở đây = đã phá đường riêng.
+//
+// Cập nhật fix wave 3 (2026-10-23, CQ-14 hợp nhất hai engine — server là nguồn
+// sự thật): SERVER_GOLDEN giữ nguyên từng byte. CLIENT_GOLDEN thay đổi ĐÚNG ở
+// các ca mà client được căn theo server: rule tuy-con (meaning + anger 2->3,
+// ×3 vai), rule bao-gio-ve (meaning + anger 1->2, ×3 vai), và 6 ca fallback
+// (fallback theo nhóm chủ đề mirror FALLBACKS server thay bản đọc chung cũ).
+// Mọi ca client còn lại giữ nguyên từng byte; parity suite ở
+// tests-evidence/engine-parity.test.mjs là bằng chứng cho các thay đổi này.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { translateDichbome } from '../lib/server/engine.ts';
@@ -1739,11 +1747,11 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Thường không phải "sao cũng được" đâu. Bố mẹ đã có ý sẵn trong đầu rồi, nói "tùy con" là để xem con có tự hiểu ý không.',
+        "'Tùy con' nghe như cho tự quyết, nhưng đa phần mẹ đã có sẵn một đáp án trong đầu rồi. Đây là phép thử nhẹ: xem con có tự nghĩ ra đúng ý mẹ đang nghĩ không.",
       realWant:
         'Muốn con hỏi thêm một câu cho chắc, hoặc chọn đúng cái ý mà bố mẹ đang nghĩ — chứ quyết luôn một mình là dễ sai ý lắm.',
-      angerLevel: 2,
-      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
+      angerLevel: 3,
+      dangerLabel: 'Đang nguội giận, đừng châm thêm',
       replies: [
         {
           label: 'An toàn nhất',
@@ -1770,11 +1778,11 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Thường không phải "sao cũng được" đâu. Bố mẹ đã có ý sẵn trong đầu rồi, nói "tùy con" là để xem con có tự hiểu ý không.',
+        "'Tùy con' nghe như cho tự quyết, nhưng đa phần bố đã có sẵn một đáp án trong đầu rồi. Đây là phép thử nhẹ: xem con có tự nghĩ ra đúng ý bố đang nghĩ không.",
       realWant:
         'Muốn con hỏi thêm một câu cho chắc, hoặc chọn đúng cái ý mà bố mẹ đang nghĩ — chứ quyết luôn một mình là dễ sai ý lắm.',
-      angerLevel: 2,
-      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
+      angerLevel: 3,
+      dangerLabel: 'Đang nguội giận, đừng châm thêm',
       replies: [
         {
           label: 'An toàn nhất',
@@ -1801,11 +1809,11 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Thường không phải "sao cũng được" đâu. Bố mẹ đã có ý sẵn trong đầu rồi, nói "tùy con" là để xem con có tự hiểu ý không.',
+        "'Tùy con' nghe như cho tự quyết, nhưng đa phần bố mẹ đã có sẵn một đáp án trong đầu rồi. Đây là phép thử nhẹ: xem con có tự nghĩ ra đúng ý bố mẹ đang nghĩ không.",
       realWant:
         'Muốn con hỏi thêm một câu cho chắc, hoặc chọn đúng cái ý mà bố mẹ đang nghĩ — chứ quyết luôn một mình là dễ sai ý lắm.',
-      angerLevel: 2,
-      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
+      angerLevel: 3,
+      dangerLabel: 'Đang nguội giận, đừng châm thêm',
       replies: [
         {
           label: 'An toàn nhất',
@@ -2105,11 +2113,11 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Bố mẹ đang đếm ngày đấy. Hỏi "bao giờ về" nghĩa là nhà đang mong lắm, có khi đã chuẩn bị sẵn món con thích và khoe hàng xóm là con sắp về rồi.',
+        "'Bao giờ thì về?' không phải hỏi lịch trình. Đó là câu hỏi của người đang đếm ngày — mẹ muốn biết chính xác để chuẩn bị, và để có cái mà mong.",
       realWant:
         'Muốn một mốc thời gian cụ thể để bố mẹ chuẩn bị và có cái để mong chờ — "để xem đã" là câu bố mẹ buồn nhất khi nghe.',
-      angerLevel: 1,
-      dangerLabel: 'Hơi nhạy cảm thôi',
+      angerLevel: 2,
+      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
       replies: [
         {
           label: 'Chốt ngày rõ ràng',
@@ -2135,11 +2143,11 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Bố mẹ đang đếm ngày đấy. Hỏi "bao giờ về" nghĩa là nhà đang mong lắm, có khi đã chuẩn bị sẵn món con thích và khoe hàng xóm là con sắp về rồi.',
+        "'Bao giờ thì về?' không phải hỏi lịch trình. Đó là câu hỏi của người đang đếm ngày — bố muốn biết chính xác để chuẩn bị, và để có cái mà mong.",
       realWant:
         'Muốn một mốc thời gian cụ thể để bố mẹ chuẩn bị và có cái để mong chờ — "để xem đã" là câu bố mẹ buồn nhất khi nghe.',
-      angerLevel: 1,
-      dangerLabel: 'Hơi nhạy cảm thôi',
+      angerLevel: 2,
+      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
       replies: [
         {
           label: 'Chốt ngày rõ ràng',
@@ -2165,11 +2173,11 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Bố mẹ đang đếm ngày đấy. Hỏi "bao giờ về" nghĩa là nhà đang mong lắm, có khi đã chuẩn bị sẵn món con thích và khoe hàng xóm là con sắp về rồi.',
+        "'Bao giờ thì về?' không phải hỏi lịch trình. Đó là câu hỏi của người đang đếm ngày — bố mẹ muốn biết chính xác để chuẩn bị, và để có cái mà mong.",
       realWant:
         'Muốn một mốc thời gian cụ thể để bố mẹ chuẩn bị và có cái để mong chờ — "để xem đã" là câu bố mẹ buồn nhất khi nghe.',
-      angerLevel: 1,
-      dangerLabel: 'Hơi nhạy cảm thôi',
+      angerLevel: 2,
+      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
       replies: [
         {
           label: 'Chốt ngày rõ ràng',
@@ -2558,23 +2566,23 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Câu này chưa có trong từ điển nhà mình, nhưng thường bố mẹ nói ngắn gọn thế này là đang muốn con hỏi thêm — đừng trả lời cụt lủn một chữ "dạ" rồi thôi nhé.',
+        'Câu này nghe nhẹ mà thường còn một lớp nghĩa ở dưới. Mẹ hay nói giảm nói tránh cho con đỡ lo, nên phải nghe cả điều không được nói ra mới hiểu hết.',
       realWant:
-        'Muốn con dừng lại vài phút, hỏi han tử tế và lắng nghe hết câu chuyện, thay vì trả lời cho qua chuyện.',
-      angerLevel: 1,
-      dangerLabel: 'Hơi nhạy cảm thôi',
+        'Muốn con hỏi thêm một câu và quan tâm thêm một chút. Với mẹ, được con để ý là đã vui rồi.',
+      angerLevel: 2,
+      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
       replies: [
         {
+          label: 'Ngoan nhất',
+          text: 'Dạ, mẹ nói vậy là còn chuyện gì nữa không ạ? Mẹ kể con nghe đi.',
+        },
+        {
+          label: 'Khéo nhất',
+          text: 'Con cảm ơn mẹ. Có gì mẹ cứ nói thẳng với con, con nghe hết ạ.',
+        },
+        {
           label: 'An toàn nhất',
-          text: 'Dạ con nghe đây ạ, mẹ nói thêm cho con hiểu với, con muốn nghe mẹ nói hết.',
-        },
-        {
-          label: 'Quan tâm',
-          text: 'Chuyện này mẹ để bụng lâu chưa ạ? Con xin lỗi nếu con vô tâm, mẹ kể con nghe nhé.',
-        },
-        {
-          label: 'Hài hước',
-          text: 'Câu này của mẹ là con phải "dịch" một lúc mới hiểu. Mẹ gợi ý thêm cho con một chút đi ạ 😄',
+          text: 'Dạ, để con gọi về nói chuyện với mẹ kỹ hơn nhé.',
         },
       ],
     },
@@ -2588,23 +2596,23 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Câu này chưa có trong từ điển nhà mình, nhưng thường bố mẹ nói ngắn gọn thế này là đang muốn con hỏi thêm — đừng trả lời cụt lủn một chữ "dạ" rồi thôi nhé.',
+        'Chuyện về quê, về nhà mà được nhắc tới là mẹ đang nhớ con. Nhà có việc chỉ là cái cớ, lý do thật là muốn nhìn thấy con một lần cho yên tâm.',
       realWant:
-        'Muốn con dừng lại vài phút, hỏi han tử tế và lắng nghe hết câu chuyện, thay vì trả lời cho qua chuyện. Chuyện về quê thì đừng hứa suông: chốt ngày cụ thể, bố mẹ nghe ngày tháng rõ ràng là vui cả tuần.',
-      angerLevel: 1,
-      dangerLabel: 'Hơi nhạy cảm thôi',
+        'Muốn con sắp xếp về một chuyến, hoặc ít nhất chốt một dịp cụ thể để mẹ có cái mà đợi. Chuyện về quê thì đừng hứa suông: chốt ngày cụ thể, bố mẹ nghe ngày tháng rõ ràng là vui cả tuần.',
+      angerLevel: 2,
+      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
       replies: [
         {
+          label: 'Ngoan nhất',
+          text: 'Dạ, để con sắp xếp công việc rồi con về một chuyến. Con báo ngày cho mẹ sớm.',
+        },
+        {
+          label: 'Khéo nhất',
+          text: 'Dạ con cũng muốn về lắm. Kỳ này về con ở nhà lâu lâu với mẹ.',
+        },
+        {
           label: 'An toàn nhất',
-          text: 'Dạ con nghe đây ạ, mẹ nói thêm cho con hiểu với, con muốn nghe mẹ nói hết.',
-        },
-        {
-          label: 'Quan tâm',
-          text: 'Chuyện này mẹ để bụng lâu chưa ạ? Con xin lỗi nếu con vô tâm, mẹ kể con nghe nhé.',
-        },
-        {
-          label: 'Hài hước',
-          text: 'Câu này của mẹ là con phải "dịch" một lúc mới hiểu. Mẹ gợi ý thêm cho con một chút đi ạ 😄',
+          text: 'Giờ con chưa về được, nhưng con gọi video với mẹ mỗi tối nhé.',
         },
       ],
     },
@@ -2618,23 +2626,23 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Câu này chưa có trong từ điển nhà mình, nhưng thường bố mẹ nói ngắn gọn thế này là đang muốn con hỏi thêm — đừng trả lời cụt lủn một chữ "dạ" rồi thôi nhé.',
+        'Câu này nghe nhẹ mà thường còn một lớp nghĩa ở dưới. Bố hay nói giảm nói tránh cho con đỡ lo, nên phải nghe cả điều không được nói ra mới hiểu hết.',
       realWant:
-        'Muốn con dừng lại vài phút, hỏi han tử tế và lắng nghe hết câu chuyện, thay vì trả lời cho qua chuyện.',
-      angerLevel: 1,
-      dangerLabel: 'Hơi nhạy cảm thôi',
+        'Muốn con hỏi thêm một câu và quan tâm thêm một chút. Với bố, được con để ý là đã vui rồi.',
+      angerLevel: 2,
+      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
       replies: [
         {
+          label: 'Ngoan nhất',
+          text: 'Dạ, bố nói vậy là còn chuyện gì nữa không ạ? Bố kể con nghe đi.',
+        },
+        {
+          label: 'Khéo nhất',
+          text: 'Con cảm ơn bố. Có gì bố cứ nói thẳng với con, con nghe hết ạ.',
+        },
+        {
           label: 'An toàn nhất',
-          text: 'Dạ con nghe đây ạ, bố nói thêm cho con hiểu với, con muốn nghe bố nói hết.',
-        },
-        {
-          label: 'Quan tâm',
-          text: 'Chuyện này bố để bụng lâu chưa ạ? Con xin lỗi nếu con vô tâm, bố kể con nghe nhé.',
-        },
-        {
-          label: 'Hài hước',
-          text: 'Câu này của bố là con phải "dịch" một lúc mới hiểu. Bố gợi ý thêm cho con một chút đi ạ 😄',
+          text: 'Dạ, để con gọi về nói chuyện với bố kỹ hơn nhé.',
         },
       ],
     },
@@ -2648,23 +2656,23 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Câu này chưa có trong từ điển nhà mình, nhưng thường bố mẹ nói ngắn gọn thế này là đang muốn con hỏi thêm — đừng trả lời cụt lủn một chữ "dạ" rồi thôi nhé.',
+        'Chuyện về quê, về nhà mà được nhắc tới là bố đang nhớ con. Nhà có việc chỉ là cái cớ, lý do thật là muốn nhìn thấy con một lần cho yên tâm.',
       realWant:
-        'Muốn con dừng lại vài phút, hỏi han tử tế và lắng nghe hết câu chuyện, thay vì trả lời cho qua chuyện. Chuyện về quê thì đừng hứa suông: chốt ngày cụ thể, bố mẹ nghe ngày tháng rõ ràng là vui cả tuần.',
-      angerLevel: 1,
-      dangerLabel: 'Hơi nhạy cảm thôi',
+        'Muốn con sắp xếp về một chuyến, hoặc ít nhất chốt một dịp cụ thể để bố có cái mà đợi. Chuyện về quê thì đừng hứa suông: chốt ngày cụ thể, bố mẹ nghe ngày tháng rõ ràng là vui cả tuần.',
+      angerLevel: 2,
+      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
       replies: [
         {
+          label: 'Ngoan nhất',
+          text: 'Dạ, để con sắp xếp công việc rồi con về một chuyến. Con báo ngày cho bố sớm.',
+        },
+        {
+          label: 'Khéo nhất',
+          text: 'Dạ con cũng muốn về lắm. Kỳ này về con ở nhà lâu lâu với bố.',
+        },
+        {
           label: 'An toàn nhất',
-          text: 'Dạ con nghe đây ạ, bố nói thêm cho con hiểu với, con muốn nghe bố nói hết.',
-        },
-        {
-          label: 'Quan tâm',
-          text: 'Chuyện này bố để bụng lâu chưa ạ? Con xin lỗi nếu con vô tâm, bố kể con nghe nhé.',
-        },
-        {
-          label: 'Hài hước',
-          text: 'Câu này của bố là con phải "dịch" một lúc mới hiểu. Bố gợi ý thêm cho con một chút đi ạ 😄',
+          text: 'Giờ con chưa về được, nhưng con gọi video với bố mỗi tối nhé.',
         },
       ],
     },
@@ -2678,23 +2686,23 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Câu này chưa có trong từ điển nhà mình, nhưng thường bố mẹ nói ngắn gọn thế này là đang muốn con hỏi thêm — đừng trả lời cụt lủn một chữ "dạ" rồi thôi nhé.',
+        'Câu này nghe nhẹ mà thường còn một lớp nghĩa ở dưới. Bố mẹ hay nói giảm nói tránh cho con đỡ lo, nên phải nghe cả điều không được nói ra mới hiểu hết.',
       realWant:
-        'Muốn con dừng lại vài phút, hỏi han tử tế và lắng nghe hết câu chuyện, thay vì trả lời cho qua chuyện.',
-      angerLevel: 1,
-      dangerLabel: 'Hơi nhạy cảm thôi',
+        'Muốn con hỏi thêm một câu và quan tâm thêm một chút. Với bố mẹ, được con để ý là đã vui rồi.',
+      angerLevel: 2,
+      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
       replies: [
         {
+          label: 'Ngoan nhất',
+          text: 'Dạ, bố mẹ nói vậy là còn chuyện gì nữa không ạ? Bố mẹ kể con nghe đi.',
+        },
+        {
+          label: 'Khéo nhất',
+          text: 'Con cảm ơn bố mẹ. Có gì bố mẹ cứ nói thẳng với con, con nghe hết ạ.',
+        },
+        {
           label: 'An toàn nhất',
-          text: 'Dạ con nghe đây ạ, bố mẹ nói thêm cho con hiểu với, con muốn nghe bố mẹ nói hết.',
-        },
-        {
-          label: 'Quan tâm',
-          text: 'Chuyện này bố mẹ để bụng lâu chưa ạ? Con xin lỗi nếu con vô tâm, bố mẹ kể con nghe nhé.',
-        },
-        {
-          label: 'Hài hước',
-          text: 'Câu này của bố mẹ là con phải "dịch" một lúc mới hiểu. Bố mẹ gợi ý thêm cho con một chút đi ạ 😄',
+          text: 'Dạ, để con gọi về nói chuyện với bố mẹ kỹ hơn nhé.',
         },
       ],
     },
@@ -2708,23 +2716,23 @@ const CLIENT_GOLDEN = [
     },
     expected: {
       meaning:
-        'Câu này chưa có trong từ điển nhà mình, nhưng thường bố mẹ nói ngắn gọn thế này là đang muốn con hỏi thêm — đừng trả lời cụt lủn một chữ "dạ" rồi thôi nhé.',
+        'Chuyện về quê, về nhà mà được nhắc tới là bố mẹ đang nhớ con. Nhà có việc chỉ là cái cớ, lý do thật là muốn nhìn thấy con một lần cho yên tâm.',
       realWant:
-        'Muốn con dừng lại vài phút, hỏi han tử tế và lắng nghe hết câu chuyện, thay vì trả lời cho qua chuyện. Chuyện về quê thì đừng hứa suông: chốt ngày cụ thể, bố mẹ nghe ngày tháng rõ ràng là vui cả tuần.',
-      angerLevel: 1,
-      dangerLabel: 'Hơi nhạy cảm thôi',
+        'Muốn con sắp xếp về một chuyến, hoặc ít nhất chốt một dịp cụ thể để bố mẹ có cái mà đợi. Chuyện về quê thì đừng hứa suông: chốt ngày cụ thể, bố mẹ nghe ngày tháng rõ ràng là vui cả tuần.',
+      angerLevel: 2,
+      dangerLabel: 'Hơi nguy hiểm — đáp khéo vào',
       replies: [
         {
+          label: 'Ngoan nhất',
+          text: 'Dạ, để con sắp xếp công việc rồi con về một chuyến. Con báo ngày cho bố mẹ sớm.',
+        },
+        {
+          label: 'Khéo nhất',
+          text: 'Dạ con cũng muốn về lắm. Kỳ này về con ở nhà lâu lâu với bố mẹ.',
+        },
+        {
           label: 'An toàn nhất',
-          text: 'Dạ con nghe đây ạ, bố mẹ nói thêm cho con hiểu với, con muốn nghe bố mẹ nói hết.',
-        },
-        {
-          label: 'Quan tâm',
-          text: 'Chuyện này bố mẹ để bụng lâu chưa ạ? Con xin lỗi nếu con vô tâm, bố mẹ kể con nghe nhé.',
-        },
-        {
-          label: 'Hài hước',
-          text: 'Câu này của bố mẹ là con phải "dịch" một lúc mới hiểu. Bố mẹ gợi ý thêm cho con một chút đi ạ 😄',
+          text: 'Giờ con chưa về được, nhưng con gọi video với bố mẹ mỗi tối nhé.',
         },
       ],
     },

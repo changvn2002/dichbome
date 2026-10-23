@@ -39,65 +39,46 @@ test(
   },
 );
 
-test(
-  'KI-PARITY-1: normalizeVi hai engine cho cùng một chuỗi',
-  { todo: 'Backlog C6 — hợp nhất 2 engine (sprint riêng, cần ADR)' },
-  () => {
-    for (const s of ['Mẹ ơi! Con về...', 'Tuỳ con!!!', 'Ăn cơm chưa?', 'ĐỪNG có về nữa...']) {
-      assert.equal(
-        normalizeServer(s),
-        normalizeClient(s),
-        `normalize lệch cho ${JSON.stringify(s)}`,
-      );
-    }
-  },
-);
+// ĐÃ SỬA ở fix wave 3 (CQ-14, 2026-10-23): bỏ cờ todo — test thành khoá hồi quy.
+test('KI-PARITY-1: normalizeVi hai engine cho cùng một chuỗi', () => {
+  for (const s of ['Mẹ ơi! Con về...', 'Tuỳ con!!!', 'Ăn cơm chưa?', 'ĐỪNG có về nữa...']) {
+    assert.equal(normalizeServer(s), normalizeClient(s), `normalize lệch cho ${JSON.stringify(s)}`);
+  }
+});
 
-test(
-  'KI-PARITY-2: cùng input, server và client fallback cho cùng meaning',
-  { todo: 'Backlog C6 — hợp nhất 2 engine (sprint riêng, cần ADR)' },
-  () => {
-    const cases = [
-      { message: 'Tuỳ con', speaker: 'me', context: 'khac', cs: 'Mẹ', cc: 'Khác' },
-      { message: 'Con bận', speaker: 'child', context: 'khac', cs: 'Con', cc: 'Khác' },
-      { message: 'Mẹ ăn cơm rồi', speaker: 'me', context: 'suc-khoe', cs: 'Mẹ', cc: 'Sức khoẻ' },
-      { message: 'Khi nào về quê?', speaker: 'me', context: 've-que', cs: 'Mẹ', cc: 'Về quê' },
-      { message: 'Ừ', speaker: 'me', context: 'khac', cs: 'Mẹ', cc: 'Khác' },
-    ];
-    for (const c of cases) {
-      const s = translateDichbome({ message: c.message, speaker: c.speaker, context: c.context });
-      const cl = translateParentMessage({ message: c.message, speaker: c.cs, context: c.cc });
-      assert.equal(s.meaning, cl.meaning, `meaning lệch cho "${c.message}"`);
-    }
-  },
-);
+// ĐÃ SỬA ở fix wave 3 (CQ-14, 2026-10-23): bỏ cờ todo — test thành khoá hồi quy.
+test('KI-PARITY-2: cùng input, server và client fallback cho cùng meaning', () => {
+  const cases = [
+    { message: 'Tuỳ con', speaker: 'me', context: 'khac', cs: 'Mẹ', cc: 'Khác' },
+    { message: 'Con bận', speaker: 'child', context: 'khac', cs: 'Con', cc: 'Khác' },
+    { message: 'Mẹ ăn cơm rồi', speaker: 'me', context: 'suc-khoe', cs: 'Mẹ', cc: 'Sức khoẻ' },
+    { message: 'Khi nào về quê?', speaker: 'me', context: 've-que', cs: 'Mẹ', cc: 'Về quê' },
+    { message: 'Ừ', speaker: 'me', context: 'khac', cs: 'Mẹ', cc: 'Khác' },
+  ];
+  for (const c of cases) {
+    const s = translateDichbome({ message: c.message, speaker: c.speaker, context: c.context });
+    const cl = translateParentMessage({ message: c.message, speaker: c.cs, context: c.cc });
+    assert.equal(s.meaning, cl.meaning, `meaning lệch cho "${c.message}"`);
+  }
+});
 
-test(
-  'KI-PARITY-3: tập examples server và client giống hệt nhau',
-  { todo: 'Backlog C6/C5 — đồng bộ examples 2 phía (C5 chờ Panel duyệt hiển thị)' },
-  () => {
-    assert.equal(DICHBOME_EXAMPLES.length, PARENT_EXAMPLES.length);
-  },
-);
+// ĐÃ SỬA ở fix wave 3 (CQ-14, 2026-10-23): bỏ cờ todo — test thành khoá hồi quy.
+test('KI-PARITY-3: tập examples server và client giống hệt nhau', () => {
+  assert.equal(DICHBOME_EXAMPLES.length, PARENT_EXAMPLES.length);
+});
 
-test(
-  'KI-VAL-1: engine server tự chặn message > 500 ký tự như route',
-  { todo: 'Backlog C8 — đưa validation xuống engine (cần vá đồng thời đường fallback app.tsx)' },
-  () => {
-    assert.throws(
-      () => translateDichbome({ message: 'a'.repeat(501), speaker: 'me', context: 'khac' }),
-      /500/,
-    );
-  },
-);
+// ĐÃ SỬA ở fix wave 3 (2026-10-23): bỏ cờ todo — test thành khoá hồi quy.
+test('KI-VAL-1: engine server tự chặn message > 500 ký tự như route', () => {
+  assert.throws(
+    () => translateDichbome({ message: 'a'.repeat(501), speaker: 'me', context: 'khac' }),
+    /500/,
+  );
+});
 
-test(
-  'KI-VAL-2: engine client tự chặn message rỗng như mock API',
-  { todo: 'Backlog C8 — đưa validation xuống engine (cần vá đồng thời đường fallback app.tsx)' },
-  () => {
-    assert.throws(() => translateParentMessage({ message: '   ', speaker: 'Mẹ', context: 'Khác' }));
-  },
-);
+// ĐÃ SỬA ở fix wave 3 (2026-10-23): bỏ cờ todo — test thành khoá hồi quy.
+test('KI-VAL-2: engine client tự chặn message rỗng như local API', () => {
+  assert.throws(() => translateParentMessage({ message: '   ', speaker: 'Mẹ', context: 'Khác' }));
+});
 
 test(
   'KI-PERF-1: JS first-load route / không vượt 170 KB gzip',

@@ -15,5 +15,8 @@ export const SITE_NAME = 'Giải Mã Gia Đình';
 
 export const SITE_TITLE = 'Giải Mã Gia Đình — Dịch ý thật sau tin nhắn của người thân';
 
+// SEO-06 (fix wave 3): description PHẢI chứa tên thương hiệu "Giải Mã Gia
+// Đình" (bản cũ thiếu tên thương hiệu dù độ dài đạt) — 128 ký tự, trong
+// dải chuẩn của mục.
 export const SITE_DESCRIPTION =
-  'Dán câu người nhà vừa nhắn — bố mẹ, mẹ chồng, vợ chồng, sếp — xem ý thật, mức căng thẳng và 3 câu trả lời cho êm chuyện. Không cần đăng nhập.';
+  'Giải Mã Gia Đình — dán câu người nhà vừa nhắn để xem ý thật, mức căng thẳng và 3 câu trả lời cho êm chuyện. Không cần đăng nhập.';

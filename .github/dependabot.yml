@@ -1,0 +1,12 @@
+# SEC-10 (fix wave 3): quét cập nhật dependency hằng tuần — npm cho cây
+# package (pnpm dùng chung registry) và github-actions cho workflow.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

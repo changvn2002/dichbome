@@ -109,7 +109,7 @@ export function StageSlip({
       <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-strong bg-stage px-4 py-4 shadow-[var(--shadow-card)] sm:px-5">
         <div className="anim-slip-block" style={{ '--i': 0 } as CSSProperties}>
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
             <img
               src="/products/brand/dichbome-logo.svg"
               alt=""
@@ -388,7 +388,7 @@ export function NotReadCard({
   return (
     <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-strong bg-stage p-4 shadow-[var(--shadow-card)]">
       <div className="flex gap-3">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
         <img
           src="/products/brand/dichbome-logo.svg"
           alt=""

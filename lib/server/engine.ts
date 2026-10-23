@@ -1200,6 +1200,12 @@ function extractSalientDetail(raw: string): string | null {
  * bản standalone bỏ NestJS, route handlers của Next gọi trực tiếp 2 hàm này).
  */
 export function translateDichbome(input: DichbomeTranslateInput): DichbomeTranslateResult {
+  // Validation ở tầng engine (KI-VAL-1, fix wave 3): engine tự chặn message
+  // quá 500 ký tự — cùng giới hạn route khai (handler trả 400 trước khi gọi
+  // engine, nhưng engine không còn phụ thuộc route để giữ contract).
+  if ((input.message ?? '').length > 500) {
+    throw new Error('message must be shorter than or equal to 500 characters');
+  }
   const speaker = canonicalSpeaker(input.speaker ?? 'me');
   const context = input.context ?? 'khac';
   const raw = (input.message ?? '').trim();

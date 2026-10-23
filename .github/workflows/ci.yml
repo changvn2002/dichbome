@@ -1,0 +1,65 @@
+name: CI
+
+# CQ-04 / OPS-01 (fix wave 3): pipeline đầy đủ trên mọi push lên main và
+# mọi pull request — typecheck, lint, format, test, build, ngân sách JS
+# (perf-budget.json) và audit dependency. Theo mẫu .github/workflows của
+# chiatien, chỉnh cho runner node --test của repo này.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Dependency audit (prod)
+        run: pnpm audit --prod
+        continue-on-error: true
+
+      - name: Build
+        run: pnpm build
+
+      - name: Bundle budget (first-load JS, perf-budget.json)
+        run: node scripts/check-bundle-budget.mjs
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

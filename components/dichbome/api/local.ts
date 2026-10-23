@@ -1,7 +1,7 @@
 import { PARENT_EXAMPLES, matchRuleInfo, translateParentMessage } from '../lib/translate';
 import type { DichbomeApi } from './types';
 
-export function createMockDichbomeApi(): DichbomeApi {
+export function createLocalDichbomeApi(): DichbomeApi {
   return {
     async translate(input) {
       await new Promise((r) => setTimeout(r, 350));

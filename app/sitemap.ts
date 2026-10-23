@@ -6,7 +6,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Khi có thêm route trang thật, bổ sung vào danh sách này.
   return [
     {
-      url: `${SITE_URL}/`,
+      // SEO-04 (fix wave 3): dạng không slash cuối — Next chuẩn hoá
+      // canonical/og:url của metadata về đúng dạng này, nên sitemap +
+      // JSON-LD dùng cùng một dạng để mọi tín hiệu URL gốc khớp byte.
+      url: SITE_URL,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 1,

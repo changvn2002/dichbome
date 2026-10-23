@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Be_Vietnam_Pro, Fraunces } from 'next/font/google';
 import RegisterServiceWorker from '@/components/dichbome/register-sw';
+import { WebVitalsReporter } from '@/components/dichbome/web-vitals';
 import { FAQS } from '@/lib/faq';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from '@/lib/site';
 import './globals.css';
@@ -10,6 +11,11 @@ const sans = Be_Vietnam_Pro({
   weight: ['400', '500', '600', '700'],
   variable: '--font-sans',
   display: 'swap',
+  // PERF-08 (fix wave 3): KHÔNG preload font chữ thân — 4 weight × 2 subset
+  // = 8 file preload (~73 KB) tranh băng thông với LCP trong khi font vẫn
+  // được nạp ngay qua CSS cùng origin + display:swap. Chỉ font hiển thị
+  // Fraunces (chữ ký thương hiệu ở sân khấu) giữ preload. Xem ADR-002.
+  preload: false,
 });
 
 /* Display serif duy nhất của app (DESIGN.md): Fraunces variable —
@@ -51,7 +57,11 @@ export const metadata: Metadata = {
     'ứng dụng gia đình việt',
   ],
   alternates: {
-    canonical: '/',
+    // SEO-04 (fix wave 3): canonical tuyệt đối. Next chuẩn hoá URL gốc
+    // về dạng KHÔNG slash cuối (đã đo trên bản build: truyền vào có
+    // slash, HTML ra không slash) — sitemap + JSON-LD đồng bộ về cùng
+    // dạng này để mọi tín hiệu URL gốc khớp nhau byte-for-byte.
+    canonical: `${SITE_URL}/`,
   },
   robots: {
     index: true,
@@ -67,7 +77,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'vi_VN',
-    url: '/',
+    // SEO-04: og:url cùng dạng URL gốc như canonical + sitemap.
+    url: `${SITE_URL}/`,
     siteName: SITE_NAME,
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
@@ -109,14 +120,27 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
+      // SEO-09 (fix wave 3): node WebSite — tín hiệu tên thứ ba (cùng
+      // og:site_name + title/H1) để SEO-09b đối chiếu nhất quán được.
+      '@type': 'WebSite',
+      name: SITE_NAME,
+      alternateName: 'dichbome',
+      // SEO-04: cùng dạng URL gốc không slash như canonical/sitemap.
+      url: SITE_URL,
+      inLanguage: 'vi',
+    },
+    {
       '@type': 'WebApplication',
       name: SITE_NAME,
       alternateName: 'dichbome',
-      url: `${SITE_URL}/`,
+      url: SITE_URL,
       description: SITE_DESCRIPTION,
       inLanguage: 'vi',
       applicationCategory: 'LifestyleApplication',
       operatingSystem: 'Any',
+      // SEO-09: offers khai đúng sự thật — app miễn phí hoàn toàn, không
+      // bán gì, không có gói trả phí (price 0).
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'VND' },
     },
     {
       // FAQPage phải khớp từng câu với section FAQ hiển thị trên trang chủ —
@@ -142,6 +166,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         {children}
         <RegisterServiceWorker />
+        <WebVitalsReporter />
       </body>
     </html>
   );

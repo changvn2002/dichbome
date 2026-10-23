@@ -1,4 +1,4 @@
-# Giải Mã Gia Đình — kịch bản quay demo viral (15–30 giây)
+# Giải Mã Gia Đình — kịch bản quay video viral (15–30 giây)
 
 App: `/p/dichbome` trên ChangtoTech (slug giữ `dichbome`, tên hiển thị mới: **Giải Mã Gia Đình**). Quay màn hình thật, chỉnh nhẹ, không dùng template AI dựng sẵn.
 

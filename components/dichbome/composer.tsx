@@ -8,6 +8,7 @@ import {
   type ParentContext,
   type RelationRole,
 } from './lib/translate';
+import { tryReadRaw, writeRaw } from './lib/storage';
 import { roleName } from './lib/ui-types';
 import { Sheet } from './sheets';
 
@@ -71,22 +72,18 @@ export function Composer({
   // Gợi ý vuốt dải chip vai — CHỈ lần dùng đầu tiên (N-5b): hiện cho tới khi
   // người dùng cuộn ngang dải chip lần đầu, rồi ghi nhớ vĩnh viễn trên thiết bị.
   useEffect(() => {
-    try {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- chủ đích: đọc localStorage sau mount, tránh hydration mismatch (cùng pattern ở app.tsx)
-      if (!window.localStorage.getItem(SWIPE_HINT_KEY)) setShowSwipeHint(true);
-    } catch {
-      // Không đọc được localStorage: không hiện gợi ý (tránh lặp lại gây phiền).
-    }
+    // Đọc qua storage adapter (ARC-04) sau mount, tránh hydration mismatch.
+    // Không đọc được storage: không hiện gợi ý (tránh lặp lại gây phiền).
+    const stored = tryReadRaw(SWIPE_HINT_KEY);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- chủ đích: đọc localStorage sau mount, tránh hydration mismatch (cùng pattern ở app.tsx)
+    if (stored.ok && !stored.value) setShowSwipeHint(true);
   }, []);
 
   const dismissSwipeHint = () => {
     if (!showSwipeHint) return;
     setShowSwipeHint(false);
-    try {
-      window.localStorage.setItem(SWIPE_HINT_KEY, '1');
-    } catch {
-      // Không lưu được thì gợi ý chỉ sống trong phiên này — chấp nhận được.
-    }
+    // Không lưu được thì gợi ý chỉ sống trong phiên này — chấp nhận được.
+    writeRaw(SWIPE_HINT_KEY, '1');
   };
 
   // Roving-tabindex cho hàng chip vai (N-6, mẫu APG toolbar): chỉ chip đang
@@ -252,6 +249,10 @@ export function Composer({
           </button>
         )}
       </div>
+
+      {/* DATA-09b: một câu hướng dẫn trách nhiệm ngay tại điểm nhập — dán
+          tin nhắn của người khác là việc cần sự thoải mái của người gửi. */}
+      <p className="mt-2 text-xs text-muted">Chỉ dán khi người gửi thoải mái với việc đó.</p>
 
       {error ? (
         <p role="alert" className="mt-2 text-sm text-crimson-ink">

@@ -1,5 +1,5 @@
 /**
- * Rule-based "dịch tiếng nhà mình" engine — bản local dùng cho mock/offline fallback.
+ * Rule-based "dịch tiếng nhà mình" engine — bản local chạy trên máy, dùng cho chế độ offline.
  * Phản chiếu đúng contract server: POST /api/products/dichbome/translate.
  * v2: dịch được nhiều mối quan hệ (bố mẹ <-> con, thông gia, vợ chồng, người yêu, sếp...).
  * Nguyên tắc: replies LUÔN là câu dành cho người đang dùng app đáp lại người nhắn.
@@ -105,101 +105,123 @@ export type ParentExample = {
   tease: string;
 };
 
+/**
+ * Thư viện câu mẫu phía client — CQ-14 (fix wave 3): ĐỒNG BỘ NGUYÊN VĂN với
+ * DICHBOME_EXAMPLES phía server (lib/server/engine.ts), chỉ khác biểu diễn
+ * (nhãn vai/hoàn cảnh tiếng Việt thay cho mã code — ánh xạ đúng
+ * SPEAKER_CODE_BY_ROLE / CONTEXT_CODE_BY_LABEL ở api/http.ts, gồm cả tease).
+ * Trước đây hai phía là hai bộ câu mẫu khác nhau (15 ↔ 14, lệch cả nội
+ * dung) nên chế độ http và chế độ local gợi ý hai thư viện khác nhau.
+ * Parity suite (tests-evidence/engine-parity.test.mjs) + KI-PARITY-3 khoá
+ * việc đồng bộ này — sửa một phía là phải sửa phía kia trong cùng thay đổi.
+ */
 export const PARENT_EXAMPLES: ParentExample[] = [
   {
-    message: 'Tùy con, mẹ sao cũng được.',
+    message: 'Tùy con',
     speaker: 'Mẹ',
-    context: 'Người yêu',
-    tease: 'Chữ "tùy" này nguy hiểm cỡ nào?',
+    context: 'Khác',
+    tease: 'Hiểu câu này là "được tự quyết" thì xác định...',
   },
   {
-    message: 'Mẹ không sao đâu, con cứ lo việc của con đi.',
+    message: 'Mẹ không buồn đâu, con cứ đi đi',
+    speaker: 'Mẹ',
+    context: 'Về quê',
+    tease: 'Tin là không buồn thật là toang đấy',
+  },
+  {
+    message: 'Ăn cơm chưa?',
     speaker: 'Mẹ',
     context: 'Sức khoẻ',
-    tease: '"Không sao đâu" — thật không?',
+    tease: 'Không phải hỏi chuyện cơm đâu',
   },
   {
-    message: 'Ăn cơm chưa con?',
-    speaker: 'Bố',
-    context: 'Khác',
-    tease: 'Câu hỏi này không hỏi về cơm đâu',
-  },
-  {
-    message: 'Bao giờ thì về? Tết này có về không?',
+    message: 'Bao giờ thì về?',
     speaker: 'Cả hai',
     context: 'Về quê',
-    tease: 'Bố mẹ đang đếm ngày đấy',
+    tease: 'Hỏi lịch về nhưng ý ở đằng sau khác hẳn',
   },
   {
-    message: 'Con nhà người ta lương tháng mấy chục triệu rồi đấy.',
-    speaker: 'Mẹ',
+    message: 'Con nhà người ta...',
+    speaker: 'Bố',
     context: 'Công việc',
-    tease: 'Huyền thoại "con nhà người ta"',
+    tease: 'Nhân vật quốc dân không bao giờ lộ diện',
   },
   {
-    message: 'Tiền bạc không quan trọng, quan trọng là... thôi không nói nữa.',
+    message: 'Tiền bạc không quan trọng',
     speaker: 'Bố',
     context: 'Xin tiền',
-    tease: 'Nửa câu sau mới là phần chính',
+    tease: 'Quan trọng là câu nói tiếp ngay sau câu này',
   },
   {
-    message: 'Con bận, để sau đi mẹ.',
+    message: 'Mẹ không sao đâu, hơi mệt tí thôi',
+    speaker: 'Mẹ',
+    context: 'Sức khoẻ',
+    tease: '"Hơi mệt tí" của mẹ thường không "tí" chút nào',
+  },
+  {
+    message: 'Con cứ làm đi, bố mẹ già rồi biết gì',
+    speaker: 'Cả hai',
+    context: 'Công việc',
+    tease: 'Nghe câu này là phải ngồi xuống ngay',
+  },
+  {
+    message: 'Con bận, để sau đi mẹ',
     speaker: 'Con',
     context: 'Con cái',
-    tease: 'Bố mẹ nghe câu này nên đáp sao cho con đỡ áp lực?',
+    tease: 'Bố mẹ nên đáp sao để con đỡ áp lực?',
   },
   {
-    message: 'Để đấy mẹ làm cho, con cứ nghỉ đi.',
+    message: 'Để đấy mẹ làm cho, con cứ nghỉ đi',
     speaker: 'Mẹ chồng',
     context: 'Ở chung',
-    tease: 'Mẹ chồng nói vậy là thương hay đang thử nàng dâu?',
+    tease: 'Thương thật hay đang thử nàng dâu?',
   },
   {
-    message: 'Dạ để con làm ạ, con sao cũng được.',
+    message: 'Dạ để con làm ạ, con sao cũng được',
     speaker: 'Nàng dâu',
     context: 'Ở chung',
-    tease: 'Mẹ chồng dịch thử xem dâu đang mệt hay đang ngại',
+    tease: 'Mẹ chồng dịch xem dâu đang mệt hay đang ngại',
   },
   {
-    message: 'Em không sao, anh tự hiểu đi.',
+    message: 'Em không sao, anh tự hiểu đi',
     speaker: 'Vợ',
     context: 'Khác',
-    tease: 'Câu này mà tin là "không sao" thật thì nguy',
+    tease: 'Tin là không sao thật thì nguy',
   },
   {
-    message: 'Ừ để anh, em quyết đi cũng được.',
+    message: 'Ừ để anh, em quyết đi cũng được',
     speaker: 'Chồng',
     context: 'Khác',
-    tease: 'Chồng nói ngắn vậy là đang muốn vợ hỏi rõ điều gì?',
+    tease: 'Chồng nói ngắn là muốn vợ hỏi rõ điều gì?',
   },
   {
-    message: 'Em xem lại nhé, cái này đơn giản mà.',
+    message: 'Em xem lại nhé, cái này đơn giản mà',
     speaker: 'Sếp',
     context: 'Công việc',
-    tease: 'Dịch tiếng sếp: đơn giản là đơn giản cỡ nào?',
+    tease: '"Đơn giản" của sếp là đơn giản cỡ nào?',
   },
   {
-    message: 'Em không giận đâu, anh bận thì thôi.',
+    message: 'Em không giận đâu, anh bận thì thôi',
     speaker: 'Người yêu',
     context: 'Người yêu',
-    tease: '"Không giận đâu" phiên bản người yêu còn đáng sợ hơn',
-  },
-  {
-    message: 'Mai con gọi lại sau nhé.',
-    speaker: 'Con',
-    context: 'Con cái',
-    tease: 'Bố mẹ nên nhắn lại thế nào để con thật sự gọi?',
+    tease: '"Không giận đâu" bản người yêu đáng sợ hơn bản gốc',
   },
 ];
 
-/** Bỏ dấu tiếng Việt + hạ chữ thường + gộp khoảng trắng để khớp từ điển. */
+/**
+ * Bỏ dấu + thường hoá để match không phụ thuộc cách gõ của người dùng.
+ * CQ-14 (fix wave 3): dùng CHUNG một thuật toán với normalizeVi phía server
+ * (lib/server/engine.ts) — trước đây bản client giữ nguyên dấu câu nên hai
+ * engine chuẩn hoá lệch nhau (parity suite: "me oi! con ve..." ↔
+ * "me oi con ve"). Mọi ký tự ngoài [a-z0-9] thành khoảng trắng, gộp đôi.
+ */
 export function normalizeVi(text: string): string {
   return text
+    .toLowerCase()
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
-    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
@@ -217,6 +239,13 @@ type Rule = {
   id: string;
   /** Cụm (đã bỏ dấu) — khớp nếu câu chứa bất kỳ cụm nào. */
   keys: string[];
+  /**
+   * Cụm khớp theo RANH GIỚI TỪ (như hasWord phía server) — dùng cho cụm
+   * ngắn dễ nuốt nhầm qua biên từ: 'om roi' dạng substring sẽ khớp cả
+   * "ăn cơm rồi" ("c[om roi]"), phía server tránh bằng hasWord nên phía
+   * client cũng phải tránh (CQ-14, fix wave 3).
+   */
+  wordKeys?: string[];
   /** Nếu khai báo: rule chỉ áp dụng khi người nhắn thuộc các vai này. Không khai = mọi vai. */
   roles?: RelationRole[];
   meaning: string;
@@ -236,8 +265,11 @@ const RULES: Rule[] = [
     id: 'con-ban',
     keys: ['con ban', 'dang ban lam', 'ban lam a', 'ban qua', 'con dang ban'],
     roles: ['Con'],
+    // CQ-14 (fix wave 3): meaning dùng NGUYÊN VĂN entry con-ban phía server
+    // (lib/server/engine.ts) — hai engine không còn hai bản diễn đạt cho
+    // cùng một câu; parity suite ở tests-evidence/ khoá việc này.
     meaning:
-      'Con nói "con bận" thường không phải từ chối bố mẹ đâu — là con đang quá tải thật, hoặc đang sợ mở máy ra lại thêm một việc phải lo. Câu cụt này là dấu hiệu con cần được giảm áp lực, không cần thêm kỳ vọng.',
+      'Con nói "con bận" thường là đang quá tải thật hoặc sợ mở lời lại thêm việc phải lo — không phải từ chối bố mẹ. Đây là tín hiệu cần giảm áp lực, không cần thêm kỳ vọng.',
     realWant:
       'Điều con cần nghe lúc này là sự thông cảm và một lối thoát nhẹ nhàng: không trách, không giục, để con tự quay lại khi rảnh.',
     angerLevel: 1,
@@ -751,12 +783,23 @@ const RULES: Rule[] = [
   },
   {
     id: 'tuy-con',
-    keys: ['tuy con', 'tuy may', 'sao cung duoc', 'the nao cung duoc', 'tuy con quyet'],
+    // CQ-14 (fix wave 3): keys + meaning + thang giận căn theo entry tuy-con
+    // phía server (lib/server/engine.ts): meaning nguyên văn bản server
+    // (điền {x} thay {p}), angerLevel 3 = 62/100 quy về thang 0–5 theo đúng
+    // quy tắc chuẩn hoá ở api/http.ts. realWant/replies giữ bản client.
+    keys: [
+      'tuy con',
+      'tuy em',
+      'tuy may',
+      'the nao cung duoc',
+      'sao cung duoc',
+      'tuy con quyet dinh',
+    ],
     meaning:
-      'Thường không phải "sao cũng được" đâu. Bố mẹ đã có ý sẵn trong đầu rồi, nói "tùy con" là để xem con có tự hiểu ý không.',
+      "'Tùy con' nghe như cho tự quyết, nhưng đa phần {x} đã có sẵn một đáp án trong đầu rồi. Đây là phép thử nhẹ: xem con có tự nghĩ ra đúng ý {x} đang nghĩ không.",
     realWant:
       'Muốn con hỏi thêm một câu cho chắc, hoặc chọn đúng cái ý mà bố mẹ đang nghĩ — chứ quyết luôn một mình là dễ sai ý lắm.',
-    angerLevel: 2,
+    angerLevel: 3,
     replies: [
       {
         label: 'An toàn nhất',
@@ -845,19 +888,23 @@ const RULES: Rule[] = [
   },
   {
     id: 'bao-gio-ve',
+    // CQ-14 (fix wave 3): keys + meaning + thang giận căn theo entry
+    // bao-gio-ve phía server (lib/server/engine.ts): meaning nguyên văn
+    // bản server (điền {x} thay {p}), angerLevel 2 = 30/100 quy về 0–5.
     keys: [
+      'bao gio thi ve',
       'bao gio ve',
       'khi nao ve',
+      'may gio ve',
       'sap ve chua',
-      'co ve khong',
-      've que khong',
-      'bao gio con ve',
+      've chua con',
+      'bao gio moi ve',
     ],
     meaning:
-      'Bố mẹ đang đếm ngày đấy. Hỏi "bao giờ về" nghĩa là nhà đang mong lắm, có khi đã chuẩn bị sẵn món con thích và khoe hàng xóm là con sắp về rồi.',
+      "'Bao giờ thì về?' không phải hỏi lịch trình. Đó là câu hỏi của người đang đếm ngày — {x} muốn biết chính xác để chuẩn bị, và để có cái mà mong.",
     realWant:
       'Muốn một mốc thời gian cụ thể để bố mẹ chuẩn bị và có cái để mong chờ — "để xem đã" là câu bố mẹ buồn nhất khi nghe.',
-    angerLevel: 1,
+    angerLevel: 2,
     replies: [
       {
         label: 'Chốt ngày rõ ràng',
@@ -927,16 +974,10 @@ const RULES: Rule[] = [
   },
   {
     id: 'suc-khoe-lo',
-    keys: [
-      'hoi met',
-      'met lam',
-      'dau lung',
-      'dau chan',
-      'dau dau',
-      'om roi',
-      'di kham',
-      'benh vien',
-    ],
+    keys: ['hoi met', 'met lam', 'dau lung', 'dau chan', 'dau dau', 'di kham', 'benh vien'],
+    // 'om roi' phải khớp theo ranh giới từ: dạng substring nó nuốt cả
+    // "ăn cơm rồi" (c[om roi]) — câu ăn uống bị đọc thành câu sức khỏe.
+    wordKeys: ['om roi'],
     meaning:
       'Khi bố mẹ chủ động nói "hơi mệt" thì thường là mệt hơn mức họ nói rất nhiều. Bố mẹ Việt mình hay khai giảm bệnh xuống một nửa để con khỏi lo.',
     realWant:
@@ -982,6 +1023,232 @@ const RULES: Rule[] = [
     ],
   },
 ];
+
+/** Khớp nguyên từ (như hasWord phía server): cụm nằm giữa hai khoảng trắng. */
+function hasWord(norm: string, word: string): boolean {
+  return ` ${norm} `.includes(` ${word} `);
+}
+
+function hasAnyPhrase(norm: string, phrases: string[]): boolean {
+  return phrases.some((p) => norm.includes(p));
+}
+
+type FallbackDef = Omit<Rule, 'id' | 'keys' | 'roles'>;
+
+const REPLY_LABELS = ['Ngoan nhất', 'Khéo nhất', 'An toàn nhất'] as const;
+
+function catDef(
+  meaning: string,
+  realWant: string,
+  angerLevel: number,
+  replies: [string, string, string],
+  warning?: string,
+): FallbackDef {
+  return {
+    meaning,
+    realWant,
+    angerLevel,
+    // replies vào luôn có đúng 3 phần tử (kiểu tuple ở tham số) — map giữ nguyên số lượng.
+    replies: replies.map((text, i) => ({ label: REPLY_LABELS[i], text })) as [
+      TranslationReply,
+      TranslationReply,
+      TranslationReply,
+    ],
+    ...(warning ? { warning } : {}),
+  };
+}
+
+/**
+ * Câu cụt nguyên văn (mirror entry `ngan-gon` phía server — exact match).
+ * CHỦ ĐÍCH chỉ áp ở tầng fallback của translateParentMessage, KHÔNG đưa
+ * vào RULES/matchRule: tầng trung thực (lib/honesty.ts) yêu cầu
+ * matchRuleInfo('Ừ') = null để câu cụt đi đường trình bày 'low-direct'
+ * (test khoá ở tests/honesty.test.mjs) — bản đọc ở đây chỉ thay phần nội
+ * dung fallback chung chung bằng đúng bản đọc ngan-gon của server.
+ */
+const CURT_EXACT_PATTERNS: readonly string[] = ['u', 'uh', 'um', 'o', 'da', 'vang', 'biet roi'];
+
+function curtDef(): FallbackDef {
+  // angerLevel 3 = 58/100 của server quy về thang 0–5 (quy tắc api/http.ts).
+  return catDef(
+    'Một chữ mà nặng cả buổi tối. Trả lời càng ngắn thì trong đầu {x} càng nhiều chuyện — thường là đang không vui nhưng chưa muốn nói, hoặc đang chờ con tự nhận ra điều gì đó.',
+    "Muốn con tinh ý hỏi thêm một câu, chứ đừng thấy 'ừ' là tưởng mọi chuyện đã xong.",
+    3,
+    [
+      'Dạ, {x} sao thế ạ? Có chuyện gì {x} kể con nghe đi.',
+      'Nghe giọng {x} hình như đang không vui. Con làm gì sai {x} cứ nói thẳng với con.',
+      'Dạ, để con gọi lại cho {x} nói chuyện đàng hoàng nhé.',
+    ],
+    'Đừng đáp lại bằng một chữ tương tự. Hai bên mỗi người một chữ là cuộc trò chuyện đi vào ngõ cụt.',
+  );
+}
+
+type FallbackCategory =
+  'tien' | 've-que' | 'suc-khoe' | 'tinh-cam' | 'cong-viec' | 'quan-tam' | 'chung';
+
+/**
+ * Fallback theo nhóm chủ đề cho vai bố mẹ — mirror FALLBACKS phía server
+ * (CQ-14, fix wave 3): meaning/realWant dùng nguyên văn bản server (điền
+ * {x}/{X} thay {p}/{P}), angerLevel là điểm server 0–100 quy về 0–5 theo
+ * quy tắc làm tròn ở api/http.ts (38→2, 32→2, 24→1, 42→2, 28→1, 12→1, 30→2).
+ */
+const FALLBACK_CATEGORIES: Record<FallbackCategory, FallbackDef> = {
+  tien: catDef(
+    'Nhắc tới tiền mà nói vòng vo là {x} đang ngại mở lời. Phụ huynh rất ít khi nói thẳng chuyện tiền, thường chờ con tự hiểu và chủ động trước.',
+    'Muốn con chủ động quan tâm chuyện tiền nong trong nhà, để {x} khỏi phải mở miệng — với {x}, mở miệng xin con là điều khó nhất.',
+    2,
+    [
+      'Dạ, chuyện tiền {x} cứ để con lo. Tháng này con gửi về một ít, {x} cầm chi tiêu nhé.',
+      'Dạ con cảm ơn {x} lo cho con. Con vẫn ổn, {x} đừng dè sẻn quá với bản thân.',
+      'Để con tính lại rồi con báo {x}. Có gì thiếu {x} cứ nói với con, đừng giấu.',
+    ],
+  ),
+  've-que': catDef(
+    'Chuyện về quê, về nhà mà được nhắc tới là {x} đang nhớ con. Nhà có việc chỉ là cái cớ, lý do thật là muốn nhìn thấy con một lần cho yên tâm.',
+    'Muốn con sắp xếp về một chuyến, hoặc ít nhất chốt một dịp cụ thể để {x} có cái mà đợi.',
+    2,
+    [
+      'Dạ, để con sắp xếp công việc rồi con về một chuyến. Con báo ngày cho {x} sớm.',
+      'Dạ con cũng muốn về lắm. Kỳ này về con ở nhà lâu lâu với {x}.',
+      'Giờ con chưa về được, nhưng con gọi video với {x} mỗi tối nhé.',
+    ],
+  ),
+  'suc-khoe': catDef(
+    'Chuyện sức khỏe mà {x} nói nhẹ đi thì phải nghe ngược lại. Phụ huynh hay giấu bệnh vì sợ con lo và sợ tốn tiền đi khám.',
+    'Muốn con hỏi kỹ và quan tâm thật, chứ không phải nghe qua loa rồi yên tâm luôn.',
+    1,
+    [
+      'Dạ, {x} nói thật với con đi, đau ở đâu, lâu chưa? Con đặt lịch khám cho {x} nhé.',
+      'Để con gọi về hỏi kỹ. Chuyện này không để "kệ nó tự khỏi" được đâu ạ.',
+      'Dạ, cuối tuần con về đưa {x} đi khám. {X} đừng lo chuyện tiền, có con đây.',
+    ],
+    'Riêng sức khỏe thì đừng dịch vui nữa — gọi hỏi kỹ triệu chứng, hoặc sắp xếp về xem tận mắt cho chắc.',
+  ),
+  'tinh-cam': catDef(
+    'Chuyện người yêu, cưới xin mà {x} nhắc khéo là đang sốt ruột thay con, nhưng sợ nói thẳng thì con áp lực nên cứ bóng gió mãi.',
+    'Muốn biết con có tính chuyện lâu dài chưa để {x} yên tâm, và muốn được con chia sẻ như người trong nhà chứ không phải người ngoài.',
+    2,
+    [
+      'Dạ, chuyện này con có tính rồi ạ. Khi nào chắc chắn con thưa chuyện với {x} đầu tiên.',
+      'Con biết {x} lo cho con. {X} cứ yên tâm, con không để {x} phải nhắc mãi đâu.',
+      'Dạ, để con kể {x} nghe từ từ. {X} nghe xong cho con ý kiến nhé.',
+    ],
+  ),
+  'cong-viec': catDef(
+    'Hỏi chuyện công việc là cách {x} đo xem con ở ngoài kia có ổn không. Công việc ổn thì {x} mới ngủ ngon được.',
+    'Muốn nghe con kể thật chuyện đi làm — vui buồn gì cũng được, miễn là còn chia sẻ với {x}.',
+    1,
+    [
+      'Dạ công việc con vẫn ổn ạ. Dạo này con đang làm một việc mới, để con kể {x} nghe.',
+      'Có hơi bận một chút nhưng con lo được. {X} đừng lo, con vẫn ăn ngủ đàng hoàng.',
+      'Dạ, cảm ơn {x} hỏi. Cuối tuần con gọi về kể {x} nghe kỹ hơn nhé.',
+    ],
+  ),
+  'quan-tam': catDef(
+    'Câu hỏi kiểu này thường là nhớ con nên tìm cớ bắt chuyện. Chuyện ăn uống chỉ là mở đầu, cái {x} muốn là nghe giọng con lâu hơn một chút.',
+    'Muốn trò chuyện với con thêm vài câu và biết chắc con đang tự lo cho mình ổn.',
+    1,
+    [
+      'Dạ con ổn ạ. {X} nay thế nào, ăn uống có ngon miệng không ạ?',
+      'Dạ, để con gọi video cho {x} luôn, nói chuyện thế này không đã.',
+      'Con cảm ơn {x}. {X} giữ gìn sức khỏe nhé, con gọi về thường xuyên mà.',
+    ],
+  ),
+  chung: catDef(
+    'Câu này nghe nhẹ mà thường còn một lớp nghĩa ở dưới. {X} hay nói giảm nói tránh cho con đỡ lo, nên phải nghe cả điều không được nói ra mới hiểu hết.',
+    'Muốn con hỏi thêm một câu và quan tâm thêm một chút. Với {x}, được con để ý là đã vui rồi.',
+    2,
+    [
+      'Dạ, {x} nói vậy là còn chuyện gì nữa không ạ? {X} kể con nghe đi.',
+      'Con cảm ơn {x}. Có gì {x} cứ nói thẳng với con, con nghe hết ạ.',
+      'Dạ, để con gọi về nói chuyện với {x} kỹ hơn nhé.',
+    ],
+  ),
+};
+
+/** Nhận diện nhóm chủ đề theo từ khoá — mirror detectCategory phía server (khớp theo từ). */
+function detectCategory(norm: string): FallbackCategory | null {
+  if (
+    hasAnyPhrase(norm, ['gui tien', 'tien bac', 'tien nong']) ||
+    hasWord(norm, 'tien') ||
+    hasWord(norm, 'luong')
+  ) {
+    return 'tien';
+  }
+  if (
+    hasAnyPhrase(norm, ['ve que', 've nha', 've tham', 'an tet', 've tet']) ||
+    hasWord(norm, 'tet') ||
+    hasWord(norm, 'gio')
+  ) {
+    return 've-que';
+  }
+  if (
+    hasWord(norm, 'met') ||
+    hasWord(norm, 'om') ||
+    hasWord(norm, 'benh') ||
+    hasWord(norm, 'khoe') ||
+    hasAnyPhrase(norm, ['vao vien', 'di kham', 'suc khoe', 'dau om'])
+  ) {
+    return 'suc-khoe';
+  }
+  if (
+    hasWord(norm, 'cuoi') ||
+    hasWord(norm, 'vo') ||
+    hasWord(norm, 'chong') ||
+    hasAnyPhrase(norm, ['nguoi yeu', 'ban gai', 'ban trai', 'lay vo', 'lay chong', 'ra mat'])
+  ) {
+    return 'tinh-cam';
+  }
+  if (
+    hasAnyPhrase(norm, ['cong viec', 'di lam', 'lam them']) ||
+    hasWord(norm, 'viec') ||
+    hasWord(norm, 'sep')
+  ) {
+    return 'cong-viec';
+  }
+  if (hasWord(norm, 'com') || hasWord(norm, 'an') || hasWord(norm, 'doi')) {
+    return 'quan-tam';
+  }
+  return null;
+}
+
+function categoryFromContext(context: ParentContext): FallbackCategory {
+  switch (context) {
+    case 'Xin tiền':
+      return 'tien';
+    case 'Về quê':
+      return 've-que';
+    case 'Sức khoẻ':
+      return 'suc-khoe';
+    case 'Người yêu':
+    case 'Cưới hỏi':
+      return 'tinh-cam';
+    case 'Công việc':
+      return 'cong-viec';
+    default:
+      return 'chung';
+  }
+}
+
+const PARENT_ROLES: readonly RelationRole[] = ['Mẹ', 'Bố', 'Cả hai'];
+
+/**
+ * Chọn bản đọc fallback khi không rule nào khớp — cùng thứ tự ưu tiên với
+ * server: câu cụt nguyên văn (mọi vai) → nhóm chủ đề (vai bố mẹ) → bản đọc
+ * theo vai (fallbackFor). Vai ngoài bố mẹ giữ bản đọc riêng của client
+ * (server có SPEAKER_FALLBACKS riêng — phần lệch còn lại ghi ở ADR-001).
+ */
+function fallbackDefFor(
+  normalized: string,
+  speaker: RelationRole,
+  context: ParentContext,
+): FallbackDef {
+  if (CURT_EXACT_PATTERNS.includes(normalized)) return curtDef();
+  if (PARENT_ROLES.includes(speaker)) {
+    return FALLBACK_CATEGORIES[detectCategory(normalized) ?? categoryFromContext(context)];
+  }
+  return fallbackFor(speaker);
+}
 
 /** Fallback theo vai người nhắn khi không khớp từ điển. */
 function fallbackFor(speaker: RelationRole): Omit<Rule, 'id' | 'keys' | 'roles'> {
@@ -1186,7 +1453,12 @@ const ADDRESSES: Record<RelationRole, Address> = {
 };
 
 function matchRule(normalized: string, speaker: RelationRole): Rule | null {
-  const matched = RULES.filter((r) => r.keys.some((k) => normalized.includes(k)));
+  const padded = ` ${normalized} `;
+  const matched = RULES.filter(
+    (r) =>
+      r.keys.some((k) => normalized.includes(k)) ||
+      (r.wordKeys ?? []).some((k) => padded.includes(` ${k} `)),
+  );
   // Ưu tiên rule gắn vai đúng người nhắn (vd "không sao" của Vợ) trước rule chung mọi vai.
   return matched.find((r) => r.roles?.includes(speaker)) ?? matched.find((r) => !r.roles) ?? null;
 }
@@ -1206,7 +1478,10 @@ export function matchRuleInfo(
 }
 
 /** Toàn bộ keys của RULES (đã bỏ dấu sẵn) — dùng làm từ vựng cho tầng trung thực. */
-export const CLIENT_RULE_KEYS: readonly string[] = RULES.flatMap((r) => r.keys);
+export const CLIENT_RULE_KEYS: readonly string[] = RULES.flatMap((r) => [
+  ...r.keys,
+  ...(r.wordKeys ?? []),
+]);
 
 /** M-2 (Panel #02): tin từ mốc này mới coi là "tin dài" để xét độ sâu ở đường mẫu chung. */
 const GENERIC_DEPTH_MIN_MESSAGE = 50;
@@ -1250,6 +1525,9 @@ function extractSalientDetail(message: string): string | null {
 
 export function translateParentMessage(input: TranslateInput): TranslateResult {
   const message = (input?.message ?? '').trim();
+  // Validation ở tầng engine (KI-VAL-2, fix wave 3): engine tự chặn message
+  // rỗng — trước đây chỉ lớp API local chặn hộ, gọi thẳng engine thì lọt.
+  if (!message) throw new Error('Chưa có tin nhắn để dịch.');
   const speaker = input?.speaker ?? 'Mẹ';
   const context = input?.context ?? 'Khác';
   const addr = ADDRESSES[speaker];
@@ -1259,7 +1537,7 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
   const rule: Rule = matchedRule ?? {
     id: 'fallback',
     keys: [],
-    ...fallbackFor(speaker),
+    ...fallbackDefFor(normalized, speaker, context),
   };
 
   const fill = (text: string) =>

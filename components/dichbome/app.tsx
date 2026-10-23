@@ -22,6 +22,7 @@ import {
   type RelationRole,
   type TranslateResult,
 } from './lib/translate';
+import { readVersioned, writeVersioned } from './lib/storage';
 import { planDelete } from './lib/undo';
 import type { BoardTab, SlipView, StoredItem, StripState } from './lib/ui-types';
 import { NotReadCard, OriginalBubble, StageErrorCard, StageSlip, TypingBubble } from './slip';
@@ -33,8 +34,8 @@ const PREFS_KEY = 'dichbome_prefs_v1';
 const HISTORY_MAX = 8;
 const SAVED_MAX = 20;
 const UNDO_WINDOW_MS = 8000;
-// Mock mode chạy engine client ngay trên máy — nguồn trình bày là 'device', không phải 'server'.
-const USE_MOCK = resolveDichbomeApiMode() === 'mock';
+// Chế độ local chạy engine client ngay trên máy — nguồn trình bày là 'device', không phải 'server'.
+const USE_LOCAL = resolveDichbomeApiMode() === 'local';
 const api = createDichbomeApi();
 
 type ActiveInput = { message: string; speaker: RelationRole; context: ParentContext };
@@ -58,23 +59,6 @@ type PendingDeletion = {
   snapshot: StoredItem[];
   label: string;
 };
-
-function readStored<T>(key: string): T | null {
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeStored(key: string, value: unknown) {
-  try {
-    window.localStorage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Bộ nhớ đầy/bị chặn: app vẫn chạy, chỉ không lưu được — không chặn luồng dịch.
-  }
-}
 
 function excerpt(message: string): string {
   const words = message.split(/\s+/).filter(Boolean);
@@ -123,7 +107,7 @@ export function DichbomeApp() {
    * Khi một bộ sưu tập đang có lệnh xoá chờ hoàn tác, KHÔNG ghi đè localStorage của nó:
    * bản đã xoá chỉ được "chốt" khi hết 8 giây, khi có xoá mới, hoặc khi có mục mới thêm vào. */
   const persistCollection = useCallback((scope: 'history' | 'saved', items: StoredItem[]) => {
-    writeStored(scope === 'history' ? HISTORY_KEY : SAVED_KEY, items);
+    writeVersioned(scope === 'history' ? HISTORY_KEY : SAVED_KEY, items);
   }, []);
 
   const commitPendingDeletion = useCallback(() => {
@@ -181,13 +165,13 @@ export function DichbomeApp() {
   useEffect(() => {
     // Nạp prefs + dữ liệu đã lưu từ localStorage SAU khi mount để tránh hydration mismatch
     // (server không có localStorage) — giữ pattern gốc của bản v1.
-    const prefs = readStored<{ speaker?: RelationRole; context?: ParentContext }>(PREFS_KEY);
+    const prefs = readVersioned<{ speaker?: RelationRole; context?: ParentContext }>(PREFS_KEY);
     // eslint-disable-next-line react-hooks/set-state-in-effect -- chủ đích: đọc localStorage sau mount, tránh hydration mismatch
     if (prefs?.speaker) setSpeaker(prefs.speaker);
     if (prefs?.context) setContext(prefs.context);
-    const storedHistory = readStored<StoredItem[]>(HISTORY_KEY);
+    const storedHistory = readVersioned<StoredItem[]>(HISTORY_KEY);
     if (Array.isArray(storedHistory)) setHistory(storedHistory.slice(0, HISTORY_MAX));
-    const storedSaved = readStored<StoredItem[]>(SAVED_KEY);
+    const storedSaved = readVersioned<StoredItem[]>(SAVED_KEY);
     if (Array.isArray(storedSaved)) setSaved(storedSaved.slice(0, SAVED_MAX));
     hydratedRef.current = true;
 
@@ -218,7 +202,7 @@ export function DichbomeApp() {
 
   useEffect(() => {
     if (!hydratedRef.current) return;
-    writeStored(PREFS_KEY, { speaker, context });
+    writeVersioned(PREFS_KEY, { speaker, context });
   }, [speaker, context]);
 
   /* ---------- trình bày kết quả ---------- */
@@ -320,7 +304,7 @@ export function DichbomeApp() {
       requestAnimationFrame(() => stageScrollRef.current?.scrollTo({ top: 0 }));
 
       const offlineNow = !navigator.onLine;
-      if (offlineNow && !USE_MOCK) {
+      if (offlineNow && !USE_LOCAL) {
         runDevice(input, false, true);
         return;
       }
@@ -334,7 +318,7 @@ export function DichbomeApp() {
         const { meta, ...result } = res as TranslateResult & { meta?: TranslateMeta };
         const clientEval = evaluateClient(input.message, input.speaker);
         const gate = gateForServer(meta, clientEval.isCurt);
-        const source: 'server' | 'device' = USE_MOCK ? 'device' : 'server';
+        const source: 'server' | 'device' = USE_LOCAL ? 'device' : 'server';
         if (gate === 'not-read') {
           setStage({
             kind: 'not-read',
@@ -358,7 +342,7 @@ export function DichbomeApp() {
           input,
           source,
           tier,
-          offline: USE_MOCK ? offlineNow : false,
+          offline: USE_LOCAL ? offlineNow : false,
           fellBack: false,
         });
       } catch {
@@ -560,7 +544,7 @@ export function DichbomeApp() {
     <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
       {/* Thanh app ghim trên */}
       <header className="flex h-[52px] shrink-0 items-center gap-3 border-b border-line-strong bg-paper px-4 min-[1280px]:h-14">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
         <img
           src="/products/brand/dichbome-logo.svg"
           alt=""
@@ -599,7 +583,7 @@ export function DichbomeApp() {
               <div className="mx-auto w-full max-w-[640px]">
                 {stage.kind === 'idle' ? (
                   <div className="flex flex-col items-center pt-6 text-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
                     <img
                       src="/products/brand/dichbome-empty-stage.webp"
                       alt=""

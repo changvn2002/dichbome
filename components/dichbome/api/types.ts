@@ -1,7 +1,7 @@
 /**
- * Stable contract for live HTTP and mock demo — keep in sync with server DTOs.
+ * Stable contract for live HTTP and the on-device local engine — keep in sync with server DTOs.
  * v2 (nhiều mối quan hệ):
- * - Mock/local: speaker là RelationRole tiếng Việt ('Mẹ', 'Con', 'Mẹ chồng', 'Sếp'...),
+ * - Local (trên máy): speaker là RelationRole tiếng Việt ('Mẹ', 'Con', 'Mẹ chồng', 'Sếp'...),
  *   context là ParentContext tiếng Việt.
  * - HTTP: http.ts map speaker -> code server ('me'|'bo'|'both' legacy + 'child',
  *   'mother-in-law', 'daughter-in-law', 'wife', 'husband', 'boss', 'lover'...) và

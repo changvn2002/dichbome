@@ -115,8 +115,8 @@ test('engine validation: translateDichbome rejects >500 chars (route limit) at e
   );
 });
 
-test('engine validation: translateParentMessage rejects empty message like mock API does', () => {
-  // mock.ts: if (!input.message?.trim()) throw new Error('Chưa có tin nhắn để dịch.')
+test('engine validation: translateParentMessage rejects empty message like the local API does', () => {
+  // local.ts: if (!input.message?.trim()) throw new Error('Chưa có tin nhắn để dịch.')
   assert.throws(() => translateParentMessage({ message: '   ', speaker: 'Mẹ', context: 'Khác' }));
 });
 

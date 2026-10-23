@@ -1,46 +1,47 @@
-# Giải Mã Gia Đình (`dichbome`) — extract / demo / bán
+# Giải Mã Gia Đình (`dichbome`) — ghi chú cấu trúc repo
 
-Mọi code sản phẩm nằm trong folder này (client) và `server/src/products/dichbome` (server, do main tích hợp). Không phụ thuộc mini app khác — chỉ dùng nền tảng chung (`@/lib/api`, `@/lib/utils`, Tailwind của host).
+Repo này là bản độc lập hoàn chỉnh của sản phẩm: giao diện, API route và
+engine đều nằm trong cùng một repo Next.js — không phụ thuộc host hay
+mini app khác.
 
 ## Chế độ API
 
-- `NEXT_PUBLIC_DICHBOME_API_MODE=http` (mặc định) — gọi `POST /api/products/dichbome/translate` và `GET /api/products/dichbome/examples` trên host.
-- `NEXT_PUBLIC_DICHBOME_API_MODE=mock` — demo UI không cần server: dùng engine rule-based local trong `lib/translate.ts`.
+- `NEXT_PUBLIC_DICHBOME_API_MODE=http` (mặc định) — gọi
+  `POST /api/products/dichbome/translate` và
+  `GET /api/products/dichbome/examples` trên chính app này (engine phía
+  server trong `lib/server/`).
+- `NEXT_PUBLIC_DICHBOME_API_MODE=local` — không cần server: dùng engine
+  rule-based trên máy trong `components/dichbome/lib/translate.ts`.
 
-Chỉ import từ `./api` trong UI (`app.tsx`). Khi HTTP lỗi, UI tự rơi về engine local và báo rõ cho người dùng nên demo không bao giờ "chết".
+Chỉ import từ `./api` trong UI (`app.tsx`). Khi HTTP lỗi hoặc mất mạng,
+UI tự rơi về engine local và báo rõ cho người dùng. Hai engine được một
+parity suite tự động kiểm chứng khớp nhau ở các chiều đã đo (chuẩn hoá
+text, nội dung đọc vị, thang mức giận, bộ câu mẫu, luật validation) —
+xem README mục Development.
 
-## Tính năng lưu/chia sẻ trên thiết bị
+## Tính năng lưu trên thiết bị
 
-- Kết quả có nút **Chia sẻ kết quả** (Web Share API nếu trình duyệt hỗ trợ, nếu không sẽ copy tóm tắt kèm URL trang hiện tại).
-- Nút **Lưu kết quả** giữ tối đa 20 mục yêu thích trong `localStorage` khóa `dichbome_saved_v1`; lịch sử gần đây vẫn dùng `dichbome_history_v1`.
-- Khi mất mạng, app hiện banner offline và vẫn dịch bằng engine local; banner tự ẩn khi có mạng lại.
-- Luồng sau khi dịch hỗ trợ cuộn/focus tới kết quả trên di động và nút **Dịch câu khác** để dọn ô nhập nhanh.
+- Nút **Lưu kết quả** giữ tối đa 20 mục trong `localStorage` khoá
+  `dichbome_saved_v1`; lịch sử gần đây (tối đa 8 mục) dùng khoá
+  `dichbome_history_v1`; tuỳ chọn người gửi/ngữ cảnh ở
+  `dichbome_prefs_v1`. Mọi truy cập storage đi qua một adapter duy nhất
+  (`components/dichbome/lib/storage.ts`) kèm `schemaVersion`.
+- Khi mất mạng, app vẫn dịch bằng engine local (việc chuyển nguồn được
+  ghi rõ trên kết quả); có mạng lại thì dùng API như thường.
 
 ## Contract
 
-```
-POST /api/products/dichbome/translate
-Body: { message: string, speaker?: 'Mẹ' | 'Bố' | 'Cả hai', context?: 'Xin tiền' | 'Về quê' | 'Công việc' | 'Người yêu' | 'Cưới hỏi' | 'Sức khoẻ' | 'Khác' }
--> { meaning, realWant, angerLevel (0-5), dangerLabel, replies: [{ label, text }] x3, warning? }
-
-GET /api/products/dichbome/examples
--> { examples: [{ message, speaker, context, tease }] }
-```
-
-Server nên tái dùng cùng bộ từ điển trong `lib/translate.ts` (port sang Nest util) để client mock và server trả kết quả giống nhau.
-
-## Extract ra repo riêng
-
-1. Copy nguyên folder `client/products/dichbome/` (kèm `api/`, `lib/`, `app.tsx`, file này).
-2. Brand: copy `client/public/products/brand/dichbome-logo.svg` và `dichbome-hero.svg` sang `public/products/brand/` của repo đích.
-3. Gắn `DichbomeApp` (named export từ `app.tsx`) vào route bất kỳ của Next shell đích (cần `'use client'`, Tailwind, `lucide-react`, và hai helper host `@/lib/api` + `@/lib/utils` — hoặc thay bằng shim tương đương).
-4. Demo không server: đặt `NEXT_PUBLIC_DICHBOME_API_MODE=mock`.
-5. Bản full: port contract trên sang Nest module `server/src/products/dichbome` (translate rule-based, examples tĩnh) rồi trỏ `NEXT_PUBLIC_API_URL` về API đó.
+Xem README mục "API (built into this repo)" — contract đầy đủ kèm hình
+dạng lỗi thống nhất `{ error: { code, message, fields? } }`.
 
 ## Auth
 
-Engine thuần rule-based, không cần đăng nhập để dịch. HTTP mode đi qua `api()` của host (tự gắn JWT Changtotech nếu có) — buyer thay base URL / header trong `api/http.ts` nếu auth khác.
+Không có đăng nhập và không có token nào trong app: engine thuần
+rule-based, API route không yêu cầu Authorization. Mọi bản ghi đều ở
+trên thiết bị của người dùng (xem README mục "Privacy & data").
 
-## Nhận diện riêng
+## Nhận diện
 
-Tông hồng đào `#e2547a` / tím nho `#7c5cff` khai báo bằng CSS var cục bộ trong `app.tsx` (không sửa `globals.css`), thẻ bo 24px (`rounded-3xl`), chữ to dễ đọc cho người lớn tuổi, mọi nút chạm ≥44px.
+Thương hiệu đỏ crimson `#C22A44` trên nền giấy ấm, font hiển thị
+Fraunces + Be Vietnam Pro tự host — toàn bộ quy tắc ở `DESIGN.md` và
+`PRODUCT.md`.

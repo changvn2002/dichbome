@@ -97,7 +97,7 @@ export function FindOutContent({ swUpdateAvailable }: { swUpdateAvailable: boole
       ) : null}
 
       <figure>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
         <img
           src="/products/brand/dichbome-banner.svg"
           alt="Gia đình ngồi cạnh nhau xem điện thoại, trên đầu là bong bóng chat hình trái tim"

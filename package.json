@@ -4,7 +4,8 @@
     "lucide-react": "^1.48.0",
     "next": "16.3.6",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "web-vitals": "^5.3.0"
   },
   "description": "Giải Mã Gia Đình — dịch ý thật đằng sau tin nhắn của bố mẹ, người thân, vợ chồng, sếp... bằng engine rule-based tiếng Việt (không cần AI, không cần đăng nhập).",
   "devDependencies": {
@@ -18,8 +19,13 @@
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.3"
   },
+  "engines": {
+    "node": "24.x",
+    "pnpm": "10.32.1"
+  },
   "license": "MIT",
   "name": "dichbome",
+  "packageManager": "pnpm@10.32.1",
   "private": true,
   "scripts": {
     "build": "next build",
@@ -31,5 +37,5 @@
     "test": "node --test \"tests/*.test.mjs\"",
     "typecheck": "tsc --noEmit"
   },
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

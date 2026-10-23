@@ -5,7 +5,7 @@ import type { DichbomeApi, ParentExample, TranslateResult } from './types';
 
 const base = '/api/products/dichbome';
 
-/** RelationRole (nhãn tiếng Việt ở UI/mock) -> speaker code của server. Giữ legacy me/bo/both. */
+/** RelationRole (nhãn tiếng Việt ở UI/local) -> speaker code của server. Giữ legacy me/bo/both. */
 export const SPEAKER_CODE_BY_ROLE: Record<RelationRole, string> = {
   Mẹ: 'me',
   Bố: 'bo',
@@ -50,7 +50,7 @@ const CONTEXT_BY_CODE: Record<string, ParentContext> = Object.fromEntries(
   Object.entries(CONTEXT_CODE_BY_LABEL).map(([label, code]) => [code, label as ParentContext]),
 ) as Record<string, ParentContext>;
 
-/** Server trả angerLevel 0–100; UI/mock dùng thang 0–5. Chuẩn hoá tại đây để hai chế độ khớp nhau. */
+/** Server trả angerLevel 0–100; UI/local dùng thang 0–5. Chuẩn hoá tại đây để hai chế độ khớp nhau. */
 function normalizeResult(
   raw: TranslateResult & { angerLevel: number; meta?: TranslateMeta },
 ): TranslateResult & { meta?: TranslateMeta } {
