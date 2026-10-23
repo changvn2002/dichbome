@@ -8,16 +8,16 @@
 >
 > Người nhà nhắn “tùy” là ý gì? Dịch ý thật cho bố mẹ, con cái, thông gia và vợ chồng.
 
-[![Live demo](https://img.shields.io/badge/demo-live-brightgreen)](https://dichbome.vercel.app)
+[![Live app](https://img.shields.io/badge/app-live-brightgreen)](https://dichbome.vercel.app)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-**🔴 Live demo: https://dichbome.vercel.app** — no account, no sign-up, just paste a message.
+**🔴 Live app: https://dichbome.vercel.app** — no account, no sign-up, just paste a message.
 Repository: https://github.com/changvn2002/dichbome
 
 <p align="center">
   <img src="docs/screenshots/dichbome-desktop.png" alt="Giải Mã Gia Đình — màn hình đã dịch xong câu “Tùy con, mẹ sao cũng được.”" width="900">
 </p>
-<p align="center"><em>Mẹ nhắn “Tùy con, mẹ sao cũng được.” — app dịch ra ý thật, điều mẹ muốn nghe, mức độ không hài lòng 3/5 và gợi ý sẵn câu trả lời. Ảnh chụp thật từ bản production, không phải mockup.</em></p>
+<p align="center"><em>Mẹ nhắn “Tùy con, mẹ sao cũng được.” — app dịch ra ý thật, điều mẹ muốn nghe, mức độ không hài lòng 3/5 và gợi ý sẵn câu trả lời. Ảnh chụp thật từ bản production đang chạy.</em></p>
 
 **Tóm tắt (Tiếng Việt):** Dán một câu bố mẹ, con cái, mẹ chồng, nàng dâu, vợ chồng hay sếp
 vừa nhắn — app cho bạn biết câu đó *thật ra nghĩa là gì*, người nhắn *đang muốn gì*, mức độ
@@ -39,14 +39,14 @@ liệu đi đâu.
 - **Save & share results** — share via the Web Share API (or copy a summary), keep up to 20 favourites in `localStorage`, plus a recent-history list on-device.
 - **Works offline** — an offline banner appears when the network drops and decoding continues on the local rule-based engine.
 - **No account needed, large touch targets** — readable type and ≥44px buttons, designed so older family members can use it too.
-- **Two API modes** — `http` (default: the UI calls the Next.js route handlers built into this repo) or `mock` (local rule-based engine in the browser only, zero backend). If the HTTP call fails, the UI automatically falls back to the local engine and tells the user.
+- **Two run modes** — `http` (default: the UI calls the Next.js route handlers built into this repo) or fully offline in the browser, where the same rule-based engine runs locally with zero backend. If the HTTP call fails, the UI automatically falls back to the offline engine and tells the user.
 
 ## 🖼️ Screenshots
 
 Tất cả ảnh dưới đây được chụp trực tiếp từ bản production
 [https://dichbome.vercel.app](https://dichbome.vercel.app) khi app đang ở trạng thái
 **đã dịch xong một tin nhắn thật** — đúng những gì người dùng nhìn thấy sau khi bấm
-“Dịch ý”, không phải màn hình trống lúc mới mở app hay ảnh mockup.
+“Dịch ý”, không phải màn hình trống lúc mới mở app hay ảnh dựng sẵn.
 
 ### Kết quả dịch — giá trị cốt lõi của app
 
@@ -125,8 +125,9 @@ cp .env.example .env.local   # optional — the defaults already work
 pnpm dev                     # http://localhost:3000
 ```
 
-> Quick demo with no server logic at all: set `NEXT_PUBLIC_DICHBOME_API_MODE=mock` in
-> `.env.local` — the app then runs entirely on the in-browser rule-based engine.
+> Run fully offline with no server logic at all: set `NEXT_PUBLIC_DICHBOME_API_MODE=mock` in
+> `.env.local` (the value is the offline engine's internal mode name) — the app then runs
+> entirely on the real rule-based engine in the browser, the same decoder the API uses.
 
 ### Scripts
 
@@ -143,7 +144,7 @@ pnpm dev                     # http://localhost:3000
 
 | Variable                      | Default                     | Description                                                                                                                                                                              |
 | ----------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_DICHBOME_API_MODE` | `http`                    | `http` = call this repo's route handlers; `mock` = local browser engine only.                                                                                                            |
+| `NEXT_PUBLIC_DICHBOME_API_MODE` | `http`                    | `http` = call this repo's route handlers; `mock` (internal mode name) = the offline engine running locally in the browser.                                                                    |
 | `NEXT_PUBLIC_API_URL`         | _(empty)_                   | Base URL for `http` mode. Empty = same-origin API (recommended). Only set it to point at a separate backend implementing the contract below.                                              |
 | `NEXT_PUBLIC_SITE_URL`        | `https://dichbome.vercel.app` | Canonical origin of the production deployment, used as `metadataBase` for SEO (canonical, Open Graph, `sitemap.xml`, `robots.txt`). No trailing slash.                                   |
 
@@ -214,8 +215,8 @@ Returns `{ examples: [{ message, speaker, context, tease }] }` — the static sa
 │       └── examples/route.ts      # GET  — static sample lines
 ├── components/dichbome/           # The whole product (original structure preserved)
 │   ├── app.tsx                    # Main UI (DichbomeApp, 'use client')
-│   ├── api/                       # Client API: http / mock / types + mode selection
-│   └── lib/translate.ts           # Local engine for mock mode + offline fallback
+│   ├── api/                       # Client API: http + offline engine, types, mode selection
+│   └── lib/translate.ts           # Local offline engine + fallback when the API is unreachable
 ├── lib/
 │   ├── api.ts                     # Fetch helper (shim equivalent to the host's @/lib/api)
 │   ├── site.ts                    # Shared site name/description/URL for metadata, robots, sitemap, manifest
@@ -230,14 +231,14 @@ Returns `{ examples: [{ message, speaker, context, tease }] }` — the static sa
 ├── docs/
 │   └── screenshots/               # Production screenshots used in this README
 ├── BRAND.md                       # Brand kit: colours, logo, usage rules
-├── CONTENT.md                     # Demo/content shooting script
+├── CONTENT.md                     # Content/video shooting script
 ├── EXTRACT.md                     # Original extraction notes from the source monorepo
 └── LICENSE                        # MIT
 ```
 
 ## 🧑‍💻 Development
 
-- **Add new phrases to the decoder**: edit the `ENTRIES` dictionary in `lib/server/engine.ts` (and the client copy in `components/dichbome/lib/translate.ts` if you want mock mode to match 100%). Rule order matters: specific patterns go before generic ones; rules tagged with `speakers` win when the role matches.
+- **Add new phrases to the decoder**: edit the `ENTRIES` dictionary in `lib/server/engine.ts` (and the client copy in `components/dichbome/lib/translate.ts` if you want the offline engine to match 100%). Rule order matters: specific patterns go before generic ones; rules tagged with `speakers` win when the role matches.
 - **Code style**: TypeScript `strict`, ESLint via `eslint-config-next`, Prettier (single quotes, semicolons, print width 100). Run `pnpm lint && pnpm typecheck` before committing.
 - **Don't add app-specific colours to `globals.css`** — product colours are declared as local CSS vars in `components/dichbome/app.tsx` (see EXTRACT.md). Respect the brand rules in `BRAND.md` for UI changes (single accent colour `#C22A44`, no gradients).
 - PRs welcome: fork → branch → PR against `main`. Describe the user-visible change and add screenshots for UI changes.
@@ -248,7 +249,7 @@ The production deployment runs at **https://dichbome.vercel.app**. To deploy you
 
 1. Fork/clone this repo, then in Vercel: **Add New → Project** and import it.
 2. Framework preset: **Next.js** (auto-detected). Root directory: repository root.
-3. Environment variables are optional — the defaults already run the full app (for a pure front-end demo, `NEXT_PUBLIC_DICHBOME_API_MODE=mock` is enough; no backend, no secrets).
+3. Environment variables are optional — the defaults already run the full app (for a pure front-end deployment, the offline engine mode is enough; no backend, no secrets).
 4. Deploy. Every push to `main` redeploys automatically.
 
 It is a plain Next.js app, so any Node host works too (Docker, VPS):
