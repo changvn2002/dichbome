@@ -1483,18 +1483,44 @@ export const CLIENT_RULE_KEYS: readonly string[] = RULES.flatMap((r) => [
   ...(r.wordKeys ?? []),
 ]);
 
-/** M-2 (Panel #02): tin từ mốc này mới coi là "tin dài" để xét độ sâu ở đường mẫu chung. */
-const GENERIC_DEPTH_MIN_MESSAGE = 50;
+/**
+ * M-2 (Panel #02): tin từ mốc này mới coi là "tin dài" để xét độ sâu ở đường
+ * mẫu chung. Panel #03 (§10.2) chứng minh dải 30–60 ký tự nuốt chi tiết 100%
+ * (ca 43 ký tự cho kết quả giống stub 6/6) → hạ ngưỡng 50 → 30 cho đường
+ * RULE CHUNG ĐÃ KHỚP (fix wave 4); đường fallback thuần giữ mốc 80
+ * (GENERIC_LIMIT_MIN_MESSAGE) — lý do ở khối độ sâu trong
+ * translateParentMessage.
+ */
+const GENERIC_DEPTH_MIN_MESSAGE = 30;
 /** Tin rất dài mà vẫn không tách được chi tiết riêng: khai báo giới hạn ngay trong Ý thật. */
 const GENERIC_LIMIT_MIN_MESSAGE = 80;
 
+/** Cắt chi tiết quá dài ở biên từ (giữ nguyên quy tắc bản Panel #02). */
+function trimDetail(segment: string): string {
+  if (segment.length <= 90) return segment;
+  const cut = segment.slice(0, 90);
+  const lastSpace = cut.lastIndexOf(' ');
+  return `${(lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trim()}…`;
+}
+
 /**
- * Trích một chi tiết riêng nổi bật từ chính tin nhắn: đoạn con dài nhất (tách theo
- * dấu câu / dấu phẩy) mà sau khi gỡ các khoá mẫu đã khớp vẫn còn ít nhất 4 từ riêng.
- * Trích nguyên văn (chỉ cắt ở biên từ khi quá 90 ký tự) — không bịa thêm nội dung.
- * Cùng quy tắc với extractSalientDetail phía server (lib/server/engine.ts).
+ * Trích tối đa HAI chi tiết riêng nổi bật từ chính tin nhắn, trích nguyên
+ * văn — không bịa thêm nội dung:
+ * - một đoạn con "đủ riêng" = dài ≥ 15 ký tự và còn ≥ 4 từ riêng sau khi gỡ
+ *   các mẫu ĐÃ KHỚP (khoá của rule đang xét; đường fallback gỡ mọi khoá).
+ *   Gỡ theo rule đã khớp là điểm chốt của Panel #03 §10.2: «Tối nay con
+ *   bận» từng bị khoá 'con ban' của MỘT RULE KHÁC ăn mất 2/4 từ nên rơi
+ *   khỏi ngưỡng và bị nuốt 100% ở ca 43 ký tự.
+ * - chi tiết thứ nhất = đoạn đủ riêng dài nhất; chi tiết thứ hai = đoạn đủ
+ *   riêng CUỐI CÙNG trong tin (khác đoạn thứ nhất) — vế kết thường là vế
+ *   đau nhất («khỏi cần về ăn cơm với mẹ đâu»), bản Panel #02 chỉ trích
+ *   một chi tiết nên mất hẳn vế này (bao phủ 1/2).
+ * Cùng quy tắc với extractSalientDetails phía server (lib/server/engine.ts).
  */
-function extractSalientDetail(message: string): string | null {
+function extractSalientDetails(
+  message: string,
+  stripKeys: readonly string[],
+): { first: string | null; second: string | null } {
   const segments = message
     .split(/[.!?…;]+/)
     .flatMap((part) => part.split(','))
@@ -1505,22 +1531,23 @@ function extractSalientDetail(message: string): string | null {
         .trim(),
     )
     .filter(Boolean);
-  let best: string | null = null;
-  for (const segment of segments) {
-    if (segment.length < 15) continue;
+  const qualified: Array<{ segment: string; index: number }> = [];
+  segments.forEach((segment, index) => {
+    if (segment.length < 15) return;
     let residual = normalizeVi(segment).replace(/[^a-z0-9\s]/g, ' ');
-    for (const key of CLIENT_RULE_KEYS) residual = residual.split(key).join(' ');
+    for (const key of stripKeys) residual = residual.split(key).join(' ');
     const residualWords = residual.split(/\s+/).filter(Boolean);
-    if (residualWords.length < 4) continue;
-    if (!best || segment.length > best.length) best = segment;
-  }
-  if (!best) return null;
-  if (best.length > 90) {
-    const cut = best.slice(0, 90);
-    const lastSpace = cut.lastIndexOf(' ');
-    best = `${(lastSpace > 40 ? cut.slice(0, lastSpace) : cut).trim()}…`;
-  }
-  return best;
+    if (residualWords.length < 4) return;
+    qualified.push({ segment, index });
+  });
+  if (qualified.length === 0) return { first: null, second: null };
+  const longest = qualified.reduce((a, b) => (b.segment.length > a.segment.length ? b : a));
+  const rest = qualified.filter((q) => q.index !== longest.index);
+  const secondPick = rest.length > 0 ? rest[rest.length - 1] : null;
+  return {
+    first: trimDetail(longest.segment),
+    second: secondPick ? trimDetail(secondPick.segment) : null,
+  };
 }
 
 export function translateParentMessage(input: TranslateInput): TranslateResult {
@@ -1557,14 +1584,23 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
     ...(rule.warning ? { warning: fill(rule.warning) } : {}),
   };
 
-  // M-2 (Panel #02, D-3): độ sâu cho tin dài ở đường MẪU CHUNG phía client —
-  // cùng quy tắc server: chỉ rule chung (không gắn vai) hoặc fallback, chỉ tin
-  // dài (>= 50 ký tự); bổ sung (a) hoàn cảnh đã chọn và (b) chi tiết riêng trích
-  // nguyên văn từ chính tin vào Ý thật / Điều muốn nghe / câu trả lời đầu tiên.
-  // Rule gắn đúng vai và tin ngắn giữ nguyên (corpus vàng ở tests/golden-corpus-parents).
+  // M-2 (Panel #02, D-3): độ sâu cho tin ở đường MẪU CHUNG phía client —
+  // cùng quy tắc server: chỉ rule chung (không gắn vai) hoặc fallback; bổ
+  // sung (a) hoàn cảnh đã chọn và (b) tối đa HAI chi tiết riêng trích
+  // nguyên văn từ chính tin vào Ý thật / Điều muốn nghe / câu trả lời thứ
+  // nhất + thứ hai, kèm câu lý do mức khi có vế thứ hai. Ngưỡng theo loại
+  // đường (Panel #03 §10.2): rule chung đã khớp → 30 ký tự; fallback thuần
+  // → 80 (corpus vàng khoá nguyên văn các fallback 31–48 ký tự dạng một ý
+  // — ở đó "chi tiết riêng" chỉ là cả tin tự trích chính nó). Rule gắn
+  // đúng vai và tin ngắn giữ nguyên (corpus vàng ở
+  // tests/golden-corpus-parents).
   const isGenericPath = !matchedRule || !matchedRule.roles;
-  if (isGenericPath && message.length >= GENERIC_DEPTH_MIN_MESSAGE) {
-    const detail = extractSalientDetail(message);
+  const depthMin = matchedRule ? GENERIC_DEPTH_MIN_MESSAGE : GENERIC_LIMIT_MIN_MESSAGE;
+  if (isGenericPath && message.length >= depthMin) {
+    const { first: detail, second: detail2 } = extractSalientDetails(
+      message,
+      matchedRule ? matchedRule.keys : CLIENT_RULE_KEYS,
+    );
     if (detail) {
       result.meaning += ` Chi tiết riêng trong tin này: “${detail}”.`;
       if (context !== 'Khác') {
@@ -1579,6 +1615,15 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
           result.replies[0].text +
           fill(` Riêng chuyện “${detail}”, {s} sẽ nói rõ thêm với {x} cho chắc.`),
       };
+      if (detail2) {
+        result.meaning += ` Tin còn một vế riêng nữa: “${detail2}”. Mức căng thẳng chấm theo vế chính của câu — vế riêng là chi tiết cá nhân, app nhắc lại để bạn đáp cho trúng chứ không tính vào mức.`;
+        result.replies[1] = {
+          ...result.replies[1],
+          text:
+            result.replies[1].text +
+            fill(` Riêng chuyện “${detail2}”, {s} sẽ nói rõ thêm với {x} cho chắc.`),
+        };
+      }
     } else if (message.length >= GENERIC_LIMIT_MIN_MESSAGE) {
       result.meaning +=
         context !== 'Khác'

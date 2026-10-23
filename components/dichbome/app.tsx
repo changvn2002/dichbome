@@ -475,7 +475,13 @@ export function DichbomeApp() {
   const handleShare = useCallback(async () => {
     if (stage.kind !== 'slip') return;
     const view = stage.view;
-    const text = `${view.message}\n\nÝ thật: ${view.result.meaning}\n\nMức căng thẳng: ${view.result.angerLevel}/5 — ${view.result.dangerLabel}\n\n— Dịch bởi Giải Mã Gia Đình`;
+    // D-6(2) (Panel #03): phiếu tier 'low' không chấm mức — chuỗi chia sẻ
+    // cũng không được bịa một con số mức cho cùng kết quả đó.
+    const levelPart =
+      view.tier === 'low'
+        ? 'Mức căng thẳng: chưa đủ dữ kiện để chấm cho câu này'
+        : `Mức căng thẳng: ${view.result.angerLevel}/5 — ${view.result.dangerLabel}`;
+    const text = `${view.message}\n\nÝ thật: ${view.result.meaning}\n\n${levelPart}\n\n— Dịch bởi Giải Mã Gia Đình`;
     if (typeof navigator !== 'undefined' && 'share' in navigator) {
       try {
         await navigator.share({ title: 'Giải Mã Gia Đình', text });
@@ -584,21 +590,30 @@ export function DichbomeApp() {
                 {stage.kind === 'idle' ? (
                   <div className="flex flex-col items-center pt-6 text-center">
                     {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
+                    {/* PERF-09 (vòng 4): file đã xuất lại 360×240 (@2x của
+                        khung hiển thị 180×120) thay cho bản 1080×720 cũ;
+                        attrs khai đúng tỉ lệ 3:2 thật của ảnh. */}
                     <img
                       src="/products/brand/dichbome-empty-stage.webp"
                       alt=""
                       width={180}
-                      height={180}
+                      height={120}
                       className="w-[180px]"
                     />
                     {/* M-4: Stage display về đúng DESIGN-LANGUAGE §3 đã duyệt —
-                      30/37 mobile · 40/48 desktop (trước đây render 26/34 ở cả hai). */}
-                    <h2 className="mt-4 font-display text-[30px] leading-[37px] font-semibold min-[1280px]:text-[40px] min-[1280px]:leading-[48px]">
+                      30/37 mobile · 40/48 desktop (trước đây render 26/34 ở cả hai).
+                      D-4(a) (Panel #03): text-balance — trước đây dòng cuối
+                      «thế?» đứng mồ côi ở 19,6% bề rộng dòng tại 390px
+                      (ngưỡng §10.1: dòng cuối ≥40%). */}
+                    <h2 className="mt-4 font-display text-[30px] leading-[37px] font-semibold text-balance min-[1280px]:text-[40px] min-[1280px]:leading-[48px]">
                       Người nhà vừa nhắn gì thế?
                     </h2>
-                    <p className="mt-2 max-w-[320px] text-[15px] leading-relaxed text-muted">
-                      Dán câu vào ô dưới, chọn đúng người nhắn — app đọc ý thật và gợi ý câu trả lời
-                      cho êm chuyện.
+                    {/* R4-F1: phụ đề rút 23 → 17 từ (bù hồi quy ngân sách chữ
+                        đứng 77/75 do dòng DATA-09b cộng thêm; đích ≤72/75).
+                        Ý giữ nguyên: dán câu — app đọc ý thật, gợi ý câu trả
+                        lời. Dòng DATA-09b ở composer KHÔNG bị cắt. */}
+                    <p className="mt-2 max-w-[320px] text-[15px] leading-relaxed text-balance text-muted">
+                      Dán câu vào ô dưới — app đọc ý thật, gợi ý câu trả lời êm chuyện.
                     </p>
                     <div className="mt-4 flex flex-col items-center gap-2">
                       {examples.slice(0, 2).map((ex) => (

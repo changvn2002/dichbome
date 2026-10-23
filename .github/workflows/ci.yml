@@ -42,9 +42,10 @@ jobs:
       - name: Tests
         run: pnpm test
 
+      # CQ-04 (fix wave 4): KHÔNG continue-on-error — audit đỏ là pipeline
+      # đỏ. Vòng 4 chỉ còn đúng điểm này để CQ-04 đóng hẳn (r4 dossier).
       - name: Dependency audit (prod)
         run: pnpm audit --prod
-        continue-on-error: true
 
       - name: Build
         run: pnpm build

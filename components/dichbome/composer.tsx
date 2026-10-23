@@ -261,7 +261,11 @@ export function Composer({
       ) : null}
       {pasteHint ? <p className="mt-2 text-sm text-muted">{pasteHint}</p> : null}
 
-      <div className="mt-2 flex items-center gap-2">
+      {/* D-4(b) (Panel #03): flex-wrap + nhãn CTA nowrap. Trước đây CTA bị
+          bó trong khe còn lại cạnh nút Hoàn cảnh (~116px ở 320px) nên nhãn
+          vỡ 2 dòng. Nay: không vừa một hàng thì CTA xuống hàng riêng
+          full-width — nhãn luôn nguyên vẹn một dòng ở mọi bề rộng/vai. */}
+      <div className="mt-2 flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => setContextOpen(true)}
@@ -275,7 +279,7 @@ export function Composer({
             <button
               type="button"
               disabled
-              className="min-h-[52px] flex-1 rounded-xl bg-crimson px-5 text-[15px] font-semibold text-white opacity-60"
+              className="min-h-[52px] flex-1 whitespace-nowrap rounded-xl bg-crimson px-5 text-[15px] font-semibold text-white opacity-60"
             >
               Đang dịch…
             </button>
@@ -291,7 +295,7 @@ export function Composer({
           <button
             type="button"
             onClick={onTranslate}
-            className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 rounded-xl bg-crimson px-5 text-[15px] font-semibold text-white hover:bg-crimson-deep"
+            className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-crimson px-5 text-[15px] font-semibold text-white hover:bg-crimson-deep"
           >
             Dịch ý {currentRole}
             <ArrowRight className="size-4" aria-hidden />

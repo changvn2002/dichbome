@@ -135,3 +135,113 @@ test('M-2 client: rule gắn đúng vai dù tin dài cũng không bị bổ sung
   assert.ok(fallbackLong.meaning.includes('Chi tiết riêng trong tin này'), fallbackLong.meaning);
   assert.ok(fallbackLong.meaning.includes('“Công việc”'), fallbackLong.meaning);
 });
+
+// ---------------------------------------------------------------------------
+// M-2 PHẦN CÒN LẠI (Panel #03 §10.2, fix wave 4) — điều kiện đóng của R3:
+//   (1) bao phủ chi tiết 2/2 ở ca 115 ký tự của Panel #03 (bản có vế
+//       «mẹ ở nhà một mình cũng quen rồi»): cả hai mệnh đề chi tiết đều được
+//       nhắc trong ≥1 trường của {Ý thật, Điều muốn nghe, replies};
+//   (2) ≥2/3 câu trả lời khác stub ở ca 115;
+//   (3) dòng mức identical stub/long phải kèm lý do ngay trên phiếu (công
+//       thức angerLevel không đổi — lý do nằm trong Ý thật);
+//   (4) chi tiết có mặt trong Ý thật (không hồi quy);
+//   (5) dải 30–60 ký tự: bộ 5 ca chuẩn, mỗi ca đúng 1 mệnh đề chi tiết →
+//       chi tiết được phản ánh trong Ý thật ở 100% ca;
+//   (6) cổng theo loại đường: fallback thuần dạng một ý (31–48 ký tự) giữ
+//       nguyên từng byte — corpus vàng khoá các ca này, "chi tiết" ở đó
+//       chỉ là cả tin tự trích chính nó.
+// Quy tắc trích (cả 2 engine): gỡ mẫu theo entry/rule ĐÃ KHỚP (không phải
+// toàn ngân hàng); chi tiết 1 = đoạn đủ riêng dài nhất; chi tiết 2 = đoạn
+// đủ riêng cuối cùng trong tin.
+
+const PANEL03_MESSAGE =
+  'Thôi, tùy con. Chủ nhật này con bận thì cứ lo việc của con đi, mẹ ở nhà một mình cũng quen rồi, khỏi cần về ăn cơm với mẹ đâu.';
+const PANEL03_DETAIL_1 = 'Chủ nhật này con bận thì cứ lo việc của con đi';
+const PANEL03_DETAIL_2 = 'khỏi cần về ăn cơm với mẹ đâu';
+const STUB_MESSAGE = 'Tùy con, mẹ sao cũng được.';
+
+test('M-2/w4 server: ca Panel #03 115 ký tự — bao phủ 2/2, ≥2/3 replies khác stub, có lý do mức', () => {
+  const stub = translateDichbome({ message: STUB_MESSAGE, speaker: 'me', context: 'khac' });
+  const r = translateDichbome({ message: PANEL03_MESSAGE, speaker: 'me', context: 've-que' });
+  const allUnits = [r.meaning, r.realWant, ...r.replies.map((x) => x.text)].join('\n');
+  // (1) bao phủ 2/2
+  assert.ok(allUnits.includes(PANEL03_DETAIL_1), 'thiếu chi tiết 1');
+  assert.ok(allUnits.includes(PANEL03_DETAIL_2), 'thiếu chi tiết 2 (vế cơm)');
+  // (4) cả hai chi tiết đều vào Ý thật; chi tiết 2 vào cả replies[1]
+  assert.ok(r.meaning.includes(PANEL03_DETAIL_1), r.meaning);
+  assert.ok(r.meaning.includes(PANEL03_DETAIL_2), r.meaning);
+  assert.ok(r.replies[1].text.includes(PANEL03_DETAIL_2), r.replies[1].text);
+  // (2) ít nhất 2/3 câu trả lời khác stub
+  const differing = r.replies.filter((x, i) => x.text !== stub.replies[i].text).length;
+  assert.ok(differing >= 2, `chỉ ${differing}/3 replies khác stub`);
+  // (3) dòng mức HIỂN THỊ không đổi (điểm thô 62 vs 66 cùng quy về 3/5 —
+  // công thức adjustAnger giữ nguyên) NHƯNG phiếu có câu lý do đi kèm.
+  const uiLevel = (raw) => Math.min(5, Math.max(0, raw > 5 ? Math.round((raw / 100) * 5) : raw));
+  assert.equal(uiLevel(r.angerLevel), uiLevel(stub.angerLevel));
+  assert.equal(r.dangerLabel, stub.dangerLabel);
+  assert.ok(r.meaning.includes('Mức căng thẳng chấm theo vế chính của câu'), r.meaning);
+});
+
+test('M-2/w4 client: ca Panel #03 115 ký tự — cùng các điều kiện phía offline', () => {
+  const stub = translateParentMessage({ message: STUB_MESSAGE, speaker: 'Mẹ', context: 'Khác' });
+  const r = translateParentMessage({ message: PANEL03_MESSAGE, speaker: 'Mẹ', context: 'Về quê' });
+  const allUnits = [r.meaning, r.realWant, ...r.replies.map((x) => x.text)].join('\n');
+  assert.ok(allUnits.includes(PANEL03_DETAIL_1), 'thiếu chi tiết 1');
+  assert.ok(allUnits.includes(PANEL03_DETAIL_2), 'thiếu chi tiết 2 (vế cơm)');
+  assert.ok(r.meaning.includes(PANEL03_DETAIL_2), r.meaning);
+  assert.ok(r.replies[1].text.includes(PANEL03_DETAIL_2), r.replies[1].text);
+  const differing = r.replies.filter((x, i) => x.text !== stub.replies[i].text).length;
+  assert.ok(differing >= 2, `chỉ ${differing}/3 replies khác stub`);
+  assert.ok(r.meaning.includes('Mức căng thẳng chấm theo vế chính của câu'), r.meaning);
+  // Parity prong CQ-14: Ý thật hai engine trùng nhau ở ca này.
+  const srv = translateDichbome({ message: PANEL03_MESSAGE, speaker: 'me', context: 've-que' });
+  assert.equal(r.meaning, srv.meaning);
+});
+
+test('M-2/w4: ca 43 ký tự (dưới ngưỡng 50 cũ) — chi tiết không còn bị nuốt', () => {
+  const msg = 'Tùy con, mẹ sao cũng được. Tối nay con bận.';
+  assert.equal(msg.length, 43);
+  const srv = translateDichbome({ message: msg, speaker: 'me', context: 'khac' });
+  assert.ok(srv.meaning.includes('Tối nay con bận'), srv.meaning);
+  const cli = translateParentMessage({ message: msg, speaker: 'Mẹ', context: 'Khác' });
+  assert.ok(cli.meaning.includes('Tối nay con bận'), cli.meaning);
+  assert.equal(cli.meaning, srv.meaning);
+});
+
+test('M-2/w4: dải 30–60 ký tự — bộ 5 ca chuẩn, mỗi ca 1 mệnh đề chi tiết, phản ánh 100%', () => {
+  const band = [
+    { message: 'Sao cũng được. Thứ bảy này mẹ đi khám.', detail: 'Thứ bảy này mẹ đi khám' },
+    { message: 'Ừ, tùy con thôi. Tuần sau bố mổ mắt đấy.', detail: 'Tuần sau bố mổ mắt đấy' },
+    {
+      message: 'Mẹ sao cũng được. Chiều nay con đón cháu nhé.',
+      detail: 'Chiều nay con đón cháu nhé',
+    },
+    { message: 'Tuỳ con quyết định. Nhớ mang áo mưa, trời sắp mưa to.', detail: 'Nhớ mang áo mưa' },
+    {
+      message: 'Ừ thì tùy con. Tháng này tiền điện tăng gấp đôi rồi đấy.',
+      detail: 'Tháng này tiền điện tăng gấp đôi rồi đấy',
+    },
+  ];
+  for (const c of band) {
+    assert.ok(c.message.length >= 30 && c.message.length <= 60, `độ dài ${c.message.length}`);
+    const srv = translateDichbome({ message: c.message, speaker: 'me', context: 'khac' });
+    assert.ok(srv.meaning.includes(c.detail), `${c.message} → ${srv.meaning}`);
+    const cli = translateParentMessage({ message: c.message, speaker: 'Mẹ', context: 'Khác' });
+    assert.ok(cli.meaning.includes(c.detail), `${c.message} → ${cli.meaning}`);
+  }
+});
+
+test('M-2/w4: fallback thuần một ý 31–48 ký tự giữ nguyên — không tự trích cả tin làm chi tiết', () => {
+  const singles = [
+    'Nhà mình nói chuyện này nhé con',
+    'Tháng này tiền nhà tăng nhiều rồi con ạ',
+    'Hôm nay nhà mình có chuyện này muốn nói con nghe',
+    'Con ăn uống thế nào, có đói không',
+  ];
+  for (const message of singles) {
+    const srv = translateDichbome({ message, speaker: 'me', context: 'khac' });
+    assert.ok(!srv.meaning.includes('Chi tiết riêng trong tin này'), `${message} → ${srv.meaning}`);
+    const cli = translateParentMessage({ message, speaker: 'Mẹ', context: 'Khác' });
+    assert.ok(!cli.meaning.includes('Chi tiết riêng trong tin này'), `${message} → ${cli.meaning}`);
+  }
+});

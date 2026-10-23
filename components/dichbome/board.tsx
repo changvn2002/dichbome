@@ -36,14 +36,26 @@ const ALL_GROUPS = 'Tất cả';
 
 function savedSourceLabel(item: StoredItem): string {
   if (item.source === 'server') return 'Nguồn: Máy chủ';
-  if (item.source === 'device') return 'Nguồn: Trên máy';
+  // D-6(1) (Panel #03): phiếu ghi «Nguồn: Trên máy · Đang offline» nhưng bản
+  // ghi cũ đánh rơi hậu tố offline — một sự kiện, hai bề mặt phải nói cùng
+  // một sự thật (spec §2.7).
+  if (item.source === 'device')
+    return item.offline ? 'Nguồn: Trên máy · Đang offline' : 'Nguồn: Trên máy';
   return 'Đã lưu trên máy';
 }
 
 function historySourceShort(item: StoredItem): string {
   if (item.source === 'server') return 'Máy chủ';
-  if (item.source === 'device') return 'Trên máy';
+  if (item.source === 'device') return item.offline ? 'Trên máy · Đang offline' : 'Trên máy';
   return 'Đã lưu';
+}
+
+/**
+ * D-6(2)/T15 (Panel #03): phiếu tier 'low' tuyên bố «Chưa đủ dữ kiện để
+ * chấm mức» — bản ghi KHÔNG được in «Mức n/5» cho cùng một kết quả.
+ */
+function recordLevelLabel(item: StoredItem): string {
+  return item.tier === 'low' ? 'Chưa đủ dữ kiện' : `Mức ${item.result.angerLevel}/5`;
 }
 
 /**
@@ -73,7 +85,15 @@ function BoardEmptyState({
   return (
     <div className="py-4">
       {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
-      <img src="/products/brand/dichbome-empty-stage.webp" alt="" className="w-[120px]" />
+      {/* PERF-09 (vòng 4): cùng file 360×240 như sân khấu; khai attrs đúng
+          khung hiển thị 120×80 để trình duyệt giữ chỗ chống CLS. */}
+      <img
+        src="/products/brand/dichbome-empty-stage.webp"
+        alt=""
+        width={120}
+        height={80}
+        className="w-[120px]"
+      />
       <p className="mt-3 font-semibold text-ink">{title}</p>
       {description ? (
         <p className="mt-1 text-[15px] leading-relaxed text-muted">{description}</p>
@@ -336,11 +356,16 @@ export function Board({
                   Không có kết quả đã lưu nào khớp với từ khoá này.
                 </p>
               ) : (
-                <div className="columns-2 gap-3">
+                /* D-4(c) (Panel #03): tab Đã lưu là danh sách bản ghi (như
+                   Lịch sử) — bỏ masonry 2 cột. Trong cột ~145px, hàng nút
+                   [Mở trên sân khấu + xoá 44px] bó nhãn còn 60–91px nên vỡ
+                   2–4 dòng ở cả 3 viewport; một cột cho khe nút ≥208px,
+                   nhãn nowrap nguyên vẹn một dòng (điều kiện §10.1). */
+                <div className="flex flex-col gap-3">
                   {filteredSaved.map((item) => (
                     <div
                       key={item.id}
-                      className="mb-3 break-inside-avoid rounded-[14px] border border-line-strong bg-card p-3.5 shadow-[var(--shadow-card)]"
+                      className="rounded-[14px] border border-line-strong bg-card p-3.5 shadow-[var(--shadow-card)]"
                     >
                       <p className="line-clamp-3 text-[15px] font-medium text-ink">
                         “{item.message}”
@@ -349,14 +374,14 @@ export function Board({
                         {item.result.meaning}
                       </p>
                       <p className="mt-1.5 text-xs text-muted">
-                        Mức {item.result.angerLevel}/5 · {savedSourceLabel(item)}
+                        {recordLevelLabel(item)} · {savedSourceLabel(item)}
                         {item.tier === 'low' ? ' · Độ tin cậy thấp' : ''}
                       </p>
                       <div className="mt-2.5 flex gap-2">
                         <button
                           type="button"
                           onClick={() => onRestore(item)}
-                          className="min-h-11 flex-1 rounded-lg border border-line-strong bg-card px-3 text-sm font-semibold text-ink"
+                          className="min-h-11 flex-1 whitespace-nowrap rounded-lg border border-line-strong bg-card px-3 text-sm font-semibold text-ink"
                         >
                           Mở trên sân khấu
                         </button>
@@ -408,7 +433,7 @@ export function Board({
                           “{item.message}”
                         </span>
                         <span className="mt-0.5 block truncate text-xs text-muted">
-                          {item.speaker} · {item.context} · Mức {item.result.angerLevel}/5 ·{' '}
+                          {item.speaker} · {item.context} · {recordLevelLabel(item)} ·{' '}
                           {historySourceShort(item)}
                         </span>
                       </span>

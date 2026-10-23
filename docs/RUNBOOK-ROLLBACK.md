@@ -6,6 +6,21 @@ giữ dữ liệu người dùng — rollback không có rủi ro mất dữ li�
 trên máy người dùng (localStorage) đọc được qua các bản nhờ adapter
 `schemaVersion` (migrate-on-read).
 
+## Sự kiện deploy (OPS-02)
+
+- Nền tảng: Vercel, project `dichbome` (team changaffiliate1). Không có
+  `vercel.json` ghim region trong repo — region chạy theo mặc định của
+  Vercel.
+- **Region của function** (route `/api/products/dichbome/translate`):
+  **iad1** (US East, Washington D.C.) — bằng chứng: header
+  `X-Vercel-Id: iad1::iad1::…` trên response POST thật tới production,
+  đo 2026-10-23 (fix wave 4). Trang tĩnh/asset được phục vụ qua Edge
+  Network toàn cầu (PoP gần người dùng nhất — cùng lần đo, request tĩnh
+  được phục vụ từ `sfo1`), nên "region" cần ghi cho rollback/monitoring
+  là region của function: iad1.
+- Kiểm lại khi có thay đổi hạ tầng: gửi một POST tới API production và
+  đọc lại `X-Vercel-Id` (cặp mã đầu là edge :: region function).
+
 ## Nguyên tắc ghép đôi tag ↔ deployment
 
 - Mỗi lần deploy production, parent tạo **git tag** dạng `vX.Y.Z`

@@ -6,7 +6,36 @@ phiên bản theo [SemVer](https://semver.org/). Mỗi bản phát hành trên
 production tương ứng một git tag `vX.Y.Z` — xem
 `docs/RUNBOOK-ROLLBACK.md` cho bảng ghép đôi tag ↔ deployment.
 
-## [Unreleased] — fix wave 3 (chờ deploy)
+## [1.2.0] — 2026-10-24 — fix wave 4 (Panel #03 §10) + hotfix SEC-10
+
+### Added
+
+- ADR-003 (storage/schemaVersion) + ADR-004 (rendering strategy);
+  `docs/dependency-report.md` (madge — 0 circular).
+- Test cho `undo.ts` (5) và `lib/api.ts` (8) — CQ-05.
+
+### Changed
+
+- D-4: họ lỗi "chữ quyết định bề rộng layout" xử tới 0 ca ở ca điển
+  hình (heading mồ côi, CTA composer, pill × nhãn gauge, suggestion
+  bị clamp có nút mở tại chỗ).
+- M-2: độ sâu bản dịch vai phụ — bao phủ chi tiết 2/2 ở ca 115 ký tự,
+  corpus vàng 89 ca byte-identical, công thức angerLevel không đổi.
+- Chữ đứng 77 → 71/75 (phép đếm COPY-DIET); ảnh empty-stage nhẹ hơn
+  32% (PERF-09); RUNBOOK ghi region iad1 (OPS-02).
+
+### Fixed
+
+- D-6(2): thẻ đã lưu ở ca ít dữ kiện hết in «Mức n/5» sai — nay
+  «Chưa đủ dữ kiện».
+
+### Security
+
+- next 16.3.6 → 16.4.2: vá 2 CRITICAL RCE (GHSA-2464-fhr4-w9xw,
+  GHSA-673q-mjm6-r5xr) + HIGH SSRF/DoS; step audit CI hết
+  continue-on-error, chặn thật (CQ-04).
+
+## [1.1.0] — 2026-10-23 — fix wave 3
 
 ### Added
 

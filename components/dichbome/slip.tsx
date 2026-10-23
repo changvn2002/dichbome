@@ -183,18 +183,15 @@ export function StageSlip({
           <p className={`mt-1 text-base leading-relaxed${expandedAll ? '' : ' line-clamp-2'}`}>
             {result.realWant}
           </p>
-          {result.meaning.length > 115 ||
-          result.realWant.length > 110 ||
-          result.replies.some((r) => r.text.length > 80) ? (
-            <button
-              type="button"
-              aria-expanded={expandedAll}
-              onClick={() => setExpandedAll((v) => !v)}
-              className="min-h-11 text-sm font-semibold text-crimson-ink"
-            >
-              {expandedAll ? 'Thu gọn' : 'Đọc tiếp'}
-            </button>
-          ) : null}
+          {/* D-4(d) (Panel #03): nút «Đọc tiếp» KHÔNG còn nằm trong khối này.
+              Khi nó ở trước thước, hàng nhãn thước kết thúc cách đáy sân
+              khấu 16px và pill «Còn nội dung ở dưới» (neo đáy, cao 44px)
+              che 37–38% nhãn «nhẹ nhàng» ở khung đầu — hình học tất yếu ở
+              mọi vị trí ngang. Chuyển nút xuống SAU thước: thước nhích lên
+              đúng 44px, nhãn kết thúc trên miệng pill (giao = 0, đo lại ở
+              390×844 trong FIX-WAVE-4-STATE). Vị trí nút không bị spec
+              ghim — DESIGN.md/LAYOUT-SPEC chỉ ghim «một cơ chế duy nhất»;
+              lý do đã ghi vào hai spec như tiền lệ M-3/D-2. */}
         </div>
 
         <div
@@ -244,6 +241,21 @@ export function StageSlip({
           )}
         </div>
 
+        {result.meaning.length > 115 ||
+        result.realWant.length > 110 ||
+        result.replies.some((r) => r.text.length > 80) ? (
+          <div className="anim-slip-block mt-1" style={{ '--i': 3 } as CSSProperties}>
+            <button
+              type="button"
+              aria-expanded={expandedAll}
+              onClick={() => setExpandedAll((v) => !v)}
+              className="min-h-11 text-sm font-semibold text-crimson-ink"
+            >
+              {expandedAll ? 'Thu gọn' : 'Đọc tiếp'}
+            </button>
+          </div>
+        ) : null}
+
         {result.warning ? (
           <div className="mt-3 border-t border-line-strong pt-2">
             <button
@@ -283,12 +295,32 @@ export function StageSlip({
                   </button>
                 </div>
                 {/* Xem trước tối đa 2 dòng khi phiếu thu gọn; nút Sao chép luôn
-                    chép TOÀN VĂN, và cơ chế «Đọc tiếp» duy nhất ở trên mở trọn. */}
-                <p
-                  className={`mt-1 text-[15px] leading-[22px]${expandedAll ? '' : ' line-clamp-2'}`}
-                >
-                  {reply.text}
-                </p>
+                    chép TOÀN VĂN. D-4(e) (Panel #03): trước đây chữ bị clamp
+                    là ngõ cụt — bấm vào không có gì xảy ra, nút «Đọc tiếp»
+                    duy nhất nằm cách thẻ đáp ~330px. Nay câu bị rút gọn tự
+                    mang tín hiệu mở NGAY TRÊN THẺ: bấm vào chữ (hoặc dòng
+                    «Đọc tiếp» kèm chevron dưới chữ) là mở tại chỗ — vẫn là
+                    MỘT cơ chế mở rộng duy nhất (expandedAll) như cam kết. */}
+                {!expandedAll && reply.text.length > 80 ? (
+                  <button
+                    type="button"
+                    onClick={() => setExpandedAll(true)}
+                    aria-label={`Đọc tiếp câu trả lời ${reply.label}`}
+                    className="mt-1 block w-full text-left"
+                  >
+                    <span className="line-clamp-2 text-[15px] leading-[22px]">{reply.text}</span>
+                    <span className="mt-0.5 inline-flex items-center gap-1 text-[13px] font-semibold text-crimson-ink">
+                      Đọc tiếp
+                      <ChevronDown className="size-3.5" aria-hidden />
+                    </span>
+                  </button>
+                ) : (
+                  <p
+                    className={`mt-1 text-[15px] leading-[22px]${expandedAll ? '' : ' line-clamp-2'}`}
+                  >
+                    {reply.text}
+                  </p>
+                )}
               </div>
             ))}
           </div>

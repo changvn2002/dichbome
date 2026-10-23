@@ -132,7 +132,16 @@ by hairlines; reply rows are flat rows inside the slip.
   strip, actions (Lưu kết quả · Chia sẻ · Dịch câu khác). ONE shared
   «Đọc tiếp»/«Thu gọn» control expands every clamped block at once (revised
   2026-10-23, Panel #02 M-3 — the previous two separate expand buttons plus
-  internal scroll were two competing "there is more" mechanisms). Internal
+  internal scroll were two competing "there is more" mechanisms). The
+  control sits immediately AFTER the tension gauge (revised 2026-10-23,
+  fix wave 4, Panel #03 D-4(d) — inside the want block it pushed the gauge
+  labels into the bottom-docked «Còn nội dung ở dưới» pill's band, a
+  geometric overlap no horizontal placement could fix; moving it below
+  the gauge lifts the gauge by exactly the control's 44px and zeroes the
+  intersection; see LAYOUT-SPEC §3 note D-4(d)). A clamped reply carries
+  its own in-place «Đọc tiếp» signal on the card and tapping the reply
+  text expands in place — the same single expansion mechanism (Panel #03
+  D-4(e)). Internal
   section dividers and the gauge track use `--line-strong` (revised
   2026-10-23, N-6 — was the decorative `--line` at 1.32:1). Once saved, the
   «Đã lưu» action opens the Board's Saved tab instead of un-saving
