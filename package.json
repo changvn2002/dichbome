@@ -42,5 +42,5 @@
     "typecheck": "tsc --noEmit",
     "tokens:verify": "node scripts/verify-tokens.mjs"
   },
-  "version": "1.4.0"
+  "version": "1.4.1"
 }

@@ -3,9 +3,12 @@
    không bao giờ vào SW cache). Cập nhật không tự reload giữa phiên:
    skipWaiting chỉ chạy khi trang gửi message { type: 'SKIP_WAITING' }. */
 
-// v3 (REDESIGN-V4): bộ asset brand thay toàn bộ (mark/hero/icons/OG) —
-// bump cache cùng đợt đổi asset theo luật IDENTITY của hồ sơ.
-const CACHE_NAME = 'dichbome-shell-v3';
+// v4 (FIN v1.4.1): hero-stage.svg đổi motif counter sang echo hai bong
+// bóng hội thoại + og.png sinh lại —
+// bump cache để người dùng cũ nhận art mới (hero nằm trong precache);
+// đây là thay đổi cơ chế giao asset, không đổi nội dung app.
+// (v3 trước đó: REDESIGN-V4 thay toàn bộ bộ asset brand.)
+const CACHE_NAME = 'dichbome-shell-v4';
 
 const PRECACHE_URLS = [
   '/',

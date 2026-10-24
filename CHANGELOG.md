@@ -6,6 +6,32 @@ phiên bản theo [SemVer](https://semver.org/). Mỗi bản phát hành trên
 production tương ứng một git tag `vX.Y.Z` — xem
 `docs/RUNBOOK-ROLLBACK.md` cho bảng ghép đôi tag ↔ deployment.
 
+## [1.4.1] — 2026-10-24 — đóng 7 MINOR của Panel #05
+
+### Fixed
+
+- Avatar personas nay sinh theo DANH TÍNH người gửi (vai + tên
+  chuẩn hoá) thay vì id từng bản ghi: cùng một phiếu có cùng một
+  gương mặt ở Đã lưu, Lịch sử và sau dịch lại. **Lưu ý: avatar của
+  các bản ghi cũ đổi đúng một lần khi bản này lên sóng, sau đó ổn
+  định vĩnh viễn theo danh tính.**
+- Board tab mặc định hết đỏ quá liều: nút «Dùng câu này» về dạng
+  trung tính — neutral 99,5% / accent 0,09% (từ 92,05% / 7,70%).
+- Focus: đích focus lập trình không còn dính outline sau chạm;
+  Escape/nút đóng sheet trả focus về đúng nút kích hoạt (16/16);
+  hộp thoại xác nhận xoá nay giữ Tab khép kín bên trong và Escape
+  chỉ đóng lớp trên cùng (lỗi có từ trước v1.4.0, đã tái lập trên
+  HEAD sạch trước khi sửa).
+- Engine: mệnh đề cam-chịu/cô-đơn («mẹ ở nhà một mình cũng quen
+  rồi») nay được trích thành chi tiết riêng và có câu đáp trực
+  tiếp — golden corpus giữ nguyên từng byte.
+- Disclaimer offline trích đúng nhãn nút dịch thật theo vai.
+- Hero: motif «nhịp đáp» 3 cột (bị kiểm mù đọc thành biểu đồ cột
+  5/5) thay bằng echo hai bong bóng hội thoại (kiểm mù crop cô
+  lập: 0/5 biểu đồ, toàn cảnh 5/5 «trò chuyện»); bản Tìm hiểu ở
+  desktop dùng crop cận cảnh riêng. Logo/mark/wordmark không đổi
+  một byte.
+
 ## [1.4.0] — 2026-10-24 — REDESIGN-V4 (TikTok seed, Neutral-First)
 
 ### Changed

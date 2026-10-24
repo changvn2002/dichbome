@@ -1289,6 +1289,31 @@ function trimDetail(segment: string): string {
 }
 
 /**
+ * Dấu hiệu HỌ mệnh đề cam chịu / cô đơn (đã bỏ dấu, khớp trên vế đã
+ * normalizeVi) — FIX v1.4.1 / N5-5 Panel #05. Họ này mang tải cảm xúc
+ * chính của tin («ở nhà một mình», «quen rồi»…) nhưng các vế của nó
+ * thường nằm GIỮA tin nên bị cơ chế chọn theo độ dài/vị trí nuốt mất
+ * (xem extractSalientDetails). Danh sách theo HỌ, không theo từng câu:
+ * «một mình» (ở nhà/sống/ăn một mình…), lời tự nhận cô đơn («cô đơn»,
+ * «cô độc», «lẻ loi», «lủi thủi») và cam chịu đã thành quen («quen rồi»,
+ * «quen dần»). Bản client mirror cùng danh sách.
+ */
+const RESIGNED_LONELY_MARKERS = [
+  'mot minh',
+  'co don',
+  'co doc',
+  'le loi',
+  'lui thui',
+  'quen roi',
+  'quen dan',
+];
+
+function isResignedLonelyClause(segment: string): boolean {
+  const norm = normalizeVi(segment);
+  return RESIGNED_LONELY_MARKERS.some((m) => norm.includes(m));
+}
+
+/**
  * Trích tối đa HAI chi tiết riêng nổi bật từ chính tin nhắn, trích nguyên
  * văn — không bịa thêm nội dung:
  * - một đoạn con "đủ riêng" = dài ≥ 15 ký tự và còn ≥ 4 từ riêng sau khi gỡ
@@ -1300,11 +1325,19 @@ function trimDetail(segment: string): string {
  *   riêng CUỐI CÙNG trong tin (khác đoạn thứ nhất) — vế kết thường là vế
  *   đau nhất («khỏi cần về ăn cơm với mẹ đâu»), bản Panel #02 chỉ trích
  *   một chi tiết nên mất hẳn vế này (bao phủ 1/2).
+ * - NGOẠI LỆ HỌ CAM CHỊU/CÔ ĐƠN (FIX v1.4.1, N5-5 Panel #05): hai suất
+ *   trên mù theo vị trí — vế giữa tin không phải dài nhất cũng không phải
+ *   cuối cùng thì rơi hẳn, dù đó là vế mang tải cảm xúc chính («mẹ ở nhà
+ *   một mình cũng quen rồi» bị nuốt ở cả 2 hoàn cảnh × 2 engine, panel
+ *   tái lập 3 lần). Vì vậy một vế đủ-riêng thuộc họ cam chịu/cô đơn mà
+ *   không trúng hai suất đầu được trả thêm ở suất `resignedLonely` để
+ *   tầng lắp ráp tách thành chi tiết riêng thứ ba + reply đáp trực tiếp.
+ *   Vế thuộc họ đã nằm ở suất 1/2 thì không lặp lại ở suất này.
  */
 function extractSalientDetails(
   raw: string,
   stripPatterns: readonly string[],
-): { first: string | null; second: string | null } {
+): { first: string | null; second: string | null; resignedLonely: string | null } {
   const segments = raw
     .split(/[.!?…;]+/)
     .flatMap((part) => part.split(','))
@@ -1324,14 +1357,37 @@ function extractSalientDetails(
     if (residualWords.length < 4) return;
     qualified.push({ segment, index });
   });
-  if (qualified.length === 0) return { first: null, second: null };
+  if (qualified.length === 0) return { first: null, second: null, resignedLonely: null };
   const longest = qualified.reduce((a, b) => (b.segment.length > a.segment.length ? b : a));
   const rest = qualified.filter((q) => q.index !== longest.index);
   const secondPick = rest.length > 0 ? rest[rest.length - 1] : null;
+  const resignedPick =
+    qualified.find(
+      (q) =>
+        q.index !== longest.index &&
+        q.index !== secondPick?.index &&
+        isResignedLonelyClause(q.segment),
+    ) ?? null;
   return {
     first: trimDetail(longest.segment),
     second: secondPick ? trimDetail(secondPick.segment) : null,
+    resignedLonely: resignedPick ? trimDetail(resignedPick.segment) : null,
   };
+}
+
+/**
+ * Đuôi đáp TRỰC TIẾP vào vế cam chịu/cô đơn (FIX v1.4.1, N5-5): nhận
+ * thẳng là {s} không muốn {p} ở nhà một mình và chốt một lần gọi nói
+ * chuyện cụ thể — cố ý KHÔNG dùng khung bữa ăn («ăn một mình» qua vế
+ * cơm của chi tiết 2 không được panel tính là đáp trực tiếp) và không
+ * dùng cụm «gọi về» (marker rò văn phong bố/mẹ ở ma trận vai ngoài gia
+ * đình). Chỉ chứa placeholder {s}/{p}; bản client mirror cùng văn bản.
+ */
+function resignedLonelyTail(detail: string, speaker: DichbomeSpeaker): string {
+  return fill(
+    ` Riêng chuyện “${detail}”, {s} không muốn {p} phải ở nhà một mình đâu — tối nay {s} gọi cho {p} nói chuyện một lúc, {p} thấy buồn cứ nhắn {s} ngay, đừng giữ một mình.`,
+    speaker,
+  );
 }
 
 /**
@@ -1658,6 +1714,9 @@ export function translateDichbome(input: DichbomeTranslateInput): DichbomeTransl
   // (b) tối đa HAI chi tiết riêng trích nguyên văn từ chính tin — vế thứ hai
   // vào Ý thật + câu trả lời thứ hai, kèm câu lý do mức (điều kiện R3 của
   // Panel #03: dòng mức không được identical ca leo thang mà không có lý do).
+  // Cộng (FIX v1.4.1, N5-5): một vế cam chịu/cô đơn ngoài hai suất trên
+  // được tách thêm thành chi tiết riêng thứ ba + đuôi đáp trực tiếp ở
+  // replies[2] — cơ chế ở extractSalientDetails/resignedLonelyTail.
   // Phân loại tier (chip "Khớp câu mẫu chung") nằm ở classifyDichbomeInput — không đổi.
   // Ngưỡng theo loại đường (Panel #03 §10.2, fix wave 4): entry chung đã
   // khớp → 30 ký tự; fallback thuần (không entry nào khớp) → 80. Corpus
@@ -1668,10 +1727,11 @@ export function translateDichbome(input: DichbomeTranslateInput): DichbomeTransl
   const isGenericPath = entry ? !entry.speakers : true;
   const depthMin = entry ? GENERIC_DEPTH_MIN_MESSAGE : GENERIC_LIMIT_MIN_MESSAGE;
   if (isGenericPath && raw.length >= depthMin) {
-    const { first: detail, second: detail2 } = extractSalientDetails(
-      raw,
-      entry ? entry.patterns : ALL_ENTRY_PATTERNS,
-    );
+    const {
+      first: detail,
+      second: detail2,
+      resignedLonely,
+    } = extractSalientDetails(raw, entry ? entry.patterns : ALL_ENTRY_PATTERNS);
     const contextLabel = CONTEXT_LABELS[context];
     if (detail) {
       result.meaning += ` Chi tiết riêng trong tin này: “${detail}”.`;
@@ -1700,6 +1760,17 @@ export function translateDichbome(input: DichbomeTranslateInput): DichbomeTransl
         ...result.replies[2],
         text: result.replies[2].text + closingTail(detail, 2, speaker, context, raw),
       };
+      if (resignedLonely) {
+        // FIX v1.4.1 (N5-5): vế cam chịu/cô đơn được tách thành chi tiết
+        // riêng thứ ba trong Ý thật (không gộp vào D1/D2, không thay hai
+        // suất cũ — bao phủ M-2/w4 giữ nguyên) và replies[2] nhận thêm
+        // đuôi đáp trực tiếp vào chính vế đó (resignedLonelyTail).
+        result.meaning += ` Tin còn một vế cam chịu riêng nữa: “${resignedLonely}”. Vế này nói phần cô đơn/chịu đựng của người nhắn — app tách nó thành chi tiết riêng để bạn đáp thẳng vào đó, không gộp chung với các vế khác.`;
+        result.replies[2] = {
+          ...result.replies[2],
+          text: result.replies[2].text + resignedLonelyTail(resignedLonely, speaker),
+        };
+      }
     } else if (raw.length >= GENERIC_LIMIT_MIN_MESSAGE) {
       // Không tách được chi tiết riêng: nói rõ giới hạn ngay trong Ý thật thay vì
       // để phiếu trông như một bản đọc riêng đầy đủ.

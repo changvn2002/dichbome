@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 216" role="img" aria-label="Cận cảnh phiến đáp của hero «Hai Lượt Một Nhịp»: phiến thoại xám lớn — lượt đáp êm chuyện — cạnh trục ba chấm mốc lượt">
+  <!-- Biến thể desktop của dichbome-hero-stage.svg (FIX v1.4.1, nợ N5-7): cùng
+       artwork, crop chặt vào LƯỢT ĐÁP — chỉ phiến B + trục chấm mốc lượt.
+       Trục chấm giữ nguyên vị trí của bản gốc; phiến B chép nguyên dữ liệu
+       đường `d` của bản gốc, phóng 1.35x cho đầy khung 720x216 (cùng tỉ lệ
+       10:3, không nhảy layout); stroke-width 1.85 = 2.5 / 1.35 để nét vẽ sau
+       phóng giữ đúng trọng lượng 2.5 của hệ. Hex giữ nguyên hệ token V4:
+       mực #212121 (neutral-900), phiến B #F5F5F5 (neutral-100). -->
+  <!-- Trục chấm mốc lượt — nguyên vị trí của dichbome-hero-stage.svg (x=20) -->
+  <circle cx="20" cy="40" r="5" fill="#212121"/>
+  <circle cx="20" cy="108" r="5" fill="#212121"/>
+  <circle cx="20" cy="176" r="5" fill="#212121"/>
+  <!-- Phiến B (đáp): neutral N-vay Grey 100 #F5F5F5, đuôi dưới-phải hướng về người đáp -->
+  <g transform="translate(-277 -89) scale(1.35)">
+    <path d="M292,76 L636,76 A24,24 0 0 1 660,100 L660,170 A24,24 0 0 1 636,194 L616,194 L616,210 L588,194 L292,194 A24,24 0 0 1 268,170 L268,100 A24,24 0 0 1 292,76 Z" fill="#F5F5F5" stroke="#212121" stroke-width="1.85"/>
+  </g>
+</svg>

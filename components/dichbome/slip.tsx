@@ -3,7 +3,7 @@
 import { useState, type CSSProperties, type RefObject } from 'react';
 import { Bookmark, BookmarkCheck, Check, ChevronDown, Copy, Eraser, Share2 } from 'lucide-react';
 import type { ParentContext, RelationRole } from './lib/translate';
-import { roleName, type SlipView, type StripState } from './lib/ui-types';
+import { roleName, translateCtaLabel, type SlipView, type StripState } from './lib/ui-types';
 
 export function OriginalBubble({
   message,
@@ -143,8 +143,14 @@ export function StageSlip({
             </p>
           ) : null}
           {view.source === 'device' ? (
+            // N5-6 (Panel #05): bản cũ hứa «bấm Dịch lại» — một nhãn KHÔNG
+            // nút nào mang; đường dịch lại thật là CTA của composer mang
+            // nhãn theo vai. Disclaimer nay nêu đúng nhãn điều khiển thật
+            // của chính vai này, ghép bằng helper dùng chung với composer
+            // (translateCtaLabel) để hai bề mặt không bao giờ trôi nhau.
             <p className="mt-1 text-[13px] text-muted">
-              Bản trên máy có thể khác bản máy chủ — có mạng lại, bấm Dịch lại để đối chiếu.
+              Bản trên máy có thể khác bản máy chủ — có mạng lại, bấm «
+              {translateCtaLabel(view.speaker)}» để đối chiếu.
             </p>
           ) : null}
         </div>

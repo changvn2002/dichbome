@@ -10,22 +10,29 @@ import type { RelationRole } from './lib/translate';
 /* riêng (chỉ tải khi Board có mục đã lưu/lịch sử để hiển thị) nên      */
 /* first-load không đổi; gzip của chunk được đo và ghi V4-IMPL-LOG.     */
 /*                                                                     */
-/* Vị trí (ĐK-D4): CHỈ hàng mục Đã lưu + Lịch sử trong Board, khi mục   */
-/* có id ổn định (StoredItem.id). Mọi bề mặt khác (hero/empty/OG/sân    */
-/* khấu/phiếu/header) avatar = 0 theo hồ sơ.                            */
+/* Vị trí (ĐK-D4): CHỈ hàng mục Đã lưu + Lịch sử trong Board. Mọi bề    */
+/* mặt khác (hero/empty/OG/sân khấu/phiếu/header) avatar = 0 theo hồ sơ. */
 /*                                                                     */
 /* Render bằng SVG INLINE (không <img src=data:...>): CSP hiện hành     */
 /* của app khai img-src đúng 'self' (tests/csp.test.mjs khẳng định      */
 /* từng token) nên data:-URI sẽ bị chặn — SVG inline là đường duy       */
 /* nhất không phải nới CSP (tiền lệ chiatien).                          */
 /*                                                                     */
-/* Seed: personas dùng seed chuẩn của nhà nguyên văn                    */
-/* `dichbome:v1:contact:<id>`. Với initials, glyph của thư viện được    */
-/* SUY TỪ seed (lib/utils/initials.js của @dicebear/initials đọc        */
-/* prng.seed) nên seed chuẩn sẽ in ra glyph vô nghĩa "DC" cho mọi        */
-/* liên hệ; vì vậy initials dùng nhãn vai làm seed-glyph (tinh thần     */
-/* luật X1: glyph lấy từ tên gọi của thực thể), còn Ô NỀN palette       */
-/* được chọn bằng FNV-1a trên seed chuẩn (luật hash palette §3.1 của    */
+/* Seed: personas dùng seed DANH TÍNH `dichbome:v2:identity:<nhãn vai  */
+/* đã chuẩn hoá>` — KHÔNG dùng id bản ghi (FIX v1.4.1, nợ N5-4): id do  */
+/* app mint bằng Date.now() nên mỗi kho (Đã lưu/Lịch sử/dịch lại) một   */
+/* id khác nhau, cùng một người gửi thành nhiều mặt khác nhau. Danh     */
+/* tính duy nhất có trên phiếu ở cả 3 bề mặt là nhãn vai (StoredItem    */
+/* chỉ có speaker + message) nên seed khoá theo nhãn vai đã chuẩn hoá   */
+/* (NFC + trim + gộp khoảng trắng thừa): cùng vai → cùng mặt ở mọi kho, */
+/* hai phiếu khác nội dung cùng vai vẫn cùng mặt. Namespace tăng v1→v2  */
+/* CÓ CHỦ ĐÍCH: mặt của các bản ghi cũ đổi ĐÚNG MỘT LẦN khi bản này lên */
+/* sóng, từ đó đứng yên theo danh tính. Với initials, glyph của thư     */
+/* viện được SUY TỪ seed (lib/utils/initials.js của @dicebear/initials  */
+/* prng.seed) nên seed danh tính sẽ in ra glyph vô nghĩa "DC" cho mọi   */
+/* liên hệ; vì vậy initials dùng nhãn vai đã chuẩn hoá làm seed-glyph   */
+/* (tinh thần luật X1: glyph lấy từ tên gọi của thực thể), còn Ô NỀN    */
+/* palette được chọn bằng FNV-1a trên seed danh tính (luật hash         */
 /* hồ sơ — cấm tự chế hash thứ hai; đây vẫn là FNV-1a đó).              */
 /* ------------------------------------------------------------------ */
 
@@ -70,8 +77,19 @@ export function fnv1a(text: string): number {
   return hash >>> 0;
 }
 
-export function contactSeed(id: string): string {
-  return `dichbome:v1:contact:${id}`;
+/** Chuẩn hoá danh tính trước khi khoá seed: NFC + trim + gộp mọi dãy
+ *  khoảng trắng thừa thành một dấu cách. Nhãn vai từ enum đã sạch sẵn,
+ *  nhưng seed phải bất biến trước mọi biến thể biểu diễn của cùng một
+ *  danh tính (chữ tổ hợp vs dựng sẵn, thừa khoảng trắng). */
+export function normalizeIdentity(identity: string): string {
+  return identity.normalize('NFC').trim().replace(/\s+/g, ' ');
+}
+
+/** Seed avatar theo DANH TÍNH người gửi (nhãn vai đã chuẩn hoá), không
+ *  theo id bản ghi — xem ghi chú N5-4 ở đầu file. Namespace v2 tách hẳn
+ *  khỏi v1 (v1 khoá theo id bản ghi). */
+export function identitySeed(identity: string): string {
+  return `dichbome:v2:identity:${normalizeIdentity(identity)}`;
 }
 
 /* Union types chép từ schema của @dicebear/personas 9.4.3 (lib/types.d.ts)
@@ -217,15 +235,18 @@ function stripMetadataAndHide(svg: string): string {
     .replace(/<svg/, '<svg aria-hidden="true"');
 }
 
-async function buildAvatarSvg(id: string, speaker: RelationRole): Promise<string> {
-  const seed = contactSeed(id);
-  const cacheKey = `${seed}|${speaker}`;
+export async function buildAvatarSvg(speaker: RelationRole): Promise<string> {
+  const identity = normalizeIdentity(speaker);
+  const seed = identitySeed(identity);
+  const cacheKey = seed;
   const cached = svgCache.get(cacheKey);
   if (cached) return cached;
   const { createAvatar, personas, initials } = await loadDicebear();
   const palette = paletteFromCssVars();
   const background = palette[fnv1a(seed) % palette.length];
-  const constraint = AVATAR_PERSONAS_ENABLED ? PERSONAS_BY_ROLE[speaker] : undefined;
+  const constraint = AVATAR_PERSONAS_ENABLED
+    ? PERSONAS_BY_ROLE[identity as RelationRole]
+    : undefined;
   let raw: string;
   if (constraint) {
     raw = createAvatar(personas, {
@@ -234,12 +255,13 @@ async function buildAvatarSvg(id: string, speaker: RelationRole): Promise<string
       ...constraint,
     }).toString();
   } else {
-    // initials: seed-glyph = nhãn vai. Vai một từ: ép chars 1 như chiatien
-    // (mặc định thư viện lấy 2 ký tự đầu của từ duy nhất). Vai nhiều từ:
-    // glyph = chữ đầu của từ đầu + từ cuối theo mặc định thư viện.
-    const wordCount = speaker.split(/\s+/).filter(Boolean).length;
+    // initials: seed-glyph = nhãn vai đã chuẩn hoá. Vai một từ: ép chars 1
+    // như chiatien (mặc định thư viện lấy 2 ký tự đầu của từ duy nhất).
+    // Vai nhiều từ: glyph = chữ đầu của từ đầu + từ cuối theo mặc định
+    // thư viện.
+    const wordCount = identity.split(/\s+/).filter(Boolean).length;
     raw = createAvatar(initials, {
-      seed: speaker,
+      seed: identity,
       backgroundColor: [background],
       textColor: [inkFromCssVar()],
       fontFamily: ['Be Vietnam Pro', 'sans-serif'],
@@ -259,21 +281,11 @@ async function buildAvatarSvg(id: string, speaker: RelationRole): Promise<string
  * cùng kích thước, không nhảy layout; nhãn tên/vai dạng chữ thật luôn ở
  * cạnh avatar nên avatar không bao giờ là kênh định danh duy nhất.
  */
-export function ContactAvatar({
-  id,
-  speaker,
-  size = 36,
-}: {
-  id: string;
-  speaker: RelationRole;
-  size?: number;
-}) {
-  const [svg, setSvg] = useState<string | null>(
-    () => svgCache.get(`${contactSeed(id)}|${speaker}`) ?? null,
-  );
+export function ContactAvatar({ speaker, size = 36 }: { speaker: RelationRole; size?: number }) {
+  const [svg, setSvg] = useState<string | null>(() => svgCache.get(identitySeed(speaker)) ?? null);
   useEffect(() => {
     let cancelled = false;
-    buildAvatarSvg(id, speaker)
+    buildAvatarSvg(speaker)
       .then((built) => {
         if (!cancelled) setSvg(built);
       })
@@ -283,7 +295,7 @@ export function ContactAvatar({
     return () => {
       cancelled = true;
     };
-  }, [id, speaker]);
+  }, [speaker]);
 
   if (!svg) {
     return (

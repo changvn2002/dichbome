@@ -5,14 +5,32 @@ import { X } from 'lucide-react';
 
 const FOCUSABLE_SELECTOR = 'button, [href], textarea, input, [tabindex]:not([tabindex="-1"])';
 
+/**
+ * Ngăn xếp trap dùng chung của module (FIN v1.4.1): mỗi trap đang active đăng
+ * ký một mục khi effect chạy và gỡ khi cleanup. Handler keydown của một trap
+ * CHỈ đáp khi mục của nó đang ở TRÊN CÙNG ngăn xếp — trap kích hoạt sau nằm
+ * trên trap kích hoạt trước. Trước đây mọi trap cùng nghe keydown trên
+ * document và cùng đáp một sự kiện: ConfirmDialog lồng trong Board bị trap
+ * Board giành Tab (danh sách focusable của aside chứa cả dialog nên focus
+ * bị kéo xuống Board) và Escape đóng cả hai lớp cùng lúc. Nay: Tab/Escape chỉ
+ * lớp trên cùng xử lý; lớp trên đóng → mục bị gỡ → lớp dưới hoạt động lại.
+ * Hành vi trap đơn (ngăn xếp một mục) y hệt trước.
+ */
+const trapStack: Array<object> = [];
+
 export function useFocusTrap(
   ref: RefObject<HTMLElement | null>,
   active: boolean,
   onEscape?: () => void,
+  returnFocusTo?: RefObject<HTMLElement | null>,
 ): void {
   const escapeRef = useRef(onEscape);
   useEffect(() => {
     escapeRef.current = onEscape;
+  });
+  const returnFocusRef = useRef(returnFocusTo);
+  useEffect(() => {
+    returnFocusRef.current = returnFocusTo;
   });
 
   useEffect(() => {
@@ -29,7 +47,13 @@ export function useFocusTrap(
     const first = getFocusable()[0];
     if (first) first.focus();
 
+    const trapEntry = {};
+    trapStack.push(trapEntry);
+
     const onKeyDown = (event: KeyboardEvent) => {
+      // Chỉ trap trên cùng mới đáp (xem trapStack ở trên): các lớp dưới im
+      // lặng cho tới khi lớp trên đóng và gỡ mục của nó khỏi ngăn xếp.
+      if (trapStack[trapStack.length - 1] !== trapEntry) return;
       if (event.key === 'Escape') {
         escapeRef.current?.();
         return;
@@ -53,8 +77,19 @@ export function useFocusTrap(
     document.addEventListener('keydown', onKeyDown);
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
-        previouslyFocused.focus();
+      const trapIdx = trapStack.indexOf(trapEntry);
+      if (trapIdx !== -1) trapStack.splice(trapIdx, 1);
+      // N5-3(b) (Panel #05): khôi phục về «phần tử đang giữ focus lúc mở» là
+      // KHÔNG đủ — khi hành động kích hoạt không tự đặt focus lên nút mở
+      // (script, công nghệ hỗ trợ, chạm Safari iOS…), previouslyFocused là
+      // một đích lập trình (H2 kết quả) hoặc BODY, và focus sau đóng rơi
+      // đúng vào đó thay vì nút kích hoạt. Caller biết phần tử kích hoạt thì
+      // truyền tường minh qua returnFocusTo: ưu tiên trả về đó; không
+      // truyền (Board) thì giữ nguyên hành vi cũ.
+      const explicit = returnFocusRef.current?.current;
+      const target = explicit && explicit.isConnected ? explicit : previouslyFocused;
+      if (target && typeof target.focus === 'function') {
+        target.focus();
       }
     };
   }, [ref, active]);
@@ -66,15 +101,18 @@ export function Sheet({
   title,
   children,
   centered = false,
+  returnFocusTo,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
   centered?: boolean;
+  /** Phần tử kích hoạt mở sheet — focus trả về đây khi đóng (N5-3b). */
+  returnFocusTo?: RefObject<HTMLElement | null>;
 }) {
   const panelRef = useRef<HTMLDivElement | null>(null);
-  useFocusTrap(panelRef, open, onClose);
+  useFocusTrap(panelRef, open, onClose, returnFocusTo);
 
   if (!open) return null;
 
@@ -116,6 +154,7 @@ export function ConfirmDialog({
   confirmLabel,
   onCancel,
   onConfirm,
+  returnFocusTo,
 }: {
   open: boolean;
   title: string;
@@ -123,9 +162,11 @@ export function ConfirmDialog({
   confirmLabel: string;
   onCancel: () => void;
   onConfirm: () => void;
+  /** Phần tử kích hoạt mở dialog — focus trả về đây khi đóng (cùng kỷ luật Sheet, N5-3b). */
+  returnFocusTo?: RefObject<HTMLElement | null>;
 }) {
   return (
-    <Sheet open={open} onClose={onCancel} title={title} centered>
+    <Sheet open={open} onClose={onCancel} title={title} centered returnFocusTo={returnFocusTo}>
       <p className="mt-2 text-[15px] text-muted">{body}</p>
       <div className="mt-4 flex justify-end gap-2">
         <button

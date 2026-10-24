@@ -42,3 +42,13 @@ export type BoardTab = 'examples' | 'saved' | 'history' | 'findout';
 export function roleName(role: RelationRole): string {
   return role === 'Cả hai' ? 'bố mẹ' : role.toLowerCase();
 }
+
+/**
+ * Nhãn CTA dịch của composer — NGUỒN GHÉP DUY NHẤT cho chuỗi này.
+ * Mọi bề mặt trỏ tới hành động dịch (lại) — vd disclaimer trên phiếu
+ * trên-máy ở slip.tsx (N5-6, Panel #05) — phải ghép qua helper này thay
+ * vì chép cứng: nhãn biến thiên theo vai, chép tay là trôi nhãn.
+ */
+export function translateCtaLabel(role: RelationRole): string {
+  return `Dịch ý ${roleName(role)}`;
+}

@@ -9,7 +9,7 @@ import {
   type RelationRole,
 } from './lib/translate';
 import { tryReadRaw, writeRaw } from './lib/storage';
-import { roleName } from './lib/ui-types';
+import { roleName, translateCtaLabel } from './lib/ui-types';
 import { Sheet } from './sheets';
 
 const ROLE_PLACEHOLDERS: Record<RelationRole, string> = {
@@ -68,6 +68,10 @@ export function Composer({
   const [showSwipeHint, setShowSwipeHint] = useState(false);
   const chipRowRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  // N5-3(b): nút kích hoạt Sheet «Hoàn cảnh» — sheet trả focus về đúng nút
+  // này khi đóng (Escape/nút đóng/chọn hoàn cảnh), kể cả khi hành động mở
+  // không tự đặt focus lên nút.
+  const contextTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   // Gợi ý vuốt dải chip vai — CHỈ lần dùng đầu tiên (N-5b): hiện cho tới khi
   // người dùng cuộn ngang dải chip lần đầu, rồi ghi nhớ vĩnh viễn trên thiết bị.
@@ -268,6 +272,7 @@ export function Composer({
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <button
           type="button"
+          ref={contextTriggerRef}
           onClick={() => setContextOpen(true)}
           className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl border border-line-control bg-canvas px-3 text-sm font-semibold"
         >
@@ -297,14 +302,19 @@ export function Composer({
             onClick={onTranslate}
             className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-action-bg px-5 text-[15px] font-semibold text-action-fg"
           >
-            Dịch ý {currentRole}
+            {translateCtaLabel(speaker)}
             <ArrowRight className="size-4" aria-hidden />
           </button>
         )}
       </div>
       <p className="mt-1 hidden text-xs text-muted min-[1280px]:block">Ctrl+Enter để dịch</p>
 
-      <Sheet open={contextOpen} onClose={() => setContextOpen(false)} title="Hoàn cảnh">
+      <Sheet
+        open={contextOpen}
+        onClose={() => setContextOpen(false)}
+        title="Hoàn cảnh"
+        returnFocusTo={contextTriggerRef}
+      >
         <p className="mt-2 text-sm text-muted">Không bắt buộc — để “Khác” nếu không chắc.</p>
         <div role="radiogroup" aria-label="Hoàn cảnh" className="mt-2">
           {PARENT_CONTEXTS.map((c) => (

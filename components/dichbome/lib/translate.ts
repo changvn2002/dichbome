@@ -1610,6 +1610,27 @@ function trimDetail(segment: string): string {
 }
 
 /**
+ * Dấu hiệu HỌ mệnh đề cam chịu / cô đơn (đã bỏ dấu) — FIX v1.4.1 / N5-5
+ * Panel #05, mirror RESIGNED_LONELY_MARKERS phía server: «một mình»,
+ * lời tự nhận cô đơn («cô đơn», «cô độc», «lẻ loi», «lủi thủi») và cam
+ * chịu đã thành quen («quen rồi», «quen dần»).
+ */
+const RESIGNED_LONELY_MARKERS = [
+  'mot minh',
+  'co don',
+  'co doc',
+  'le loi',
+  'lui thui',
+  'quen roi',
+  'quen dan',
+];
+
+function isResignedLonelyClause(segment: string): boolean {
+  const norm = normalizeVi(segment);
+  return RESIGNED_LONELY_MARKERS.some((m) => norm.includes(m));
+}
+
+/**
  * Trích tối đa HAI chi tiết riêng nổi bật từ chính tin nhắn, trích nguyên
  * văn — không bịa thêm nội dung:
  * - một đoạn con "đủ riêng" = dài ≥ 15 ký tự và còn ≥ 4 từ riêng sau khi gỡ
@@ -1621,12 +1642,17 @@ function trimDetail(segment: string): string {
  *   riêng CUỐI CÙNG trong tin (khác đoạn thứ nhất) — vế kết thường là vế
  *   đau nhất («khỏi cần về ăn cơm với mẹ đâu»), bản Panel #02 chỉ trích
  *   một chi tiết nên mất hẳn vế này (bao phủ 1/2).
+ * - NGOẠI LỆ HỌ CAM CHỊU/CÔ ĐƠN (FIX v1.4.1, N5-5 Panel #05): một vế
+ *   đủ-riêng thuộc họ này mà không trúng hai suất đầu (thường vì nằm
+ *   giữa tin — «mẹ ở nhà một mình cũng quen rồi» bị nuốt ở cả 2 hoàn
+ *   cảnh × 2 engine) được trả thêm ở suất `resignedLonely` để tách
+ *   thành chi tiết riêng thứ ba + reply đáp trực tiếp.
  * Cùng quy tắc với extractSalientDetails phía server (lib/server/engine.ts).
  */
 function extractSalientDetails(
   message: string,
   stripKeys: readonly string[],
-): { first: string | null; second: string | null } {
+): { first: string | null; second: string | null; resignedLonely: string | null } {
   const segments = message
     .split(/[.!?…;]+/)
     .flatMap((part) => part.split(','))
@@ -1646,14 +1672,33 @@ function extractSalientDetails(
     if (residualWords.length < 4) return;
     qualified.push({ segment, index });
   });
-  if (qualified.length === 0) return { first: null, second: null };
+  if (qualified.length === 0) return { first: null, second: null, resignedLonely: null };
   const longest = qualified.reduce((a, b) => (b.segment.length > a.segment.length ? b : a));
   const rest = qualified.filter((q) => q.index !== longest.index);
   const secondPick = rest.length > 0 ? rest[rest.length - 1] : null;
+  const resignedPick =
+    qualified.find(
+      (q) =>
+        q.index !== longest.index &&
+        q.index !== secondPick?.index &&
+        isResignedLonelyClause(q.segment),
+    ) ?? null;
   return {
     first: trimDetail(longest.segment),
     second: secondPick ? trimDetail(secondPick.segment) : null,
+    resignedLonely: resignedPick ? trimDetail(resignedPick.segment) : null,
   };
+}
+
+/**
+ * Đuôi đáp TRỰC TIẾP vào vế cam chịu/cô đơn (FIX v1.4.1, N5-5) — mirror
+ * resignedLonelyTail phía server, chỉ khác placeholder {x} thay {p}:
+ * nhận thẳng là {s} không muốn {x} ở nhà một mình + chốt một lần gọi nói
+ * chuyện; KHÔNG dùng khung bữa ăn và không dùng cụm «gọi về». Văn bản
+ * chưa qua fill — tầng lắp ráp điền {x}/{s} như closingTailTemplate.
+ */
+function resignedLonelyTailTemplate(detail: string): string {
+  return ` Riêng chuyện “${detail}”, {s} không muốn {x} phải ở nhà một mình đâu — tối nay {s} gọi cho {x} nói chuyện một lúc, {x} thấy buồn cứ nhắn {s} ngay, đừng giữ một mình.`;
 }
 
 /**
@@ -1986,10 +2031,11 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
   const isGenericPath = !matchedRule || !matchedRule.roles;
   const depthMin = matchedRule ? GENERIC_DEPTH_MIN_MESSAGE : GENERIC_LIMIT_MIN_MESSAGE;
   if (isGenericPath && message.length >= depthMin) {
-    const { first: detail, second: detail2 } = extractSalientDetails(
-      message,
-      matchedRule ? matchedRule.keys : CLIENT_RULE_KEYS,
-    );
+    const {
+      first: detail,
+      second: detail2,
+      resignedLonely,
+    } = extractSalientDetails(message, matchedRule ? matchedRule.keys : CLIENT_RULE_KEYS);
     if (detail) {
       result.meaning += ` Chi tiết riêng trong tin này: “${detail}”.`;
       if (context !== 'Khác') {
@@ -2021,6 +2067,16 @@ export function translateParentMessage(input: TranslateInput): TranslateResult {
         text:
           result.replies[2].text + fill(closingTailTemplate(detail, 2, speaker, context, message)),
       };
+      if (resignedLonely) {
+        // FIX v1.4.1 (N5-5): mirror phía server — vế cam chịu/cô đơn
+        // thành chi tiết riêng thứ ba trong Ý thật (giữ nguyên hai suất
+        // cũ) + đuôi đáp trực tiếp vào chính vế đó ở replies[2].
+        result.meaning += ` Tin còn một vế cam chịu riêng nữa: “${resignedLonely}”. Vế này nói phần cô đơn/chịu đựng của người nhắn — app tách nó thành chi tiết riêng để bạn đáp thẳng vào đó, không gộp chung với các vế khác.`;
+        result.replies[2] = {
+          ...result.replies[2],
+          text: result.replies[2].text + fill(resignedLonelyTailTemplate(resignedLonely)),
+        };
+      }
     } else if (message.length >= GENERIC_LIMIT_MIN_MESSAGE) {
       result.meaning +=
         context !== 'Khác'

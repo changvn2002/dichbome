@@ -99,6 +99,33 @@ body {
   outline-offset: 2px;
 }
 
+/* Đích focus LẬP TRÌNH không tương tác (N5-3, Panel #05): phần tử chỉ nhận
+   focus bằng code — mẫu heading kết quả «Ý thật» (tabIndex −1) mà app focus()
+   sau mỗi lần dịch để screen reader đọc từ đầu phiếu — không bao giờ được vẽ
+   vòng. Không thể trông chờ heuristic :focus-visible của trình duyệt tự loại
+   trừ: với focus do script điều khiển, Blink khớp :focus-visible theo
+   modality suy đoán — luồng chưa từng thiết lập pointer-modality (script/AT,
+   một số trình duyệt chạm) bị coi là bàn phím, nên vòng seed từng vẽ bền
+   ≥6,6s lên một heading không bấm được, 100% lần dịch kể cả sau chạm (đo của
+   panel, tái lập tại FIX-V141-UI-LOG.md). Ngoại lệ này phân biệt theo LOẠI
+   phần tử: nó chỉ áp cho đích tabindex="-1" KHÔNG tương tác. Mọi phần tử
+   tương tác — kể cả chip vai tabindex="-1" của roving-tabindex, vẫn là
+   <button> — nằm NGOÀI ngoại lệ và giữ nguyên vòng bàn phím của rule trên;
+   đích lập trình vẫn nhận focus bình thường (activeElement rơi đúng chỗ,
+   lợi ích trợ năng giữ nguyên), chỉ không vẽ vòng. */
+[tabindex='-1']:focus-visible:not(
+    button,
+    a,
+    input,
+    textarea,
+    select,
+    summary,
+    [contenteditable],
+    [role]
+  ) {
+  outline: none;
+}
+
 /* Phần tử đứng trên nền Grey 100 (bong bóng câu gốc): seed trên Grey 100
    chỉ đạt 3,38:1 — mỏng; cộng vòng ngoài 1px mực để focus không phụ thuộc
    một mình vào đỏ (COLOR-SYSTEM §5.4). */

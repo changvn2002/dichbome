@@ -136,6 +136,10 @@ export function Board({
   const [savedQuery, setSavedQuery] = useState('');
   const [confirmClearSavedOpen, setConfirmClearSavedOpen] = useState(false);
   const [confirmClearHistoryOpen, setConfirmClearHistoryOpen] = useState(false);
+  // FIN v1.4.1: nút kích hoạt từng ConfirmDialog — dialog đóng thì focus trả
+  // về đúng nút đã mở nó (returnFocusTo, cùng kỷ luật Sheet ở FIX mục 3b).
+  const clearSavedTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const clearHistoryTriggerRef = useRef<HTMLButtonElement | null>(null);
 
   const filteredExamples = useMemo(() => {
     const group = RELATION_GROUPS.find((g) => g.label === exampleGroup);
@@ -290,13 +294,20 @@ export function Board({
                       Hàng ngang cũ bó nút chính còn ~60px (nút phụ chữ trần chiếm
                       ~75px + gap trong cột masonry ~145px) nên nhãn vỡ 3 dòng ở
                       mọi viewport. Một hệ nút thống nhất: cùng bề rộng, cùng
-                      min-h-11/bo góc/cỡ chữ, khác nhau chỉ ở nền (đặc = chính,
-                      quiet = phụ); nhãn nowrap nguyên vẹn một dòng. */}
+                      min-h-11/bo góc; nhãn nowrap nguyên vẹn một dòng.
+                      N5-1a (Panel #05): nút chính của thẻ KHÔNG còn nền seed —
+                      mỗi bề mặt chỉ MỘT hành động seed chính (CTA của composer);
+                      4 thẻ × nút full-seed kéo tab mặc định xuống neutral
+                      92,05% / accent 7,70%. Nay nút thẻ là dạng trung tính/viền:
+                      thứ bậc trong thẻ giữ bằng VIỀN ĐẬM (border-2 mực) + chữ
+                      đậm so với «Dịch ngay» (không viền, hover bg-bubble như
+                      nút phụ); seed chỉ còn ở trạng thái focus qua ring
+                      :focus-visible toàn cục. */}
                   <div className="mt-2.5 flex flex-col gap-1.5">
                     <button
                       type="button"
                       onClick={() => onUseExample(ex, false)}
-                      className="min-h-11 w-full whitespace-nowrap rounded-lg bg-action-bg px-2 text-sm font-semibold text-action-fg"
+                      className="min-h-11 w-full whitespace-nowrap rounded-lg border-2 border-ink bg-canvas px-2 text-sm font-bold text-ink hover:bg-bubble"
                     >
                       Dùng câu này
                     </button>
@@ -371,10 +382,11 @@ export function Board({
                       key={item.id}
                       className="rounded-[14px] border border-line-control bg-canvas p-3.5 shadow-[var(--shadow-card)]"
                     >
-                      {/* Avatar DiceBear (ĐK-D4): CHỈ ở hàng mục đã lưu có
-                          id ổn định; nhãn vai/chữ thật đi kèm ở meta dưới. */}
+                      {/* Avatar DiceBear (ĐK-D4 + N5-4): CHỈ ở hàng mục đã
+                          lưu; seed theo danh tính (nhãn vai), không theo id
+                          bản ghi; nhãn vai/chữ thật đi kèm ở meta dưới. */}
                       <div className="flex items-start gap-3">
-                        <ContactAvatar id={item.id} speaker={item.speaker} size={36} />
+                        <ContactAvatar speaker={item.speaker} size={36} />
                         <p className="line-clamp-3 min-w-0 flex-1 text-[15px] font-medium text-ink">
                           “{item.message}”
                         </p>
@@ -408,6 +420,7 @@ export function Board({
                 </div>
               )}
               <button
+                ref={clearSavedTriggerRef}
                 type="button"
                 onClick={() => setConfirmClearSavedOpen(true)}
                 className="mt-1 min-h-11 text-sm font-semibold text-error-ink"
@@ -437,8 +450,9 @@ export function Board({
                       onClick={() => onRestore(item)}
                       className="flex min-h-14 w-full items-center gap-3 py-3 text-left"
                     >
-                      {/* Avatar DiceBear (ĐK-D4): chỉ ở hàng Lịch sử có id ổn định. */}
-                      <ContactAvatar id={item.id} speaker={item.speaker} size={32} />
+                      {/* Avatar DiceBear (ĐK-D4 + N5-4): chỉ ở hàng Lịch sử;
+                          seed theo danh tính (nhãn vai), không theo id bản ghi. */}
+                      <ContactAvatar speaker={item.speaker} size={32} />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[15px] font-medium text-ink">
                           “{item.message}”
@@ -454,6 +468,7 @@ export function Board({
                 ))}
               </ul>
               <button
+                ref={clearHistoryTriggerRef}
                 type="button"
                 onClick={() => setConfirmClearHistoryOpen(true)}
                 className="mt-1 min-h-11 text-sm font-semibold text-error-ink"
@@ -486,6 +501,7 @@ export function Board({
         title="Xoá toàn bộ kết quả đã lưu?"
         body={`${saved.length} mục trên thiết bị này sẽ bị xoá. Dữ liệu chỉ nằm trên máy nên không khôi phục được từ máy chủ.`}
         confirmLabel="Xoá hết"
+        returnFocusTo={clearSavedTriggerRef}
         onCancel={() => setConfirmClearSavedOpen(false)}
         onConfirm={() => {
           setConfirmClearSavedOpen(false);
@@ -497,6 +513,7 @@ export function Board({
         title="Xoá toàn bộ lịch sử?"
         body={`${history.length} mục trên thiết bị này sẽ bị xoá. Dữ liệu chỉ nằm trên máy nên không khôi phục được từ máy chủ.`}
         confirmLabel="Xoá hết"
+        returnFocusTo={clearHistoryTriggerRef}
         onCancel={() => setConfirmClearHistoryOpen(false)}
         onConfirm={() => {
           setConfirmClearHistoryOpen(false);

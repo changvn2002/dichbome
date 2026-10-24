@@ -98,14 +98,30 @@ export function FindOutContent({ swUpdateAvailable }: { swUpdateAvailable: boole
 
       <figure>
         {/* Hero «Hai Lượt Một Nhịp» (REDESIGN-V4) — banner cũ đã chết cùng
-            hệ ấm V2; lớp hình của V4 chỉ phóng hình học của chính mark. */}
+            hệ ấm V2; lớp hình của V4 chỉ phóng hình học của chính mark.
+            FIX v1.4.1 (N5-7): ở ≥1440px bản sân khấu (592×178 trong main) và
+            bản Tìm hiểu này đồng hiện một khung, nên bản Tìm hiểu hoán sang
+            biến thể cận cảnh phiến đáp (dichbome-hero-reply-detail.svg —
+            suy từ chính hero-stage, cùng khung 720×216 nên không nhảy
+            layout). Dưới 1440px giữ nguyên hero-stage gốc đã được chuẩn y.
+            Hai <img> ẩn/hiện theo breakpoint (phong cách min-[…px] của
+            codebase); bản ẩn là display:none nên tại mỗi viewport chỉ một
+            hình vào cây trợ năng. */}
         {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
         <img
           src="/products/brand/dichbome-hero-stage.svg"
           alt="Hai phiến thoại nối nhau bằng bậc thang: câu gốc của người nhà và lời đáp êm chuyện"
           width={720}
           height={216}
-          className="aspect-[10/3] w-full rounded-xl border border-hairline bg-canvas object-contain"
+          className="aspect-[10/3] w-full rounded-xl border border-hairline bg-canvas object-contain min-[1440px]:hidden"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
+        <img
+          src="/products/brand/dichbome-hero-reply-detail.svg"
+          alt="Cận cảnh phiến đáp của hero «Hai Lượt Một Nhịp»: phiến thoại xám lớn — lượt đáp êm chuyện — cạnh trục ba chấm mốc lượt"
+          width={720}
+          height={216}
+          className="hidden aspect-[10/3] w-full rounded-xl border border-hairline bg-canvas object-contain min-[1440px]:block"
         />
       </figure>
 

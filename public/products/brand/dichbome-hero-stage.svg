@@ -5,10 +5,9 @@
   <circle cx="20" cy="176" r="5" fill="#212121"/>
   <!-- Phiến A (chủ — câu gốc): trắng, stroke ink 2.5, đuôi dưới-trái hướng về người nhà -->
   <path d="M88,28 L440,28 A24,24 0 0 1 464,52 L464,122 A24,24 0 0 1 440,146 L140,146 L104,178 L104,146 L88,146 A24,24 0 0 1 64,122 L64,52 A24,24 0 0 1 88,28 Z" fill="#FFFFFF" stroke="#212121" stroke-width="2.5"/>
-  <!-- Counter bậc thang trong phiến A (hồi âm mark): 3 khối 28px, đáy thẳng hàng y=128, fill accent #FE2C55 literal — phần tử accent duy nhất của hình -->
-  <rect x="96" y="114" width="28" height="14" fill="#FE2C55"/>
-  <rect x="132" y="100" width="28" height="28" fill="#FE2C55"/>
-  <rect x="168" y="86" width="28" height="42" fill="#FE2C55"/>
+  <!-- Echo hai bong bóng hội thoại trong phiến A (FIN v1.4.1 phương án B): cặp hỏi–đáp lệch nhau — bong bóng trên fill accent #FE2C55 literal, bong bóng dưới outline ink trên trắng — phần tử accent duy nhất của hình -->
+  <path d="M107,52 L157,52 A11,11 0 0 1 168,63 L168,77 A11,11 0 0 1 157,88 L124,88 L110,100 L110,88 L107,88 A11,11 0 0 1 96,77 L96,63 A11,11 0 0 1 107,52 Z" fill="#FE2C55"/>
+  <path d="M157,94 L203,94 A9,9 0 0 1 212,103 L212,115 A9,9 0 0 1 203,124 L188,124 L200,134 L200,124 L157,124 A9,9 0 0 1 148,115 L148,103 A9,9 0 0 1 157,94 Z" fill="#FFFFFF" stroke="#212121" stroke-width="2.5"/>
   <!-- Phiến B (đáp): neutral N-vay Grey 100 #F5F5F5, vẽ sau — viền B liên tục cắt viền A ở vùng giao (xen-lượt) -->
   <path d="M292,76 L636,76 A24,24 0 0 1 660,100 L660,170 A24,24 0 0 1 636,194 L616,194 L616,210 L588,194 L292,194 A24,24 0 0 1 268,170 L268,100 A24,24 0 0 1 292,76 Z" fill="#F5F5F5" stroke="#212121" stroke-width="2.5"/>
 </svg>
