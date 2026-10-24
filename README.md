@@ -38,15 +38,15 @@ tiếng Việt, deterministic** — không gọi AI bên ngoài, không cần đ
 
 ## 📸 Screenshots
 
-Ảnh chụp trực tiếp từ bản live https://dichbome.vercel.app (redesign V4 — accent TikTok #FE2C55 trên canvas trung tính, bản v1.4.1) — mọi ảnh đều là app thật đang chạy với kết quả giải mã thật trên màn hình.
+Ảnh chụp trực tiếp từ bản live https://dichbome.vercel.app (redesign V4 — accent TikTok #FE2C55 trên canvas trung tính, bản v1.5.0 «Chat») — mọi ảnh đều là app thật đang chạy với kết quả giải mã thật trên màn hình.
 
 ![Sân khấu hội thoại trên mobile: bong bóng câu gốc và phiếu giải mã có nhãn nguồn “Máy chủ”, ý thật, điều mẹ muốn nghe và mức căng thẳng 3/5](docs/screenshots/dichbome-mobile.png)
 
 _Phiếu giải mã ngay dưới bong bóng câu gốc: nhãn nguồn cho biết kết quả đến từ máy chủ hay dịch ngay trên máy, kèm ý thật, điều người nhắn muốn nghe và thang căng thẳng 0–5._
 
-![Bản desktop: sân khấu giải mã bên trái, Bảng (câu mẫu, đã lưu, lịch sử) cố định ở cột phải](docs/screenshots/dichbome-desktop.png)
+![Bản desktop: sân khấu giải mã bên trái, Bảng mở dạng panel 400px bên phải (câu mẫu, đã lưu, lịch sử, tìm hiểu)](docs/screenshots/dichbome-desktop.png)
 
-_Desktop: sân khấu bên trái, cột Bảng bên phải luôn hiện thư viện câu mẫu và các tab Đã lưu / Lịch sử._
+_Desktop: sân khấu bên trái; bấm nút Bảng để mở panel 400px bên phải với thư viện câu mẫu và các tab Đã lưu / Lịch sử._
 
 ![Phiếu giải mã cho câu của mẹ chồng trong hoàn cảnh ở chung, mức căng thẳng 1/5](docs/screenshots/gallery-01-phieu-giai-ma-me-chong.png)
 
