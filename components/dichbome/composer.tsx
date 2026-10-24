@@ -135,7 +135,10 @@ export function Composer({
     const chipRect = chip.getBoundingClientRect();
     const chipLeft = chipRect.left - container.getBoundingClientRect().left + container.scrollLeft;
     const chipRight = chipLeft + chipRect.width;
-    if (chipLeft >= container.scrollLeft && chipRight <= container.scrollLeft + container.clientWidth) {
+    if (
+      chipLeft >= container.scrollLeft &&
+      chipRight <= container.scrollLeft + container.clientWidth
+    ) {
       return;
     }
     container.scrollTo({ left: chipLeft - 24 });
@@ -182,7 +185,9 @@ export function Composer({
         <span className="text-sm font-semibold">
           Ai vừa nhắn?
           {showSwipeHint ? (
-            <span className="ml-2 text-xs font-normal text-muted">Vuốt ngang để xem thêm vai →</span>
+            <span className="ml-2 text-xs font-normal text-muted">
+              Vuốt ngang để xem thêm vai →
+            </span>
           ) : null}
         </span>
         <span

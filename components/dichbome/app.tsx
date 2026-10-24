@@ -610,18 +610,18 @@ export function DichbomeApp() {
             boardOpen ? '' : 'min-[1280px]:mx-auto min-[1280px]:w-[700px] min-[1280px]:flex-none'
           }`}
         >
-        {/* Cột sân khấu — landmark <main> cho nội dung chính (N-6) */}
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <div className="relative min-h-0 flex-1">
-            <div
-              ref={stageScrollRef}
-              onScroll={updateMoreHint}
-              className="h-full overflow-y-auto px-4 py-4 [mask-image:linear-gradient(180deg,black_calc(100%-26px),transparent)] [-webkit-mask-image:linear-gradient(180deg,black_calc(100%-26px),transparent)] min-[1280px]:px-[30px] min-[1280px]:py-6"
-            >
-              <div className="mx-auto flex min-h-full w-full max-w-[600px] flex-col">
-                {stage.kind === 'idle' ? (
-                  <div className="flex flex-1 flex-col pt-2 min-[1280px]:pt-8">
-                    {/* Hero «Chat» (bản thắng revote): pill meta căn giữa
+          {/* Cột sân khấu — landmark <main> cho nội dung chính (N-6) */}
+          <main className="flex min-h-0 min-w-0 flex-1 flex-col">
+            <div className="relative min-h-0 flex-1">
+              <div
+                ref={stageScrollRef}
+                onScroll={updateMoreHint}
+                className="h-full overflow-y-auto px-4 py-4 [mask-image:linear-gradient(180deg,black_calc(100%-26px),transparent)] [-webkit-mask-image:linear-gradient(180deg,black_calc(100%-26px),transparent)] min-[1280px]:px-[30px] min-[1280px]:py-6"
+              >
+                <div className="mx-auto flex min-h-full w-full max-w-[600px] flex-col">
+                  {stage.kind === 'idle' ? (
+                    <div className="flex flex-1 flex-col pt-2 min-[1280px]:pt-8">
+                      {/* Hero «Chat» (bản thắng revote): pill meta căn giữa
                         kiểu timestamp hội thoại mới + CỤM HAI BONG BÓNG —
                         câu nói (trắng, viền) chồng lên «Ý thật là…» (mực,
                         chấm seed) — kể trọn lời hứa của app trong một
@@ -630,184 +630,187 @@ export function DichbomeApp() {
                         phần chồng phải gọn như chủ ý, giữ khoảng an toàn
                         với mép màn hình). Cụm là minh hoạ trang trí —
                         aria-hidden; nội dung thật nằm ở headline + câu mẫu. */}
-                    <p className="flex justify-center">
-                      <span className="inline-flex items-center rounded-full bg-bubble px-3 py-[5px] text-xs font-semibold text-muted">
-                        Cuộc trò chuyện mới · chưa có câu nào được dịch
-                      </span>
-                    </p>
-                    <div aria-hidden className="relative mx-auto mt-6 w-full max-w-[360px] px-3">
-                      <span className="absolute top-[10px] left-0 z-10">
-                        <SenderDisc speaker={examples[0].speaker} size={30} />
-                      </span>
-                      <div className="ml-5 w-[86%] -rotate-[1.5deg] rounded-[18px] rounded-bl-[6px] border border-hairline bg-canvas px-[15px] py-[11px] text-[15px] leading-snug font-semibold text-ink shadow-[var(--shadow-card)]">
-                        <span className="line-clamp-2">“{examples[0].message}”</span>
+                      <p className="flex justify-center">
+                        <span className="inline-flex items-center rounded-full bg-bubble px-3 py-[5px] text-xs font-semibold text-muted">
+                          Cuộc trò chuyện mới · chưa có câu nào được dịch
+                        </span>
+                      </p>
+                      <div aria-hidden className="relative mx-auto mt-6 w-full max-w-[360px] px-3">
+                        <span className="absolute top-[10px] left-0 z-10">
+                          <SenderDisc speaker={examples[0].speaker} size={30} />
+                        </span>
+                        <div className="ml-5 w-[86%] -rotate-[1.5deg] rounded-[18px] rounded-bl-[6px] border border-hairline bg-canvas px-[15px] py-[11px] text-[15px] leading-snug font-semibold text-ink shadow-[var(--shadow-card)]">
+                          <span className="line-clamp-2">“{examples[0].message}”</span>
+                        </div>
+                        <div className="relative z-10 mt-[-8px] ml-auto w-[62%] rotate-[1.5deg] rounded-[18px] rounded-br-[6px] bg-ink px-[15px] py-[11px] text-[15px] font-bold text-canvas shadow-[var(--shadow-lift)]">
+                          <span className="mr-2 inline-block size-[7px] rounded-full bg-brand-seed align-middle" />
+                          Ý thật là…
+                        </div>
                       </div>
-                      <div className="relative z-10 mt-[-8px] ml-auto w-[62%] rotate-[1.5deg] rounded-[18px] rounded-br-[6px] bg-ink px-[15px] py-[11px] text-[15px] font-bold text-canvas shadow-[var(--shadow-lift)]">
-                        <span className="mr-2 inline-block size-[7px] rounded-full bg-brand-seed align-middle" />
-                        Ý thật là…
-                      </div>
-                    </div>
-                    <h2
-                      style={{ fontWeight: 680 }}
-                      className="mt-3 max-w-[520px] font-display text-[32px] leading-[38px] text-balance min-[1280px]:text-[42px] min-[1280px]:leading-[50px]"
-                    >
-                      Người nhà vừa nhắn gì thế?
-                    </h2>
-                    {/* R4-F1: phụ đề rút 23 → 17 từ (bù hồi quy ngân sách chữ
+                      <h2
+                        style={{ fontWeight: 680 }}
+                        className="mt-3 max-w-[520px] font-display text-[32px] leading-[38px] text-balance min-[1280px]:text-[42px] min-[1280px]:leading-[50px]"
+                      >
+                        Người nhà vừa nhắn gì thế?
+                      </h2>
+                      {/* R4-F1: phụ đề rút 23 → 17 từ (bù hồi quy ngân sách chữ
                         đứng 77/75 do dòng DATA-09b cộng thêm; đích ≤72/75).
                         Ý giữ nguyên: dán câu — app đọc ý thật, gợi ý câu trả
                         lời. Dòng DATA-09b ở composer KHÔNG bị cắt. */}
-                    <p className="mt-3 max-w-[400px] text-[15px] leading-relaxed text-muted">
-                      Dán câu vào ô dưới — app đọc ý thật, gợi ý câu trả lời êm chuyện.
-                    </p>
-                    <p className="mt-7 mb-2.5 text-[13px] font-bold text-ink">Thử một câu mẫu</p>
-                    <div className="flex max-w-[460px] flex-col gap-1">
-                      {examples.slice(0, 2).map((ex) => (
-                        <button
-                          key={ex.message}
-                          type="button"
-                          onClick={() => fillExample(ex, false)}
-                          className="flex min-h-[56px] w-full items-center gap-[10px] rounded-[18px] px-2 py-2 text-left hover:bg-surface-subtle"
-                        >
-                          <SenderDisc speaker={ex.speaker} size={34} />
-                          <span className="min-w-0 flex-1 truncate text-[15px] font-semibold">
-                            “{excerpt(ex.message)}”
-                          </span>
-                          <ArrowRight className="size-[18px] shrink-0 text-placeholder" aria-hidden />
-                        </button>
-                      ))}
-                    </div>
-                    {/* Dải 3 ô giải thích của bản thắng: Ý thật / Mức căng
+                      <p className="mt-3 max-w-[400px] text-[15px] leading-relaxed text-muted">
+                        Dán câu vào ô dưới — app đọc ý thật, gợi ý câu trả lời êm chuyện.
+                      </p>
+                      <p className="mt-7 mb-2.5 text-[13px] font-bold text-ink">Thử một câu mẫu</p>
+                      <div className="flex max-w-[460px] flex-col gap-1">
+                        {examples.slice(0, 2).map((ex) => (
+                          <button
+                            key={ex.message}
+                            type="button"
+                            onClick={() => fillExample(ex, false)}
+                            className="flex min-h-[56px] w-full items-center gap-[10px] rounded-[18px] px-2 py-2 text-left hover:bg-surface-subtle"
+                          >
+                            <SenderDisc speaker={ex.speaker} size={34} />
+                            <span className="min-w-0 flex-1 truncate text-[15px] font-semibold">
+                              “{excerpt(ex.message)}”
+                            </span>
+                            <ArrowRight
+                              className="size-[18px] shrink-0 text-placeholder"
+                              aria-hidden
+                            />
+                          </button>
+                        ))}
+                      </div>
+                      {/* Dải 3 ô giải thích của bản thắng: Ý thật / Mức căng
                         thẳng / Câu trả lời — hairline trên, chữ nhỏ yên tĩnh. */}
-                    <div className="mt-7 mb-10 grid max-w-[560px] grid-cols-3 gap-4 border-t border-hairline pt-4 min-[1280px]:gap-5">
-                      <div>
-                        <p className="text-[13px] font-bold text-ink">Ý thật</p>
-                        <p className="mt-1 text-[13px] leading-relaxed text-muted">
-                          Phần ý nằm sau câu chữ.
-                        </p>
+                      <div className="mt-7 mb-10 grid max-w-[560px] grid-cols-3 gap-4 border-t border-hairline pt-4 min-[1280px]:gap-5">
+                        <div>
+                          <p className="text-[13px] font-bold text-ink">Ý thật</p>
+                          <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                            Phần ý nằm sau câu chữ.
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-bold text-ink">Mức căng thẳng</p>
+                          <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                            Thang đo 0–5, nhìn là biết.
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-bold text-ink">Câu trả lời</p>
+                          <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                            Gợi ý đáp lại êm chuyện.
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-[13px] font-bold text-ink">Mức căng thẳng</p>
-                        <p className="mt-1 text-[13px] leading-relaxed text-muted">
-                          Thang đo 0–5, nhìn là biết.
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-[13px] font-bold text-ink">Câu trả lời</p>
-                        <p className="mt-1 text-[13px] leading-relaxed text-muted">
-                          Gợi ý đáp lại êm chuyện.
-                        </p>
-                      </div>
-                    </div>
-                    {/* Hàng «Câu mẫu trong Bảng» (chỉ desktop): 3 câu mẫu
+                      {/* Hàng «Câu mẫu trong Bảng» (chỉ desktop): 3 câu mẫu
                         tiếp theo dạng DÒNG HỘI THOẠI như hai câu mẫu ở
                         trên (đĩa người gửi + trích + meta một dòng cắt
                         gọn) — bấm là điền vào composer, cùng hành vi. */}
-                    {examples.length > 2 ? (
-                      <div className="mt-auto hidden border-t border-hairline pt-4 min-[1280px]:block">
-                        <p className="text-[13px] font-bold text-ink">Câu mẫu trong Bảng</p>
-                        <div className="mt-2 flex flex-col gap-1">
-                          {examples.slice(2, 5).map((ex) => (
-                            <button
-                              key={ex.message}
-                              type="button"
-                              onClick={() => fillExample(ex, false)}
-                              className="flex min-h-[52px] w-full items-center gap-[10px] rounded-[18px] px-2 py-2 text-left hover:bg-surface-subtle"
-                            >
-                              <SenderDisc speaker={ex.speaker} size={34} />
-                              <span className="min-w-0 flex-1">
-                                <span className="block truncate text-[15px] font-semibold text-ink">
-                                  “{ex.message}”
+                      {examples.length > 2 ? (
+                        <div className="mt-auto hidden border-t border-hairline pt-4 min-[1280px]:block">
+                          <p className="text-[13px] font-bold text-ink">Câu mẫu trong Bảng</p>
+                          <div className="mt-2 flex flex-col gap-1">
+                            {examples.slice(2, 5).map((ex) => (
+                              <button
+                                key={ex.message}
+                                type="button"
+                                onClick={() => fillExample(ex, false)}
+                                className="flex min-h-[52px] w-full items-center gap-[10px] rounded-[18px] px-2 py-2 text-left hover:bg-surface-subtle"
+                              >
+                                <SenderDisc speaker={ex.speaker} size={34} />
+                                <span className="min-w-0 flex-1">
+                                  <span className="block truncate text-[15px] font-semibold text-ink">
+                                    “{ex.message}”
+                                  </span>
+                                  <span className="mt-0.5 block truncate text-xs text-muted">
+                                    {ex.speaker} · {ex.context} — {ex.tease}
+                                  </span>
                                 </span>
-                                <span className="mt-0.5 block truncate text-xs text-muted">
-                                  {ex.speaker} · {ex.context} — {ex.tease}
-                                </span>
-                              </span>
-                              <ArrowRight
-                                className="size-[18px] shrink-0 text-placeholder"
-                                aria-hidden
-                              />
-                            </button>
-                          ))}
+                                <ArrowRight
+                                  className="size-[18px] shrink-0 text-placeholder"
+                                  aria-hidden
+                                />
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ) : null}
-                  </div>
-                ) : null}
-
-                {stage.kind === 'loading' ? (
-                  <div>
-                    <OriginalBubble
-                      message={stage.input.message}
-                      speaker={stage.input.speaker}
-                      context={stage.input.context}
-                    />
-                    <div className="mt-1">
-                      <TypingBubble />
+                      ) : null}
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
 
-                {stage.kind === 'slip' ? (
-                  <div>
-                    <OriginalBubble
-                      message={stage.view.message}
-                      speaker={stage.view.speaker}
-                      context={stage.view.context}
-                    />
-                    <div className="mt-1">
-                      <StageSlip
-                        view={stage.view}
-                        saved={Boolean(currentSavedItem)}
-                        copiedIdx={copiedIdx}
-                        onCopyReply={handleCopyReply}
-                        onToggleSave={handleToggleSave}
-                        onShare={handleShare}
-                        onTranslateAnother={handleTranslateAnother}
-                        onOpenSavedBoard={() => openBoard('saved')}
-                        strip={strip}
-                        headingRef={slipHeadingRef}
-                      />
-                    </div>
-                  </div>
-                ) : null}
-
-                {stage.kind === 'not-read' ? (
-                  <div>
-                    <OriginalBubble
-                      message={stage.input.message}
-                      speaker={stage.input.speaker}
-                      context={stage.input.context}
-                    />
-                    <div className="mt-1">
-                      <NotReadCard
-                        bodyKind={stage.bodyKind}
+                  {stage.kind === 'loading' ? (
+                    <div>
+                      <OriginalBubble
+                        message={stage.input.message}
                         speaker={stage.input.speaker}
-                        onEdit={() => setFocusSignal((n) => n + 1)}
-                        onTryExample={() => openBoard('examples')}
-                        onShowFallback={showFallback}
+                        context={stage.input.context}
                       />
+                      <div className="mt-1">
+                        <TypingBubble />
+                      </div>
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
 
-                {stage.kind === 'error' ? (
-                  <div>
-                    <OriginalBubble
-                      message={stage.input.message}
-                      speaker={stage.input.speaker}
-                      context={stage.input.context}
-                    />
-                    <div className="mt-1">
-                      <StageErrorCard onRetry={() => void runTranslate(stage.input)} />
+                  {stage.kind === 'slip' ? (
+                    <div>
+                      <OriginalBubble
+                        message={stage.view.message}
+                        speaker={stage.view.speaker}
+                        context={stage.view.context}
+                      />
+                      <div className="mt-1">
+                        <StageSlip
+                          view={stage.view}
+                          saved={Boolean(currentSavedItem)}
+                          copiedIdx={copiedIdx}
+                          onCopyReply={handleCopyReply}
+                          onToggleSave={handleToggleSave}
+                          onShare={handleShare}
+                          onTranslateAnother={handleTranslateAnother}
+                          onOpenSavedBoard={() => openBoard('saved')}
+                          strip={strip}
+                          headingRef={slipHeadingRef}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
+
+                  {stage.kind === 'not-read' ? (
+                    <div>
+                      <OriginalBubble
+                        message={stage.input.message}
+                        speaker={stage.input.speaker}
+                        context={stage.input.context}
+                      />
+                      <div className="mt-1">
+                        <NotReadCard
+                          bodyKind={stage.bodyKind}
+                          speaker={stage.input.speaker}
+                          onEdit={() => setFocusSignal((n) => n + 1)}
+                          onTryExample={() => openBoard('examples')}
+                          onShowFallback={showFallback}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {stage.kind === 'error' ? (
+                    <div>
+                      <OriginalBubble
+                        message={stage.input.message}
+                        speaker={stage.input.speaker}
+                        context={stage.input.context}
+                      />
+                      <div className="mt-1">
+                        <StageErrorCard onRetry={() => void runTranslate(stage.input)} />
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* N-04-1 (Panel #04 → cách đóng đã chốt ở V4-IMPL-STATE §5):
+            {/* N-04-1 (Panel #04 → cách đóng đã chốt ở V4-IMPL-STATE §5):
               pill «Còn nội dung ở dưới» KHÔNG còn là overlay tuyệt đối
               neo đáy vùng cuộn. Bản cũ (absolute bottom-3) chồng lên nội
               dung phiếu: ở các vai có composer cao, hàng số + nhãn thước
@@ -819,40 +822,39 @@ export function DichbomeApp() {
               phiếu bằng 0 px² theo cấu trúc, ở mọi vai/viewport/chiều cao
               composer. Giữ nguyên: nhãn, chiều cao 44px, hành vi bấm cuộn
               0,8×clientHeight, điều kiện hiện (còn >24px chưa xem). */}
-          {showMoreHint ? (
-            <div className="flex shrink-0 justify-center px-4 pt-2 pb-1">
-              {/* Luật thi công điểm 8: pill đen nổi ĐÃ CHẾT — affordance là
+            {showMoreHint ? (
+              <div className="flex shrink-0 justify-center px-4 pt-2 pb-1">
+                {/* Luật thi công điểm 8: pill đen nổi ĐÃ CHẾT — affordance là
                   nút chữ tĩnh lặng nằm trong luồng (vẫn in-flow như bản
                   đóng N-04-1, vẫn cùng hành vi bấm cuộn 0,8×clientHeight,
                   cùng điều kiện hiện, cùng nhãn). */}
-              <button
-                type="button"
-                onClick={() =>
-                  stageScrollRef.current?.scrollBy({
-                    top: stageScrollRef.current.clientHeight * 0.8,
-                    behavior: 'smooth',
-                  })
-                }
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-hairline bg-canvas px-4 text-sm font-semibold whitespace-nowrap text-ink shadow-[var(--shadow-card)]"
-              >
-                Còn nội dung ở dưới
-                <ChevronDown className="size-4 text-muted" aria-hidden />
-              </button>
-            </div>
-          ) : null}
+                <button
+                  type="button"
+                  onClick={() =>
+                    stageScrollRef.current?.scrollBy({
+                      top: stageScrollRef.current.clientHeight * 0.8,
+                      behavior: 'smooth',
+                    })
+                  }
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-hairline bg-canvas px-4 text-sm font-semibold whitespace-nowrap text-ink shadow-[var(--shadow-card)]"
+                >
+                  Còn nội dung ở dưới
+                  <ChevronDown className="size-4 text-muted" aria-hidden />
+                </button>
+              </div>
+            ) : null}
 
-          {pendingDeletion && !boardOpen ? (
-            <div className="shrink-0 px-4 pb-2 min-[1280px]:hidden">
-              <UndoBar label={pendingDeletion.label} onUndo={undoDeletion} />
-            </div>
-          ) : null}
+            {pendingDeletion && !boardOpen ? (
+              <div className="shrink-0 px-4 pb-2 min-[1280px]:hidden">
+                <UndoBar label={pendingDeletion.label} onUndo={undoDeletion} />
+              </div>
+            ) : null}
+          </main>
 
-        </main>
-
-        {/* Composer ghim đáy CỘT THREAD ở mọi bề rộng — hướng «Chat»:
+          {/* Composer ghim đáy CỘT THREAD ở mọi bề rộng — hướng «Chat»:
             Bảng mở KHÔNG giấu composer nữa (thread + composer + Bảng nổi
             cùng hiện như mock thắng). */}
-        <Composer
+          <Composer
             message={message}
             onMessageChange={(v) => {
               setMessage(v);

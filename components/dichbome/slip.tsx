@@ -152,7 +152,10 @@ function TensionGauge({ level, label }: { level: number; label: string }) {
           Mức {level}/5 · {label}
         </span>
       </div>
-      <div aria-hidden className="relative mt-[5px] ml-[14px] h-4 w-[122px] text-[10.5px] text-placeholder">
+      <div
+        aria-hidden
+        className="relative mt-[5px] ml-[14px] h-4 w-[122px] text-[10.5px] text-placeholder"
+      >
         {[0, 1, 2, 3, 4, 5].map((n) => (
           <span
             key={n}
@@ -163,7 +166,10 @@ function TensionGauge({ level, label }: { level: number; label: string }) {
           </span>
         ))}
       </div>
-      <div aria-hidden className="mt-0.5 ml-[14px] flex w-[122px] justify-between text-[10.5px] text-placeholder">
+      <div
+        aria-hidden
+        className="mt-0.5 ml-[14px] flex w-[122px] justify-between text-[10.5px] text-placeholder"
+      >
         <span>nhẹ nhàng</span>
         <span>rất căng</span>
       </div>
