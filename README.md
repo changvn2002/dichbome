@@ -38,7 +38,7 @@ tiếng Việt, deterministic** — không gọi AI bên ngoài, không cần đ
 
 ## 📸 Screenshots
 
-Ảnh chụp trực tiếp từ bản live https://dichbome.vercel.app (redesign «Sân Khấu Hội Thoại») — mọi ảnh đều là app thật đang chạy với kết quả giải mã thật trên màn hình.
+Ảnh chụp trực tiếp từ bản live https://dichbome.vercel.app (redesign V4 — accent TikTok #FE2C55 trên canvas trung tính, bản v1.4.1) — mọi ảnh đều là app thật đang chạy với kết quả giải mã thật trên màn hình.
 
 ![Sân khấu hội thoại trên mobile: bong bóng câu gốc và phiếu giải mã có nhãn nguồn “Máy chủ”, ý thật, điều mẹ muốn nghe và mức căng thẳng 3/5](docs/screenshots/dichbome-mobile.png)
 
@@ -46,7 +46,7 @@ _Phiếu giải mã ngay dưới bong bóng câu gốc: nhãn nguồn cho biết
 
 ![Bản desktop: sân khấu giải mã bên trái, Bảng (câu mẫu, đã lưu, lịch sử) cố định ở cột phải](docs/screenshots/dichbome-desktop.png)
 
-_Desktop: sân khấu ở giữa, cột Bảng bên phải luôn hiện thư viện câu mẫu và các tab Đã lưu / Lịch sử._
+_Desktop: sân khấu bên trái, cột Bảng bên phải luôn hiện thư viện câu mẫu và các tab Đã lưu / Lịch sử._
 
 ![Phiếu giải mã cho câu của mẹ chồng trong hoàn cảnh ở chung, mức căng thẳng 1/5](docs/screenshots/gallery-01-phieu-giai-ma-me-chong.png)
 
