@@ -8,7 +8,7 @@
 // bump cache để người dùng cũ nhận art mới (hero nằm trong precache);
 // đây là thay đổi cơ chế giao asset, không đổi nội dung app.
 // (v3 trước đó: REDESIGN-V4 thay toàn bộ bộ asset brand.)
-const CACHE_NAME = 'dichbome-shell-v4';
+const CACHE_NAME = 'dichbome-shell-v5';
 
 const PRECACHE_URLS = [
   '/',

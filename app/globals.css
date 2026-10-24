@@ -205,6 +205,34 @@ body {
   transition: width 400ms ease-out;
 }
 
+/* «Chat» (redesign vòng 3, hướng thắng panel bỏ phiếu lại mù — parent
+   phán quyết 2026-10-24, hồ sơ dichbome-redesign/panel/mock-revote):
+   toàn app là MỘT cuộc hội thoại — câu gốc là bong bóng chat mực, bản
+   dịch là «ghi chú dịch» treo trên sợi chỉ rail mảnh nối từ bong bóng,
+   mức căng thẳng là viên gauge chia đoạn kèm «n/5», Bảng là danh sách
+   hội thoại. Kicker caps dưới đây chỉ còn phục vụ tab Tìm hiểu. */
+.kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--neutral-700);
+}
+
+/* Kicker trên nền panel trắng của thẻ: giữ chữ mực, chấm seed đi kèm ở JSX. */
+.kicker.text-ink {
+  color: var(--neutral-900);
+}
+
+/* Hàng cuộn ngang một dòng (chip lọc của Bảng, chip vai): ẩn thanh cuộn
+   nhưng vẫn cuộn được — đúng kỷ luật «1 hàng nowrap» của bản thắng. */
+.scroll-row {
+  scrollbar-width: none;
+}
+.scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .anim-bubble-in,
   .anim-slip-block,

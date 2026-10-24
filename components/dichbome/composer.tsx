@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { ArrowRight, Check, ChevronDown, ClipboardPaste, Eraser } from 'lucide-react';
 import {
   PARENT_CONTEXTS,
@@ -65,6 +65,11 @@ export function Composer({
 }: ComposerProps) {
   const [contextOpen, setContextOpen] = useState(false);
   const [pasteHint, setPasteHint] = useState<string | null>(null);
+  // Mép mờ của hàng chip: chỉ 30px cuối hàng tan dần (đủ làm dấu hiệu
+  // còn cuộn mà KHÔNG nhuộm xám cả chip cuối — panel pack vòng 5 ghế 4:
+  // chip bị mờ toàn bộ đọc như lựa chọn bị vô hiệu hoá). Chưa cuộn → chỉ
+  // mờ mép phải; đã cuộn → mờ cả hai mép.
+  const [chipRowScrolled, setChipRowScrolled] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
   const chipRowRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -114,11 +119,26 @@ export function Composer({
   const placeholder = ROLE_PLACEHOLDERS[speaker] ?? `Ví dụ: câu ${currentRole} vừa nhắn…`;
 
   // Chip đã chọn tự cuộn vào tầm nhìn trong hàng ngang (scroll thủ công, không scrollIntoView).
+  // Vị trí tính THEO MẶT TRONG của container (rect chip − rect container +
+  // scrollLeft hiện tại): offsetLeft là tọa độ theo offsetParent — ở bố cục
+  // «Chat» desktop (cột thread căn giữa, lệch mép trang ~130px+) nó cộng cả
+  // độ lệch trang khiến hàng chip cuộn quá đà, chip đang chọn văng khỏi tầm
+  // nhìn ngay khi mở app (bắt tại pack vòng 3).
+  // Panel pack vòng 3 (5/5 ghế): nếu chip ĐÃ lọt hẳn trong tầm nhìn thì
+  // KHÔNG cuộn — cuộn thừa để lại mảnh chữ cụt của nhãn nhóm ở mép trái
+  // trong mọi ảnh trạng thái tươi.
   useEffect(() => {
     const container = chipRowRef.current;
     if (!container) return;
     const chip = container.querySelector<HTMLElement>('[aria-pressed="true"]');
-    if (chip) container.scrollTo({ left: chip.offsetLeft - 24 });
+    if (!chip) return;
+    const chipRect = chip.getBoundingClientRect();
+    const chipLeft = chipRect.left - container.getBoundingClientRect().left + container.scrollLeft;
+    const chipRight = chipLeft + chipRect.width;
+    if (chipLeft >= container.scrollLeft && chipRight <= container.scrollLeft + container.clientWidth) {
+      return;
+    }
+    container.scrollTo({ left: chipLeft - 24 });
   }, [speaker]);
 
   const autoGrow = () => {
@@ -150,7 +170,7 @@ export function Composer({
   return (
     <section
       aria-label="Soạn câu cần dịch"
-      className="border-t border-line-control bg-canvas px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+      className="border-t border-hairline bg-canvas px-4 pt-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
       onKeyDown={(e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
           e.preventDefault();
@@ -162,9 +182,7 @@ export function Composer({
         <span className="text-sm font-semibold">
           Ai vừa nhắn?
           {showSwipeHint ? (
-            <span className="ml-2 text-xs font-normal text-muted">
-              Vuốt ngang để xem thêm vai →
-            </span>
+            <span className="ml-2 text-xs font-normal text-muted">Vuốt ngang để xem thêm vai →</span>
           ) : null}
         </span>
         <span
@@ -177,17 +195,30 @@ export function Composer({
 
       <div
         ref={chipRowRef}
-        className="mt-1 flex items-center gap-2 overflow-x-auto pb-1"
+        className="scroll-row mt-1 flex items-center gap-2 overflow-x-auto pb-1"
+        style={{
+          maskImage: chipRowScrolled
+            ? 'linear-gradient(90deg, transparent, black 24px, black calc(100% - 30px), transparent)'
+            : 'linear-gradient(90deg, black calc(100% - 30px), transparent)',
+          WebkitMaskImage: chipRowScrolled
+            ? 'linear-gradient(90deg, transparent, black 24px, black calc(100% - 30px), transparent)'
+            : 'linear-gradient(90deg, black calc(100% - 30px), transparent)',
+        }}
         role="group"
         aria-label="Ai vừa nhắn?"
         onScroll={(e) => {
+          setChipRowScrolled(e.currentTarget.scrollLeft > 8);
           if (e.currentTarget.scrollLeft > 8) dismissSwipeHint();
         }}
         onKeyDown={handleChipRowKeyDown}
       >
         <span className="sr-only">Ai vừa nhắn?</span>
         {RELATION_GROUPS.map((group, groupIdx) => (
-          <Fragment key={group.label}>
+          // Wrapper «contents» ở MỌI bề rộng (hướng «Chat»: composer là
+          // một thanh ngang dưới thread ở cả desktop) — nhãn + chip chảy
+          // chung một hàng cuộn ngang; mép phải mờ dần báo hiệu còn cuộn
+          // (panel revote ghế 2 #6: không chặt cụt ở mép).
+          <div key={group.label} className="contents">
             {groupIdx > 0 ? (
               <span className="mx-1 w-px shrink-0 self-stretch bg-hairline" aria-hidden />
             ) : null}
@@ -201,15 +232,22 @@ export function Composer({
                 aria-pressed={speaker === role}
                 onClick={() => onSpeakerChange(role)}
                 className={
+                  // Chip chọn kiểu «Chat» (mock thắng): nền mực đặc + chữ
+                  // trắng đậm + chấm seed nhỏ trước nhãn — trạng thái chọn
+                  // đọc được cả khi không nhìn màu. Chip chưa chọn: viền
+                  // hairline, chữ ink-2 (không xám nhạt kiểu bị vô hiệu).
                   speaker === role
-                    ? 'min-h-11 shrink-0 rounded-full border border-line-control border-l-2 border-l-brand-seed bg-surface-selected px-4 text-sm font-semibold whitespace-nowrap text-ink'
-                    : 'min-h-11 shrink-0 rounded-full border border-line-control bg-canvas px-4 text-sm whitespace-nowrap text-muted hover:text-ink'
+                    ? 'inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-ink bg-ink px-4 text-sm font-bold whitespace-nowrap text-canvas shadow-[var(--shadow-card)]'
+                    : 'inline-flex min-h-11 shrink-0 items-center rounded-full border border-hairline bg-canvas px-4 text-sm whitespace-nowrap text-ink-2 hover:text-ink'
                 }
               >
+                {speaker === role ? (
+                  <span className="size-1.5 shrink-0 rounded-full bg-brand-seed" aria-hidden />
+                ) : null}
                 {role}
               </button>
             ))}
-          </Fragment>
+          </div>
         ))}
       </div>
 
@@ -229,15 +267,15 @@ export function Composer({
           onInput={autoGrow}
           maxLength={500}
           placeholder={placeholder}
-          className={`mt-2 w-full resize-none rounded-xl border bg-canvas py-3 pr-24 pl-4 text-base leading-relaxed text-ink placeholder:text-placeholder focus:border-line-control ${
-            error ? 'border-error-solid' : 'border-line-control'
+          className={`mt-2 w-full resize-none rounded-[24px] border bg-bubble py-3 pr-24 pl-4 text-base leading-relaxed text-ink placeholder:text-placeholder focus:border-line-control ${
+            error ? 'border-error-solid' : 'border-hairline'
           }`}
         />
         {message ? (
           <button
             type="button"
             onClick={() => onMessageChange('')}
-            className="absolute right-2 bottom-2 inline-flex min-h-11 items-center gap-1.5 px-3 text-sm font-semibold text-ink"
+            className="absolute right-2 bottom-2 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-canvas px-3.5 text-sm font-bold text-ink shadow-sm"
           >
             <Eraser className="size-4" aria-hidden />
             Xoá
@@ -246,7 +284,7 @@ export function Composer({
           <button
             type="button"
             onClick={() => void handlePaste()}
-            className="absolute right-2 bottom-2 inline-flex min-h-11 items-center gap-1.5 px-3 text-sm font-semibold text-ink"
+            className="absolute right-2 bottom-2 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-canvas px-3.5 text-sm font-bold text-ink shadow-sm"
           >
             <ClipboardPaste className="size-4" aria-hidden />
             Dán
@@ -274,7 +312,7 @@ export function Composer({
           type="button"
           ref={contextTriggerRef}
           onClick={() => setContextOpen(true)}
-          className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl border border-line-control bg-canvas px-3 text-sm font-semibold"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full border border-hairline bg-canvas px-3 text-sm font-semibold"
         >
           Hoàn cảnh: {context}
           <ChevronDown className="size-4" aria-hidden />
@@ -284,14 +322,14 @@ export function Composer({
             <button
               type="button"
               disabled
-              className="min-h-[52px] flex-1 whitespace-nowrap rounded-xl bg-disabled-bg px-5 text-[15px] font-semibold text-disabled-ink"
+              className="min-h-[52px] flex-1 whitespace-nowrap rounded-full bg-disabled-bg px-5 text-[15px] font-semibold text-disabled-ink"
             >
               Đang dịch…
             </button>
             <button
               type="button"
               onClick={onCancel}
-              className="min-h-[52px] shrink-0 rounded-xl border border-line-control px-4 font-semibold"
+              className="min-h-[52px] shrink-0 rounded-full border border-line-control px-4 font-semibold"
             >
               Huỷ
             </button>
@@ -300,7 +338,7 @@ export function Composer({
           <button
             type="button"
             onClick={onTranslate}
-            className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-action-bg px-5 text-[15px] font-semibold text-action-fg"
+            className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-action-bg px-5 text-[15px] font-semibold text-action-fg"
           >
             {translateCtaLabel(speaker)}
             <ArrowRight className="size-4" aria-hidden />

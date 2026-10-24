@@ -190,7 +190,7 @@ export function ConfirmDialog({
 
 export function UndoBar({ label, onUndo }: { label: string; onUndo: () => void }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl bg-ink px-4 py-3 text-canvas shadow-[var(--shadow-lift)]">
+    <div className="flex items-center justify-between gap-3 rounded-xl bg-ink px-4 py-3 text-canvas shadow-[var(--shadow-card)]">
       <span className="text-sm">{label}</span>
       <button
         type="button"

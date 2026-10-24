@@ -1,9 +1,20 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useState, type CSSProperties, type RefObject } from 'react';
 import { Bookmark, BookmarkCheck, Check, ChevronDown, Copy, Eraser, Share2 } from 'lucide-react';
 import type { ParentContext, RelationRole } from './lib/translate';
 import { roleName, translateCtaLabel, type SlipView, type StripState } from './lib/ui-types';
+import { SenderDisc } from './avatar';
+
+/* ------------------------------------------------------------------ */
+/* Hướng «Chat»: sân khấu là một thread — meta phiên thành pill căn    */
+/* giữa kiểu timestamp của app nhắn tin, câu gốc là bong bóng mực kèm  */
+/* đĩa chữ cái người gửi, bản dịch là «ghi chú dịch» treo trên sợi     */
+/* chỉ rail mảnh nối từ bong bóng xuống thẻ. Rail KHÔNG mang vòng tròn */
+/* rỗng lơ lửng (panel revote ghế 2+3): điểm nối là đoạn stub ngang ở  */
+/* đầu rail + chấm seed nằm trong chính pill nhãn «GHI CHÚ DỊCH».       */
+/* ------------------------------------------------------------------ */
 
 export function OriginalBubble({
   message,
@@ -17,28 +28,153 @@ export function OriginalBubble({
   const [expanded, setExpanded] = useState(false);
   return (
     <div>
-      <p className="text-xs text-muted">
-        {speaker} nhắn · Hoàn cảnh: {context}
+      {/* Meta phiên: pill timestamp căn giữa — TÊN NGƯỜI GỬI CHỈ Ở ĐÂY
+          (panel revote ghế 2 #4 + ghế 3 #4: bỏ nhãn tên nhỏ trùng cạnh
+          avatar ở hàng bong bóng). */}
+      <p className="flex justify-center">
+        <span className="inline-flex items-center rounded-full bg-bubble px-3 py-[5px] text-xs font-semibold text-muted">
+          <b className="font-bold text-ink-2">{speaker} nhắn</b>
+          <span aria-hidden>&nbsp;·&nbsp;</span>
+          Hoàn cảnh: {context}
+        </span>
       </p>
-      <button
-        type="button"
-        aria-expanded={expanded}
-        onClick={() => setExpanded((v) => !v)}
-        className="anim-bubble-in focus-on-bubble mt-1 block max-w-[85%] rounded-[18px] rounded-bl-md bg-ink px-4 py-3 text-left text-base leading-relaxed text-canvas"
+      <div className="mt-2 flex items-end gap-[9px]">
+        <SenderDisc speaker={speaker} size={34} />
+        <button
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((v) => !v)}
+          className="anim-bubble-in focus-on-bubble block w-fit max-w-[82%] rounded-[20px] rounded-bl-[6px] bg-ink px-[15px] py-[10px] text-left text-base leading-relaxed font-semibold text-canvas shadow-[var(--shadow-card)]"
+        >
+          {expanded ? <span>{message}</span> : <span className="line-clamp-2">{message}</span>}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Khung «ghi chú dịch»: sợi chỉ rail dọc (mảnh, neutral-200) chạy từ
+ *  bong bóng xuống thẻ trắng bo 18px + bóng card; pill nhãn trên rail là
+ *  điểm neo thị giác duy nhất của điểm nối (chấm seed trong pill). Rail
+ *  kết thúc đúng ở đáy thẻ — không lơ lửng ra ngoài (ghế 2 #9). */
+export function NoteShell({
+  tag,
+  dashed = false,
+  children,
+}: {
+  tag?: string;
+  dashed?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div className="relative ml-4 border-l-2 border-surface-selected pt-[9px] pl-5">
+      {/* Stub ngang ở đầu rail: nối rail về phía cột bong bóng. */}
+      <span
+        aria-hidden
+        className="absolute top-0 left-[-2px] h-[2px] w-[27px] bg-surface-selected"
+      />
+      {tag ? (
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-hairline bg-canvas px-2.5 py-1 text-[11px] font-bold tracking-[0.13em] text-ink-2 uppercase">
+          <span className="size-1.5 rounded-full bg-brand-seed" aria-hidden />
+          {tag}
+        </span>
+      ) : null}
+      <div
+        className={`relative rounded-[18px] border border-hairline bg-canvas px-4 py-4 shadow-[var(--shadow-card)] sm:px-5 ${
+          tag ? 'mt-2 ' : ''
+        }${dashed ? 'border-dashed' : ''}`}
       >
-        {expanded ? <span>{message}</span> : <span className="line-clamp-2">{message}</span>}
-      </button>
+        {/* Stub nối từ rail vào mép thẻ. */}
+        <span
+          aria-hidden
+          className="absolute top-[26px] left-[-21px] h-[2px] w-[20px] bg-surface-selected"
+        />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** Tiêu đề mục trong thẻ ghi chú: tick seed 3px + caps đậm — một ngôn
+ *  ngữ duy nhất cho mọi mục (Ý thật / Điều muốn nghe / Mức căng thẳng /
+ *  Câu trả lời gợi ý). */
+function SectionTitle({
+  as: Tag = 'h3',
+  headingRef,
+  children,
+}: {
+  as?: 'h2' | 'h3';
+  headingRef?: RefObject<HTMLHeadingElement | null>;
+  children: ReactNode;
+}) {
+  return (
+    <Tag
+      ref={headingRef}
+      tabIndex={headingRef ? -1 : undefined}
+      className="flex items-center gap-[7px] text-[11px] font-bold tracking-[0.11em] text-ink-2 uppercase"
+    >
+      <span className="h-3 w-[3px] shrink-0 rounded-[2px] bg-brand-seed" aria-hidden />
+      {children}
+    </Tag>
+  );
+}
+
+/** Thước căng thẳng «Chat»: viên gauge chia 5 đoạn rời trong pill viền
+ *  hairline kèm «n/5», nhãn chữ cạnh pill; hàng số 0–5 bên dưới THẲNG
+ *  CỘT với các đoạn theo cấu trúc (panel revote ghế 2 #10 + ghế 3 #8:
+ *  hàng số cùng bề rộng 122px với dải đoạn, neo tại đúng biên đoạn,
+ *  mốc 0/5 đậm kèm chú thích hai cực ngay dưới). */
+function TensionGauge({ level, label }: { level: number; label: string }) {
+  return (
+    <div>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <span className="inline-flex items-center gap-[9px] rounded-full border border-hairline bg-surface-subtle py-[7px] pr-3 pl-[13px]">
+          <span
+            className="flex gap-[3px]"
+            role="progressbar"
+            aria-valuenow={level}
+            aria-valuemin={0}
+            aria-valuemax={5}
+            aria-label="Mức căng thẳng"
+          >
+            {[1, 2, 3, 4, 5].map((n) => (
+              <span
+                key={n}
+                className={`h-[6px] w-[22px] rounded-[3px] ${
+                  n <= level ? 'bg-brand-seed' : 'bg-surface-selected'
+                }`}
+              />
+            ))}
+          </span>
+          <b className="text-[13px] font-bold text-ink">{level}/5</b>
+        </span>
+        <span className="text-sm font-semibold text-ink-2">
+          Mức {level}/5 · {label}
+        </span>
+      </div>
+      <div aria-hidden className="relative mt-[5px] ml-[14px] h-4 w-[122px] text-[10.5px] text-placeholder">
+        {[0, 1, 2, 3, 4, 5].map((n) => (
+          <span
+            key={n}
+            className={`absolute top-0 -translate-x-1/2 ${n === 0 || n === 5 ? 'font-bold text-muted' : ''}`}
+            style={{ left: `${(n / 5) * 100}%` }}
+          >
+            {n}
+          </span>
+        ))}
+      </div>
+      <div aria-hidden className="mt-0.5 ml-[14px] flex w-[122px] justify-between text-[10.5px] text-placeholder">
+        <span>nhẹ nhàng</span>
+        <span>rất căng</span>
+      </div>
     </div>
   );
 }
 
 export function TypingBubble() {
   return (
-    <div className="flex justify-start">
-      <div
-        aria-live="polite"
-        className="flex items-center gap-2 self-start rounded-[18px] rounded-bl-md border border-line-control bg-canvas px-4 py-3"
-      >
+    <NoteShell tag="Ghi chú dịch">
+      <div aria-live="polite" className="flex items-center gap-2">
         {[0, 1, 2].map((n) => (
           <span
             key={n}
@@ -49,7 +185,7 @@ export function TypingBubble() {
         ))}
         <span className="text-sm text-muted">Đang đọc ý…</span>
       </div>
-    </div>
+    </NoteShell>
   );
 }
 
@@ -106,7 +242,7 @@ export function StageSlip({
 
   return (
     <section aria-live="polite" className="anim-slip-block" style={{ '--i': 0 } as CSSProperties}>
-      <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-control bg-canvas px-4 py-4 shadow-[var(--shadow-card)] sm:px-5">
+      <NoteShell tag="Ghi chú dịch">
         <div className="anim-slip-block" style={{ '--i': 0 } as CSSProperties}>
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
             {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
@@ -127,12 +263,14 @@ export function StageSlip({
               <span className="text-muted">(dịch qua mạng)</span>
             ) : null}
             {view.tier === 'generic' ? (
-              <span className="rounded-full bg-surface-selected px-2 py-0.5 font-semibold text-ink">
+              <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-bubble px-2.5 py-1 font-semibold text-ink">
+                <span className="size-[5px] rounded-full bg-brand-seed" aria-hidden />
                 Khớp câu mẫu chung
               </span>
             ) : null}
             {view.tier === 'low' ? (
-              <span className="rounded-full bg-surface-selected px-2 py-0.5 font-semibold text-ink">
+              <span className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-bubble px-2.5 py-1 font-semibold text-ink">
+                <span className="size-[5px] rounded-full bg-brand-seed" aria-hidden />
                 Độ tin cậy thấp
               </span>
             ) : null}
@@ -155,103 +293,57 @@ export function StageSlip({
           ) : null}
         </div>
 
-        <div className="anim-slip-block mt-3" style={{ '--i': 1 } as CSSProperties}>
+        <div className="anim-slip-block mt-4" style={{ '--i': 1 } as CSSProperties}>
           {/* N-2: không còn class outline-none (trước đây là code CHẾT — rule
               :focus-visible không-layer trong globals.css luôn thắng utility
               đã-layer của Tailwind v4). Ring đến từ rule toàn cục như mọi phần
               tử khác; hành vi focus modality giữ nguyên (keep-list panel). */}
-          <h2 ref={headingRef} tabIndex={-1} className="text-sm font-semibold">
+          <SectionTitle as="h2" headingRef={headingRef}>
             Ý thật
-          </h2>
+          </SectionTitle>
           {view.tier === 'low' ? (
-            <p className="mt-1 text-[15px]">
+            <p className="mt-1.5 text-[15px]">
               App chưa có câu này trong dữ liệu — đây là cách đọc chung cho tin nhắn của{' '}
               {view.speaker}:
             </p>
           ) : null}
           <p
-            // REDESIGN-V4 (STATE §1): Ý thật về Be Vietnam Pro 400 ở 17/26 —
-            // Fraunces 560 cũ CHẾT; Fraunces 680 chỉ còn vai tuyên bố ≥24px.
-            // Ý thật là nội dung đọc dài, không phải vai tuyên bố.
-            className={`mt-1 text-[17px] leading-[26px] text-ink${
-              expandedAll ? '' : ' line-clamp-3'
-            }`}
+            // Ý thật KHÔNG clamp ở bất kỳ bề rộng nào (panel pack vòng 1,
+            // 4/5 ghế) — đây là nội dung giá trị nhất của phiếu; sân khấu
+            // cuộn được, «Đọc tiếp» chỉ phục vụ các câu trả lời bị rút gọn.
+            className="mt-1.5 text-[15px] leading-[1.55] text-ink"
           >
             {result.meaning}
           </p>
         </div>
 
         <div
-          className="anim-slip-block mt-3 border-t border-line-control pt-3"
+          className="anim-slip-block mt-4 border-t border-surface-selected pt-4"
           style={{ '--i': 2 } as CSSProperties}
         >
-          <h3 className="text-sm font-semibold">Điều {roleName(view.speaker)} muốn nghe</h3>
-          <p className={`mt-1 text-base leading-relaxed${expandedAll ? '' : ' line-clamp-2'}`}>
-            {result.realWant}
-          </p>
-          {/* D-4(d) (Panel #03): nút «Đọc tiếp» KHÔNG còn nằm trong khối này.
-              Khi nó ở trước thước, hàng nhãn thước kết thúc cách đáy sân
-              khấu 16px và pill «Còn nội dung ở dưới» (neo đáy, cao 44px)
-              che 37–38% nhãn «nhẹ nhàng» ở khung đầu — hình học tất yếu ở
-              mọi vị trí ngang. Chuyển nút xuống SAU thước: thước nhích lên
-              đúng 44px, nhãn kết thúc trên miệng pill (giao = 0, đo lại ở
-              390×844 trong FIX-WAVE-4-STATE). Vị trí nút không bị spec
-              ghim — DESIGN.md/LAYOUT-SPEC chỉ ghim «một cơ chế duy nhất»;
-              lý do đã ghi vào hai spec như tiền lệ M-3/D-2. */}
+          <SectionTitle>Điều {roleName(view.speaker)} muốn nghe</SectionTitle>
+          <p className="mt-1.5 text-[15px] leading-relaxed">{result.realWant}</p>
+          {/* D-4(d) (Panel #03): nút «Đọc tiếp» KHÔNG nằm trong khối này —
+              giữ nguyên vị trí sau thước như bản đã chốt (xem khối dưới). */}
         </div>
 
         <div
-          className="anim-slip-block mt-3 border-t border-line-control pt-3"
+          className="anim-slip-block mt-4 border-t border-surface-selected pt-4"
           style={{ '--i': 3 } as CSSProperties}
         >
           {view.tier === 'low' ? (
             <p className="text-[15px]">Chưa đủ dữ kiện để chấm mức căng thẳng cho câu này.</p>
           ) : (
             <>
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold">Mức căng thẳng</h3>
-                <span className="text-sm">
-                  Mức {result.angerLevel}/5 ·{' '}
-                  <span className="font-medium text-ink">{result.dangerLabel}</span>
-                </span>
-              </div>
-              <div
-                className="relative mt-2"
-                role="progressbar"
-                aria-valuenow={result.angerLevel}
-                aria-valuemin={0}
-                aria-valuemax={5}
-                aria-label="Mức căng thẳng"
-              >
-                {/* V4 (COLOR-SYSTEM §5/STATE §1): gauge fill = seed nguyên
-                    văn, track = Grey 300 (token hairline). Track là nền của
-                    một thanh tiến trình đã có nhãn chữ + số mức đi kèm nên
-                    không gánh nghĩa một mình. */}
-                <div className="h-2 rounded-full bg-hairline">
-                  <div
-                    className="gauge-fill h-full rounded-full bg-brand-seed"
-                    style={{ width: `${result.angerLevel * 20}%` }}
-                  />
-                </div>
-                <div className="mt-1 flex justify-between">
-                  {[0, 1, 2, 3, 4, 5].map((n) => (
-                    <span key={n} className="w-4 text-center text-xs text-muted">
-                      {n}
-                    </span>
-                  ))}
-                </div>
-                <div className="flex justify-between text-xs text-muted">
-                  <span>nhẹ nhàng</span>
-                  <span>rất căng</span>
-                </div>
+              <SectionTitle>Mức căng thẳng</SectionTitle>
+              <div className="mt-2.5">
+                <TensionGauge level={result.angerLevel} label={result.dangerLabel} />
               </div>
             </>
           )}
         </div>
 
-        {result.meaning.length > 115 ||
-        result.realWant.length > 110 ||
-        result.replies.some((r) => r.text.length > 80) ? (
+        {result.replies.some((r) => r.text.length > 80) ? (
           <div className="anim-slip-block mt-1" style={{ '--i': 3 } as CSSProperties}>
             <button
               type="button"
@@ -265,7 +357,7 @@ export function StageSlip({
         ) : null}
 
         {result.warning ? (
-          <div className="mt-3 border-t border-line-control pt-2">
+          <div className="mt-3 border-t border-surface-selected pt-2">
             <button
               type="button"
               aria-expanded={warningOpen}
@@ -280,11 +372,11 @@ export function StageSlip({
         ) : null}
 
         <div
-          className="anim-slip-block mt-3 border-t border-line-control pt-3"
+          className="anim-slip-block mt-4 border-t border-surface-selected pt-4"
           style={{ '--i': 4 } as CSSProperties}
         >
-          <h3 className="text-sm font-semibold">Câu trả lời gợi ý</h3>
-          <div className="divide-y divide-line-control">
+          <SectionTitle>Câu trả lời gợi ý</SectionTitle>
+          <div className="divide-y divide-surface-selected">
             {result.replies.map((reply, idx) => (
               <div key={`${reply.label}-${idx}`} className="py-2">
                 <div className="flex items-center justify-between gap-3">
@@ -292,7 +384,7 @@ export function StageSlip({
                   <button
                     type="button"
                     onClick={() => onCopyReply(reply.text, idx)}
-                    className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-ink hover:bg-bubble"
+                    className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full px-3 text-sm font-semibold text-ink hover:bg-bubble"
                   >
                     {copiedIdx === idx ? (
                       <Check className="size-4" aria-hidden />
@@ -303,12 +395,10 @@ export function StageSlip({
                   </button>
                 </div>
                 {/* Xem trước tối đa 2 dòng khi phiếu thu gọn; nút Sao chép luôn
-                    chép TOÀN VĂN. D-4(e) (Panel #03): trước đây chữ bị clamp
-                    là ngõ cụt — bấm vào không có gì xảy ra, nút «Đọc tiếp»
-                    duy nhất nằm cách thẻ đáp ~330px. Nay câu bị rút gọn tự
-                    mang tín hiệu mở NGAY TRÊN THẺ: bấm vào chữ (hoặc dòng
-                    «Đọc tiếp» kèm chevron dưới chữ) là mở tại chỗ — vẫn là
-                    MỘT cơ chế mở rộng duy nhất (expandedAll) như cam kết. */}
+                    chép TOÀN VĂN. D-4(e) (Panel #03): câu bị rút gọn tự mang
+                    tín hiệu mở NGAY TRÊN THẺ (bấm vào chữ hoặc dòng «Đọc tiếp»
+                    kèm chevron) — vẫn là MỘT cơ chế mở rộng duy nhất
+                    (expandedAll) như cam kết M-3. */}
                 {!expandedAll && reply.text.length > 80 ? (
                   <button
                     type="button"
@@ -373,15 +463,15 @@ export function StageSlip({
           </div>
         ) : null}
 
-        <div className="mt-3 flex flex-wrap gap-2 border-t border-line-control pt-3">
+        <div className="mt-3 flex flex-wrap gap-2 border-t border-surface-selected pt-3">
           {/* N-5(a): nút này không còn là toggle — khi đã lưu, bấm «Đã lưu» MỞ
               Bảng tab Đã lưu (đúng kỳ vọng «nhãn = đường dẫn tới danh sách»);
-              bỏ lưu thực hiện trong Bảng qua nút Xoá có hoàn tác. Xem app.tsx. */}
+              bỏ lưu thực hiện trong Bảng qua nút Xoá có hoàn tác 8 giây. */}
           <button
             type="button"
             onClick={onToggleSave}
             aria-label={saved ? 'Đã lưu. Mở Bảng, tab Đã lưu' : undefined}
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line-control bg-canvas px-4 text-sm font-semibold"
           >
             {saved ? (
               <BookmarkCheck className="size-4" aria-hidden />
@@ -393,7 +483,7 @@ export function StageSlip({
           <button
             type="button"
             onClick={onShare}
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line-control bg-canvas px-4 text-sm font-semibold"
           >
             <Share2 className="size-4" aria-hidden />
             Chia sẻ
@@ -401,13 +491,13 @@ export function StageSlip({
           <button
             type="button"
             onClick={onTranslateAnother}
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-line-control bg-canvas px-4 text-sm font-semibold"
           >
             <Eraser className="size-4" aria-hidden />
             Dịch câu khác
           </button>
         </div>
-      </div>
+      </NoteShell>
     </section>
   );
 }
@@ -426,9 +516,11 @@ export function NotReadCard({
   onShowFallback: () => void;
 }) {
   return (
-    <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-control bg-canvas p-4 shadow-[var(--shadow-card)]">
+    <NoteShell tag="Chưa dịch được" dashed>
       {/* «Phiến Đứt Nét» (VISUAL-LAYER §3): hình của sự thiếu cho trạng
-          thái chưa đọc được — ink-only, 0 accent, ≤120×80 cạnh khối chữ. */}
+          thái chưa đọc được — ink-only, 0 accent, ≤120×80 cạnh khối chữ.
+          Thẻ lỗi viền đứt nét như mock thắng; sợi chỉ rail kết thúc ở
+          đáy thẻ như mọi ghi chú khác (ghế 2 #9). */}
       {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
       <img
         src="/products/brand/dichbome-error-stage.svg"
@@ -437,40 +529,27 @@ export function NotReadCard({
         height={80}
         className="mb-3 w-[120px]"
       />
-      <div className="flex gap-3">
-        {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
-        <img
-          src="/products/brand/dichbome-logo.svg"
-          alt=""
-          width={28}
-          height={28}
-          className="size-7 shrink-0 rounded"
-        />
-        <div className="min-w-0">
-          <h2 className="text-base font-bold">Câu này app chưa đọc được</h2>
-          <p className="mt-1 text-[15px] leading-relaxed">
-            {bodyKind === 'garbage'
-              ? 'Chuỗi này không có từ nào app nhận ra là tiếng Việt trong nhà mình vẫn nói. Kiểm tra lại chính tả, hoặc thử một câu khác.'
-              : 'App chưa có câu này trong dữ liệu câu mẫu, nên chưa dám đoán ý. Bạn có thể xem cách đọc chung theo vai, hoặc thử một câu mẫu.'}
-          </p>
-        </div>
-      </div>
-      {/* N-1: thứ bậc hành động — hai lối ra chính là nút có khung; lối fallback
-          độ-tin-cậy-thấp hạ xuống nút chữ yên tĩnh (không nền tint, không viền
-          ở hàng riêng full-width, nhãn nằm trọn một dòng, không còn
-          chữ vai rơi mồ côi ở dòng 2 như bản panel #02 đo. */}
+      <h2 className="text-base font-bold">Câu này app chưa đọc được</h2>
+      <p className="mt-1 text-[15px] leading-relaxed">
+        {bodyKind === 'garbage'
+          ? 'Chuỗi này không có từ nào app nhận ra là tiếng Việt trong nhà mình vẫn nói. Kiểm tra lại chính tả, hoặc thử một câu khác.'
+          : 'App chưa có câu này trong dữ liệu câu mẫu, nên chưa dám đoán ý. Bạn có thể xem cách đọc chung theo vai, hoặc thử một câu mẫu.'}
+      </p>
+      {/* N-1: thứ bậc hành động — hai lối ra chính là nút pill có khung
+          (chính: viền mực đậm; phụ: viền hairline); lối fallback độ-tin-
+          cậy-thấp hạ xuống link chữ gạch chân seed yên tĩnh bên dưới. */}
       <div className="mt-3 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={onEdit}
-          className="min-h-11 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
+          className="min-h-11 rounded-full border-[1.5px] border-ink bg-canvas px-4 text-sm font-bold"
         >
           Sửa câu
         </button>
         <button
           type="button"
           onClick={onTryExample}
-          className="min-h-11 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
+          className="min-h-11 rounded-full border border-hairline bg-canvas px-4 text-sm font-semibold"
         >
           Thử một câu mẫu
         </button>
@@ -478,27 +557,27 @@ export function NotReadCard({
       <button
         type="button"
         onClick={onShowFallback}
-        className="mt-1 min-h-11 px-2 text-left text-sm font-semibold text-ink underline underline-offset-4"
+        className="mt-1 min-h-11 px-2 text-left text-sm font-semibold text-ink underline decoration-brand-seed underline-offset-4"
       >
         Xem cách đọc chung theo <span className="whitespace-nowrap">vai {speaker}</span>
       </button>
-    </div>
+    </NoteShell>
   );
 }
 
 export function StageErrorCard({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-control bg-canvas p-4 shadow-[var(--shadow-card)]">
+    <NoteShell>
       <p className="text-[15px] leading-relaxed">
         Chưa dịch được. Câu của bạn vẫn còn trong ô bên dưới.
       </p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-3 min-h-11 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
+        className="mt-3 min-h-11 rounded-full border-[1.5px] border-ink bg-canvas px-4 text-sm font-bold"
       >
         Thử lại
       </button>
-    </div>
+    </NoteShell>
   );
 }

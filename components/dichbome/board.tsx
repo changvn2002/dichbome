@@ -1,19 +1,22 @@
 'use client';
 
 import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { ChevronRight, X } from 'lucide-react';
+import { ArrowRight, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { RELATION_GROUPS, type ParentExample } from './lib/translate';
 import type { BoardTab, StoredItem } from './lib/ui-types';
 import { ConfirmDialog, UndoBar, useFocusTrap } from './sheets';
 import { FindOutContent } from './find-out';
-import { ContactAvatar } from './avatar';
+import { ContactAvatar, SenderDisc } from './avatar';
 
 /**
  * Board — bề mặt phụ duy nhất của redesign-v2 (LAYOUT-SPEC §4–§6).
- * Một instance duy nhất, responsive: <1280px là sheet phủ toàn màn hình,
- * ≥1280px là cột phải 380px luôn hiện cạnh sân khấu. 4 tab: Câu mẫu · Đã lưu ·
- * Lịch sử · Tìm hiểu. Chuỗi chốt theo COPY-DIET §3 #9–11, §4.4, §4.5.
+ * Một instance duy nhất, responsive: <1280px là sheet phủ toàn màn hình;
+ * ≥1280px (hướng «Chat» vòng 3) là PANEL NỔI bo 22px có bóng lift, đứng
+ * cạnh thread — thread + composer GIỮ NGUYÊN khi Bảng mở (không còn cột
+ * phải thay chỗ composer như bản «Quiet Instrument»).
+ * 4 tab: Câu mẫu · Đã lưu · Lịch sử · Tìm hiểu.
+ * Chuỗi chốt theo COPY-DIET §3 #9–11, §4.4, §4.5.
  */
 
 type BoardProps = {
@@ -170,8 +173,9 @@ export function Board({
       aria-label="Bảng"
       className={cn(
         'fixed inset-0 z-[60] flex flex-col bg-canvas transition-[opacity,transform] duration-200',
-        open ? 'visible opacity-100' : 'pointer-events-none invisible translate-y-3 opacity-0',
-        'min-[1280px]:pointer-events-auto min-[1280px]:visible min-[1280px]:static min-[1280px]:z-auto min-[1280px]:flex min-[1280px]:w-[380px] min-[1280px]:shrink-0 min-[1280px]:translate-y-0 min-[1280px]:border-l min-[1280px]:border-line-control min-[1280px]:opacity-100',
+        open
+          ? 'visible opacity-100 min-[1280px]:pointer-events-auto min-[1280px]:static min-[1280px]:z-auto min-[1280px]:my-5 min-[1280px]:mr-5 min-[1280px]:w-[400px] min-[1280px]:shrink-0 min-[1280px]:translate-y-0 min-[1280px]:overflow-hidden min-[1280px]:rounded-[22px] min-[1280px]:border min-[1280px]:border-hairline min-[1280px]:opacity-100 min-[1280px]:shadow-[var(--shadow-lift)]'
+          : 'pointer-events-none invisible translate-y-3 opacity-0 min-[1280px]:hidden',
       )}
     >
       <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-hairline px-4">
@@ -188,16 +192,20 @@ export function Board({
           type="button"
           onClick={onClose}
           aria-label="Đóng Bảng"
-          className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted hover:text-ink min-[1280px]:hidden"
+          className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted hover:text-ink"
         >
           <X className="size-5" aria-hidden />
         </button>
       </div>
 
+      {/* Tab kiểu «Chat»: pill — tab đang mở = nền mực + chữ trắng đậm +
+          vệt seed 3px ở mép trái pill; tab khác chữ xám yên tĩnh. Hàng
+          tab ngăn với nội dung bằng hairline neutral-200 (trong panel
+          nổi desktop, hairline này là đường chân của cụm điều hướng). */}
       <div
         role="tablist"
         aria-label="Nội dung Bảng"
-        className="flex shrink-0 gap-1 overflow-x-auto border-b border-hairline px-3 py-2"
+        className="scroll-row flex shrink-0 gap-1 overflow-x-auto border-b border-surface-selected px-4 py-2 [mask-image:linear-gradient(90deg,black_calc(100%-30px),transparent)] [-webkit-mask-image:linear-gradient(90deg,black_calc(100%-30px),transparent)]"
       >
         {tabs.map((t) => (
           <button
@@ -209,9 +217,9 @@ export function Board({
             aria-controls={`board-panel-${t.id}`}
             onClick={() => onTabChange(t.id)}
             className={cn(
-              'min-h-11 shrink-0 rounded-full px-3.5 text-sm',
+              'min-h-11 shrink-0 rounded-full px-2.5 text-sm whitespace-nowrap',
               tab === t.id
-                ? 'border-l-2 border-l-brand-seed bg-surface-selected font-semibold text-ink'
+                ? 'bg-ink font-bold text-canvas shadow-[inset_3px_0_0_var(--brand-seed)]'
                 : 'text-muted hover:text-ink',
             )}
           >
@@ -220,7 +228,7 @@ export function Board({
         ))}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 [mask-image:linear-gradient(180deg,black_calc(100%-44px),transparent)] [-webkit-mask-image:linear-gradient(180deg,black_calc(100%-44px),transparent)]">
         {/* ---------- TAB CÂU MẪU ---------- */}
         <div
           role="tabpanel"
@@ -229,8 +237,11 @@ export function Board({
           className={cn(tab !== 'examples' && 'hidden')}
         >
           <div className="sticky -top-4 z-10 bg-canvas py-2">
+            {/* Chips lọc: LUẬT cứng 1 hàng cuộn ngang nowrap (điểm 4 của
+                luật thi công — mock vỡ 3 hàng bị panel chê); chip chọn =
+                viền mực + ring inset như chip vai của composer. */}
             <div
-              className="flex gap-2 overflow-x-auto"
+              className="scroll-row flex flex-nowrap gap-2 overflow-x-auto pb-1 [mask-image:linear-gradient(90deg,black_calc(100%-30px),transparent)] [-webkit-mask-image:linear-gradient(90deg,black_calc(100%-30px),transparent)]"
               role="group"
               aria-label="Lọc theo nhóm quan hệ"
             >
@@ -241,10 +252,10 @@ export function Board({
                   aria-pressed={exampleGroup === label}
                   onClick={() => setExampleGroup(label)}
                   className={cn(
-                    'min-h-11 shrink-0 rounded-full border px-3.5 text-sm',
+                    'min-h-11 shrink-0 rounded-full border px-3.5 text-sm whitespace-nowrap',
                     exampleGroup === label
-                      ? 'border-line-control border-l-2 border-l-brand-seed bg-surface-selected font-semibold text-ink'
-                      : 'border-line-control bg-canvas text-muted hover:text-ink',
+                      ? 'border-ink bg-canvas font-bold text-ink shadow-[inset_2.5px_0_0_var(--brand-seed)]'
+                      : 'border-hairline bg-canvas text-muted hover:text-ink',
                   )}
                 >
                   {label}
@@ -260,7 +271,7 @@ export function Board({
               value={exampleQuery}
               onChange={(e) => setExampleQuery(e.target.value)}
               placeholder="Tìm trong bảng"
-              className="mt-2 min-h-11 w-full rounded-xl border border-line-control bg-canvas px-3 text-base text-ink placeholder:text-placeholder"
+              className="mt-2 min-h-11 w-full rounded-full border border-hairline bg-bubble px-4 text-base text-ink placeholder:text-placeholder"
             />
           </div>
 
@@ -279,45 +290,46 @@ export function Board({
               </button>
             </div>
           ) : (
-            <div className="columns-2 gap-3">
+            <div className="flex flex-col divide-y divide-hairline">
+              {/* Hàng mẫu kiểu «Chat»: mỗi câu mẫu là MỘT DÒNG HỘI THOẠI —
+                  đĩa chữ cái người gửi (SenderDisc, cùng quy tắc với sân
+                  khấu) + bong bóng thoại: trích semibold, meta, gloss,
+                  cụm hành động ở dưới. */}
               {filteredExamples.map((ex) => (
-                <div
-                  key={`${ex.speaker}-${ex.message}`}
-                  className="mb-3 break-inside-avoid rounded-[14px] border border-line-control bg-canvas p-3.5 shadow-[var(--shadow-card)]"
-                >
-                  <p className="text-[15px] leading-relaxed font-medium">“{ex.message}”</p>
-                  <p className="mt-1.5 text-xs text-muted">
-                    {ex.speaker} · {ex.context}
-                  </p>
-                  <p className="mt-1 text-[13px] text-muted">{wholeTeaser(ex.tease)}</p>
-                  {/* S-1 (Panel #02): xếp dọc hai hành động full-width trong thẻ.
-                      Hàng ngang cũ bó nút chính còn ~60px (nút phụ chữ trần chiếm
-                      ~75px + gap trong cột masonry ~145px) nên nhãn vỡ 3 dòng ở
-                      mọi viewport. Một hệ nút thống nhất: cùng bề rộng, cùng
-                      min-h-11/bo góc; nhãn nowrap nguyên vẹn một dòng.
-                      N5-1a (Panel #05): nút chính của thẻ KHÔNG còn nền seed —
-                      mỗi bề mặt chỉ MỘT hành động seed chính (CTA của composer);
-                      4 thẻ × nút full-seed kéo tab mặc định xuống neutral
-                      92,05% / accent 7,70%. Nay nút thẻ là dạng trung tính/viền:
-                      thứ bậc trong thẻ giữ bằng VIỀN ĐẬM (border-2 mực) + chữ
-                      đậm so với «Dịch ngay» (không viền, hover bg-bubble như
-                      nút phụ); seed chỉ còn ở trạng thái focus qua ring
-                      :focus-visible toàn cục. */}
-                  <div className="mt-2.5 flex flex-col gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => onUseExample(ex, false)}
-                      className="min-h-11 w-full whitespace-nowrap rounded-lg border-2 border-ink bg-canvas px-2 text-sm font-bold text-ink hover:bg-bubble"
-                    >
-                      Dùng câu này
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onUseExample(ex, true)}
-                      className="min-h-11 w-full whitespace-nowrap rounded-lg px-2 text-sm font-semibold text-ink hover:bg-bubble"
-                    >
-                      Dịch ngay
-                    </button>
+                <div key={`${ex.speaker}-${ex.message}`} className="flex gap-3 py-3.5">
+                  <SenderDisc speaker={ex.speaker} size={36} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[15px] leading-relaxed font-semibold text-ink">
+                      “{ex.message}”
+                    </p>
+                    <p className="mt-1 text-xs text-muted">
+                      {ex.speaker} · {ex.context}
+                    </p>
+                    <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                      {wholeTeaser(ex.tease)}
+                    </p>
+                    {/* Cụm hành động của hàng mẫu (bản thắng): «Dùng câu này»
+                      nút pill viền mực + «Dịch ngay» link gạch chân, mũi tên
+                      seed. Thứ bậc viền-đậm của N5-1a (Panel #05) giữ
+                      nguyên: nút thẻ KHÔNG dùng nền seed — mỗi bề mặt một
+                      CTA seed duy nhất (của composer). */}
+                    <div className="mt-2.5 flex items-center gap-4">
+                      <button
+                        type="button"
+                        onClick={() => onUseExample(ex, false)}
+                        className="min-h-11 shrink-0 whitespace-nowrap rounded-full border-2 border-ink bg-canvas px-3 text-sm font-bold text-ink hover:bg-bubble"
+                      >
+                        Dùng câu này
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onUseExample(ex, true)}
+                        className="inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap px-1 text-sm font-semibold text-ink underline underline-offset-4"
+                      >
+                        Dịch ngay
+                        <ArrowRight className="size-3.5 text-brand-seed" aria-hidden />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -347,7 +359,7 @@ export function Board({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-line-control bg-canvas px-4 text-sm font-semibold text-ink"
+                  className="mt-3 inline-flex min-h-11 items-center rounded-full border border-hairline bg-canvas px-4 text-sm font-semibold text-ink"
                 >
                   Về sân khấu
                 </button>
@@ -364,7 +376,7 @@ export function Board({
                 value={savedQuery}
                 onChange={(e) => setSavedQuery(e.target.value)}
                 placeholder="Tìm trong bảng"
-                className="mb-3 min-h-11 w-full rounded-xl border border-line-control bg-canvas px-3 text-base text-ink placeholder:text-placeholder"
+                className="mb-3 min-h-11 w-full rounded-full border border-hairline bg-bubble px-4 text-base text-ink placeholder:text-placeholder"
               />
               {filteredSaved.length === 0 ? (
                 <p className="text-[15px] text-muted">
@@ -376,33 +388,53 @@ export function Board({
                    [Mở trên sân khấu + xoá 44px] bó nhãn còn 60–91px nên vỡ
                    2–4 dòng ở cả 3 viewport; một cột cho khe nút ≥208px,
                    nhãn nowrap nguyên vẹn một dòng (điều kiện §10.1). */
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col divide-y divide-hairline">
                   {filteredSaved.map((item) => (
-                    <div
-                      key={item.id}
-                      className="rounded-[14px] border border-line-control bg-canvas p-3.5 shadow-[var(--shadow-card)]"
-                    >
+                    <div key={item.id} className="py-3.5">
                       {/* Avatar DiceBear (ĐK-D4 + N5-4): CHỈ ở hàng mục đã
                           lưu; seed theo danh tính (nhãn vai), không theo id
-                          bản ghi; nhãn vai/chữ thật đi kèm ở meta dưới. */}
+                          bản ghi; nhãn vai/chữ thật đi kèm ở meta dưới.
+                          Hàng phẳng kiểu Instrument: trích semibold cạnh
+                          avatar, gloss xám, meta kèm mini-gauge segmented
+                          (cùng ngôn ngữ gauge với thẻ chính; tier 'low'
+                          không chấm mức nên không vẽ gauge — D-6(2)). */}
                       <div className="flex items-start gap-3">
                         <ContactAvatar speaker={item.speaker} size={36} />
-                        <p className="line-clamp-3 min-w-0 flex-1 text-[15px] font-medium text-ink">
+                        <p className="line-clamp-3 min-w-0 flex-1 text-[15px] font-semibold text-ink">
                           “{item.message}”
                         </p>
                       </div>
                       <p className="mt-1.5 line-clamp-2 text-[13px] text-muted">
                         {item.result.meaning}
                       </p>
-                      <p className="mt-1.5 text-xs text-muted">
-                        {recordLevelLabel(item)} · {savedSourceLabel(item)}
-                        {item.tier === 'low' ? ' · Độ tin cậy thấp' : ''}
+                      <p className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
+                        {item.tier !== 'low' ? (
+                          <span
+                            className="inline-flex items-center gap-[2px] rounded-full bg-bubble px-2 py-1"
+                            aria-hidden
+                          >
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <span
+                                key={n}
+                                className={`h-[5px] w-3.5 rounded-[1px] ${
+                                  n <= item.result.angerLevel
+                                    ? 'bg-brand-seed'
+                                    : 'bg-surface-selected'
+                                }`}
+                              />
+                            ))}
+                          </span>
+                        ) : null}
+                        <span className="whitespace-nowrap">
+                          {recordLevelLabel(item)} · {savedSourceLabel(item)}
+                          {item.tier === 'low' ? ' · Độ tin cậy thấp' : ''}
+                        </span>
                       </p>
                       <div className="mt-2.5 flex gap-2">
                         <button
                           type="button"
                           onClick={() => onRestore(item)}
-                          className="min-h-11 flex-1 whitespace-nowrap rounded-lg border border-line-control bg-canvas px-3 text-sm font-semibold text-ink"
+                          className="min-h-11 flex-1 whitespace-nowrap rounded-full border border-ink bg-canvas px-3 text-sm font-semibold text-ink"
                         >
                           Mở trên sân khấu
                         </button>
@@ -410,7 +442,7 @@ export function Board({
                           type="button"
                           onClick={() => onDeleteSavedItem(item.id)}
                           aria-label={`Xoá kết quả đã lưu: ${item.message}`}
-                          className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg text-muted hover:text-ink"
+                          className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-line-control bg-bubble text-ink-2 hover:text-ink"
                         >
                           <X className="size-5" aria-hidden />
                         </button>
@@ -419,14 +451,20 @@ export function Board({
                   ))}
                 </div>
               )}
-              <button
-                ref={clearSavedTriggerRef}
-                type="button"
-                onClick={() => setConfirmClearSavedOpen(true)}
-                className="mt-1 min-h-11 text-sm font-semibold text-error-ink"
-              >
-                Xoá toàn bộ kết quả đã lưu
-              </button>
+              {/* Hành động huỷ diệt tách bạch khỏi danh sách bằng khoảng
+                  thở + hairline (panel revote ghế 2 #7 + ghế 3 #1): không
+                  đứng lẫn trong nhóm mục đã lưu, nhóm phía dưới trong các
+                  mock bị đọc lẫn với nhãn nhóm «Câu mẫu». */}
+              <div className="mt-4 border-t border-hairline pt-2">
+                <button
+                  ref={clearSavedTriggerRef}
+                  type="button"
+                  onClick={() => setConfirmClearSavedOpen(true)}
+                  className="min-h-11 text-sm font-semibold text-error-ink"
+                >
+                  Xoá toàn bộ kết quả đã lưu
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -454,7 +492,7 @@ export function Board({
                           seed theo danh tính (nhãn vai), không theo id bản ghi. */}
                       <ContactAvatar speaker={item.speaker} size={32} />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[15px] font-medium text-ink">
+                        <span className="block truncate text-[15px] font-semibold text-ink">
                           “{item.message}”
                         </span>
                         <span className="mt-0.5 block truncate text-xs text-muted">
@@ -467,14 +505,16 @@ export function Board({
                   </li>
                 ))}
               </ul>
-              <button
-                ref={clearHistoryTriggerRef}
-                type="button"
-                onClick={() => setConfirmClearHistoryOpen(true)}
-                className="mt-1 min-h-11 text-sm font-semibold text-error-ink"
-              >
-                Xoá toàn bộ lịch sử
-              </button>
+              <div className="mt-4 border-t border-hairline pt-2">
+                <button
+                  ref={clearHistoryTriggerRef}
+                  type="button"
+                  onClick={() => setConfirmClearHistoryOpen(true)}
+                  className="min-h-11 text-sm font-semibold text-error-ink"
+                >
+                  Xoá toàn bộ lịch sử
+                </button>
+              </div>
             </>
           )}
         </div>

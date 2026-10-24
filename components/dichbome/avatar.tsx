@@ -281,6 +281,27 @@ export async function buildAvatarSvg(speaker: RelationRole): Promise<string> {
  * cùng kích thước, không nhảy layout; nhãn tên/vai dạng chữ thật luôn ở
  * cạnh avatar nên avatar không bao giờ là kênh định danh duy nhất.
  */
+/**
+ * Đĩa chữ cái người gửi cho các bề mặt CHAT của hướng «Chat» (sân khấu,
+ * câu mẫu, hàng Bảng–Câu mẫu): đĩa đặc mực + chữ trắng, MỘT quy tắc duy
+ * nhất cho mọi người gửi đang hoạt động (panel revote ghế 2+3: đĩa xám
+ * nhạt đọc như bị vô hiệu hoá là lỗi). Đây KHÔNG phải DiceBear —
+ * DiceBear (ContactAvatar ở trên) giữ nguyên vị trí ĐK-D4: chỉ hàng Đã
+ * lưu + Lịch sử trong Board, kèm kill switch. Chữ = chữ cái đầu của
+ * nhãn vai (quy tắc phân biệt duy nhất là chính chữ cái đó).
+ */
+export function SenderDisc({ speaker, size = 34 }: { speaker: RelationRole; size?: number }) {
+  return (
+    <span
+      aria-hidden
+      className="inline-flex shrink-0 items-center justify-center rounded-full border-2 border-canvas bg-ink font-bold text-canvas shadow-[0_0_0_1px_var(--neutral-300)]"
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.4) }}
+    >
+      {speaker.charAt(0)}
+    </span>
+  );
+}
+
 export function ContactAvatar({ speaker, size = 36 }: { speaker: RelationRole; size?: number }) {
   const [svg, setSvg] = useState<string | null>(() => svgCache.get(identitySeed(speaker)) ?? null);
   useEffect(() => {

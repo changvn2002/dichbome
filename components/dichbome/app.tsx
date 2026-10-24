@@ -8,7 +8,7 @@
  * Thuật toán dịch không đổi — chỉ thêm provenance + cổng trình bày ở đây.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ChevronDown, Layers } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { createDichbomeApi, resolveDichbomeApiMode } from './api';
 import { Board } from './board';
 import { Composer } from './composer';
@@ -27,6 +27,7 @@ import { planDelete } from './lib/undo';
 import type { BoardTab, SlipView, StoredItem, StripState } from './lib/ui-types';
 import { NotReadCard, OriginalBubble, StageErrorCard, StageSlip, TypingBubble } from './slip';
 import { UndoBar } from './sheets';
+import { SenderDisc } from './avatar';
 
 const HISTORY_KEY = 'dichbome_history_v1';
 const SAVED_KEY = 'dichbome_saved_v1';
@@ -64,6 +65,17 @@ function excerpt(message: string): string {
   const words = message.split(/\s+/).filter(Boolean);
   return words.length > 6 ? `${words.slice(0, 6).join(' ')}…` : message;
 }
+
+/* Rail trái desktop «Quiet Instrument» (chỉ ≥1280px): vùng 1 của bố cục 3
+ * vùng trong bản thắng panel mù. Hai mặt: trạng thái trống = «Cách app đọc»
+ * (3 bước, chữ lấy nguyên văn từ tab Tìm hiểu); có phiên = dữ kiện phiên
+ * (Người nhắn / Hoàn cảnh / Khớp mẫu) + chỉ mục 3 mục của thẻ, mục đang xem
+ * tô seed. Luật thi công điểm 3: rail KHÔNG lặp dòng «Nguồn …» — nguồn chỉ
+ * xuất hiện một lần ở header thẻ giải mã. Chân rail là hint riêng tư. */
+/* Rail phiên trái «Quiet Instrument» ĐÃ BỊ XOÁ ở hướng «Chat» (vòng 3):
+   mặt trống của nó lặp nguyên văn 3 bước của tab Tìm hiểu, mặt phiên lặp
+   đúng các dữ kiện đã nằm trong pill meta + đầu phiếu — app là MỘT thread
+   duy nhất, không cột phụ. Nội dung giải thích vẫn sống ở tab Tìm hiểu. */
 
 export function DichbomeApp() {
   const [message, setMessage] = useState('');
@@ -563,12 +575,16 @@ export function DichbomeApp() {
         <h1 className="min-w-0 flex-1 truncate text-[17px] font-bold leading-6">
           Giải Mã Gia Đình
         </h1>
+        {/* Nút Bảng kiểu «Chat»: pill viền hairline + chấm seed — hiện ở
+            MỌI bề rộng; Bảng mở dạng panel nổi cạnh thread (desktop) hoặc
+            sheet (mobile), thread + composer giữ nguyên. */}
         <button
           type="button"
           onClick={() => setBoardOpen(true)}
-          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-line-control bg-canvas px-3 text-sm font-semibold min-[1280px]:hidden"
+          aria-expanded={boardOpen}
+          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full border border-hairline bg-canvas px-3.5 text-sm font-semibold"
         >
-          <Layers className="size-4" aria-hidden />
+          <span className="size-[7px] rounded-full bg-brand-seed" aria-hidden />
           Bảng
         </button>
       </header>
@@ -579,39 +595,61 @@ export function DichbomeApp() {
         </div>
       ) : null}
 
-      <div className="flex min-h-0 flex-1">
-        {/* Cột sân khấu + composer — landmark <main> cho nội dung chính (N-6) */}
+      {/* Bố cục «Chat»: mobile 1 cột (sân khấu trên, composer ghim đáy);
+          desktop ≥1280px — cột thread trắng (viền hairline hai bên) +
+          Bảng nổi khi mở, tất cả trên nền chấm bi neutral-300 thưa chỉ
+          ở vùng ngoài cột thread (panel revote ghế 3 #6: chấm không nằm
+          sau cột Bảng). Mobile không chấm — canvas trắng sạch. */}
+      <div className="flex min-h-0 flex-1 flex-col min-[1280px]:mx-auto min-[1280px]:w-full min-[1280px]:max-w-[1180px] min-[1280px]:flex-row min-[1280px]:bg-bubble min-[1280px]:[background-image:radial-gradient(circle,var(--neutral-300)_1.1px,transparent_1.2px)] min-[1280px]:[background-size:22px_22px]">
+        {/* Cột thread — main + composer cùng cột, một bề mặt hội thoại.
+            Khi Bảng ĐÓNG cột rộng 700 căn giữa (đúng khung mock thắng:
+            hai phía là nền chấm); khi Bảng MỞ cột giãn flex-1 nhường
+            400px cho panel nổi. */}
+        <div
+          className={`flex min-h-0 min-w-0 flex-1 flex-col bg-canvas min-[1280px]:border-x min-[1280px]:border-hairline ${
+            boardOpen ? '' : 'min-[1280px]:mx-auto min-[1280px]:w-[700px] min-[1280px]:flex-none'
+          }`}
+        >
+        {/* Cột sân khấu — landmark <main> cho nội dung chính (N-6) */}
         <main className="flex min-h-0 min-w-0 flex-1 flex-col">
           <div className="relative min-h-0 flex-1">
             <div
               ref={stageScrollRef}
               onScroll={updateMoreHint}
-              className="h-full overflow-y-auto px-4 py-4"
+              className="h-full overflow-y-auto px-4 py-4 [mask-image:linear-gradient(180deg,black_calc(100%-26px),transparent)] [-webkit-mask-image:linear-gradient(180deg,black_calc(100%-26px),transparent)] min-[1280px]:px-[30px] min-[1280px]:py-6"
             >
-              <div className="mx-auto w-full max-w-[640px]">
+              <div className="mx-auto flex min-h-full w-full max-w-[600px] flex-col">
                 {stage.kind === 'idle' ? (
-                  <div className="flex flex-col items-center pt-6 text-center">
-                    {/* Hero «Hai Lượt Một Nhịp» (REDESIGN-V4, VISUAL-LAYER
-                        §2): SVG tĩnh in-flow ở đầu vùng cuộn, CHỈ ở trạng
-                        thái trống — lượt đầu đến là unmount. Khung 720×216
-                        khai trước bằng attrs (aspect 10:3, CLS = 0); hiển
-                        thị 358×107 ở 390px, tối đa 592×178 ở desktop. */}
-                    {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
-                    <img
-                      src="/products/brand/dichbome-hero-stage.svg"
-                      alt=""
-                      width={720}
-                      height={216}
-                      className="h-auto w-full max-w-[592px]"
-                    />
-                    {/* M-4: Stage display về đúng thang đã duyệt — 30/37
-                      mobile · 40/48 desktop. V4: Fraunces weight 680 TƯỜNG
-                      MINH (trước đây class font-semibold = 600 — sai toạ độ
-                      trục variable; F-6 đo lại trên render thật).
-                      D-4(a) (Panel #03): text-balance giữ nguyên. */}
+                  <div className="flex flex-1 flex-col pt-2 min-[1280px]:pt-8">
+                    {/* Hero «Chat» (bản thắng revote): pill meta căn giữa
+                        kiểu timestamp hội thoại mới + CỤM HAI BONG BÓNG —
+                        câu nói (trắng, viền) chồng lên «Ý thật là…» (mực,
+                        chấm seed) — kể trọn lời hứa của app trong một
+                        hình. Cụm có đệm hai bên (px-3) và bong bóng trên
+                        không chạm mép (panel revote ghế 2 #2 + ghế 3 #7:
+                        phần chồng phải gọn như chủ ý, giữ khoảng an toàn
+                        với mép màn hình). Cụm là minh hoạ trang trí —
+                        aria-hidden; nội dung thật nằm ở headline + câu mẫu. */}
+                    <p className="flex justify-center">
+                      <span className="inline-flex items-center rounded-full bg-bubble px-3 py-[5px] text-xs font-semibold text-muted">
+                        Cuộc trò chuyện mới · chưa có câu nào được dịch
+                      </span>
+                    </p>
+                    <div aria-hidden className="relative mx-auto mt-6 w-full max-w-[360px] px-3">
+                      <span className="absolute top-[10px] left-0 z-10">
+                        <SenderDisc speaker={examples[0].speaker} size={30} />
+                      </span>
+                      <div className="ml-5 w-[86%] -rotate-[1.5deg] rounded-[18px] rounded-bl-[6px] border border-hairline bg-canvas px-[15px] py-[11px] text-[15px] leading-snug font-semibold text-ink shadow-[var(--shadow-card)]">
+                        <span className="line-clamp-2">“{examples[0].message}”</span>
+                      </div>
+                      <div className="relative z-10 mt-[-8px] ml-auto w-[62%] rotate-[1.5deg] rounded-[18px] rounded-br-[6px] bg-ink px-[15px] py-[11px] text-[15px] font-bold text-canvas shadow-[var(--shadow-lift)]">
+                        <span className="mr-2 inline-block size-[7px] rounded-full bg-brand-seed align-middle" />
+                        Ý thật là…
+                      </div>
+                    </div>
                     <h2
                       style={{ fontWeight: 680 }}
-                      className="mt-4 font-display text-[30px] leading-[37px] text-balance min-[1280px]:text-[40px] min-[1280px]:leading-[48px]"
+                      className="mt-3 max-w-[520px] font-display text-[32px] leading-[38px] text-balance min-[1280px]:text-[42px] min-[1280px]:leading-[50px]"
                     >
                       Người nhà vừa nhắn gì thế?
                     </h2>
@@ -619,21 +657,81 @@ export function DichbomeApp() {
                         đứng 77/75 do dòng DATA-09b cộng thêm; đích ≤72/75).
                         Ý giữ nguyên: dán câu — app đọc ý thật, gợi ý câu trả
                         lời. Dòng DATA-09b ở composer KHÔNG bị cắt. */}
-                    <p className="mt-2 max-w-[320px] text-[15px] leading-relaxed text-balance text-muted">
+                    <p className="mt-3 max-w-[400px] text-[15px] leading-relaxed text-muted">
                       Dán câu vào ô dưới — app đọc ý thật, gợi ý câu trả lời êm chuyện.
                     </p>
-                    <div className="mt-4 flex flex-col items-center gap-2">
+                    <p className="mt-7 mb-2.5 text-[13px] font-bold text-ink">Thử một câu mẫu</p>
+                    <div className="flex max-w-[460px] flex-col gap-1">
                       {examples.slice(0, 2).map((ex) => (
                         <button
                           key={ex.message}
                           type="button"
                           onClick={() => fillExample(ex, false)}
-                          className="min-h-11 max-w-full truncate rounded-full border border-line-control bg-canvas px-4 text-sm"
+                          className="flex min-h-[56px] w-full items-center gap-[10px] rounded-[18px] px-2 py-2 text-left hover:bg-surface-subtle"
                         >
-                          “{excerpt(ex.message)}”
+                          <SenderDisc speaker={ex.speaker} size={34} />
+                          <span className="min-w-0 flex-1 truncate text-[15px] font-semibold">
+                            “{excerpt(ex.message)}”
+                          </span>
+                          <ArrowRight className="size-[18px] shrink-0 text-placeholder" aria-hidden />
                         </button>
                       ))}
                     </div>
+                    {/* Dải 3 ô giải thích của bản thắng: Ý thật / Mức căng
+                        thẳng / Câu trả lời — hairline trên, chữ nhỏ yên tĩnh. */}
+                    <div className="mt-7 mb-10 grid max-w-[560px] grid-cols-3 gap-4 border-t border-hairline pt-4 min-[1280px]:gap-5">
+                      <div>
+                        <p className="text-[13px] font-bold text-ink">Ý thật</p>
+                        <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                          Phần ý nằm sau câu chữ.
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-bold text-ink">Mức căng thẳng</p>
+                        <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                          Thang đo 0–5, nhìn là biết.
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-bold text-ink">Câu trả lời</p>
+                        <p className="mt-1 text-[13px] leading-relaxed text-muted">
+                          Gợi ý đáp lại êm chuyện.
+                        </p>
+                      </div>
+                    </div>
+                    {/* Hàng «Câu mẫu trong Bảng» (chỉ desktop): 3 câu mẫu
+                        tiếp theo dạng DÒNG HỘI THOẠI như hai câu mẫu ở
+                        trên (đĩa người gửi + trích + meta một dòng cắt
+                        gọn) — bấm là điền vào composer, cùng hành vi. */}
+                    {examples.length > 2 ? (
+                      <div className="mt-auto hidden border-t border-hairline pt-4 min-[1280px]:block">
+                        <p className="text-[13px] font-bold text-ink">Câu mẫu trong Bảng</p>
+                        <div className="mt-2 flex flex-col gap-1">
+                          {examples.slice(2, 5).map((ex) => (
+                            <button
+                              key={ex.message}
+                              type="button"
+                              onClick={() => fillExample(ex, false)}
+                              className="flex min-h-[52px] w-full items-center gap-[10px] rounded-[18px] px-2 py-2 text-left hover:bg-surface-subtle"
+                            >
+                              <SenderDisc speaker={ex.speaker} size={34} />
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-[15px] font-semibold text-ink">
+                                  “{ex.message}”
+                                </span>
+                                <span className="mt-0.5 block truncate text-xs text-muted">
+                                  {ex.speaker} · {ex.context} — {ex.tease}
+                                </span>
+                              </span>
+                              <ArrowRight
+                                className="size-[18px] shrink-0 text-placeholder"
+                                aria-hidden
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
 
@@ -644,7 +742,7 @@ export function DichbomeApp() {
                       speaker={stage.input.speaker}
                       context={stage.input.context}
                     />
-                    <div className="mt-3">
+                    <div className="mt-1">
                       <TypingBubble />
                     </div>
                   </div>
@@ -657,7 +755,7 @@ export function DichbomeApp() {
                       speaker={stage.view.speaker}
                       context={stage.view.context}
                     />
-                    <div className="mt-3">
+                    <div className="mt-1">
                       <StageSlip
                         view={stage.view}
                         saved={Boolean(currentSavedItem)}
@@ -681,7 +779,7 @@ export function DichbomeApp() {
                       speaker={stage.input.speaker}
                       context={stage.input.context}
                     />
-                    <div className="mt-3">
+                    <div className="mt-1">
                       <NotReadCard
                         bodyKind={stage.bodyKind}
                         speaker={stage.input.speaker}
@@ -700,7 +798,7 @@ export function DichbomeApp() {
                       speaker={stage.input.speaker}
                       context={stage.input.context}
                     />
-                    <div className="mt-3">
+                    <div className="mt-1">
                       <StageErrorCard onRetry={() => void runTranslate(stage.input)} />
                     </div>
                   </div>
@@ -723,6 +821,10 @@ export function DichbomeApp() {
               0,8×clientHeight, điều kiện hiện (còn >24px chưa xem). */}
           {showMoreHint ? (
             <div className="flex shrink-0 justify-center px-4 pt-2 pb-1">
+              {/* Luật thi công điểm 8: pill đen nổi ĐÃ CHẾT — affordance là
+                  nút chữ tĩnh lặng nằm trong luồng (vẫn in-flow như bản
+                  đóng N-04-1, vẫn cùng hành vi bấm cuộn 0,8×clientHeight,
+                  cùng điều kiện hiện, cùng nhãn). */}
               <button
                 type="button"
                 onClick={() =>
@@ -731,10 +833,10 @@ export function DichbomeApp() {
                     behavior: 'smooth',
                   })
                 }
-                className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-semibold whitespace-nowrap text-canvas shadow-[var(--shadow-lift)]"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-full border border-hairline bg-canvas px-4 text-sm font-semibold whitespace-nowrap text-ink shadow-[var(--shadow-card)]"
               >
                 Còn nội dung ở dưới
-                <ChevronDown className="size-4" aria-hidden />
+                <ChevronDown className="size-4 text-muted" aria-hidden />
               </button>
             </div>
           ) : null}
@@ -745,7 +847,12 @@ export function DichbomeApp() {
             </div>
           ) : null}
 
-          <Composer
+        </main>
+
+        {/* Composer ghim đáy CỘT THREAD ở mọi bề rộng — hướng «Chat»:
+            Bảng mở KHÔNG giấu composer nữa (thread + composer + Bảng nổi
+            cùng hiện như mock thắng). */}
+        <Composer
             message={message}
             onMessageChange={(v) => {
               setMessage(v);
@@ -761,9 +868,10 @@ export function DichbomeApp() {
             error={composerError}
             focusSignal={focusSignal}
           />
-        </main>
+        </div>
 
-        {/* Bảng — một instance: sheet toàn màn hình trên mobile, cột phải cố định ≥1280px */}
+        {/* Bảng — một instance: sheet toàn màn hình trên mobile; ≥1280px
+            là panel nổi 400px đứng cạnh cột thread trên nền chấm bi */}
         <Board
           open={boardOpen}
           onClose={() => setBoardOpen(false)}

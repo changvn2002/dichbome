@@ -6,6 +6,46 @@ phiên bản theo [SemVer](https://semver.org/). Mỗi bản phát hành trên
 production tương ứng một git tag `vX.Y.Z` — xem
 `docs/RUNBOOK-ROLLBACK.md` cho bảng ghép đôi tag ↔ deployment.
 
+## [1.5.0] — 2026-10-24 — THIẾT KẾ LẠI hướng «Chat» (lệnh user 2026-10-24 ~20:29)
+
+### Changed
+
+- Toàn bộ lớp trình bày chuyển sang hướng **«Chat»** — hướng
+  thắng cuộc bỏ phiếu mù mã hoá 5 ghế do parent điều phối lại
+  sau khi hồ sơ panel mock cũ bị phát hiện lệch (bản tổng hợp
+  thừa hưởng ghi sai kết quả; parent đọc trực tiếp biên bản thô:
+  «Chat» 3/5 phiếu hạng nhất, «Editorial» 2/5, «Instrument» 0/5,
+  diện mạo live cũ xếp chót ở cả 5 biên bản). Ngôn ngữ mới: cụm
+  hai bong bóng «câu nói / Ý thật là…» ở màn hình trống, câu mẫu
+  dạng bong bóng chat có avatar người gửi, phiếu giải mã treo
+  trên sợi chỉ thread với thẻ «Ghi chú dịch», thang căng thẳng
+  dạng viên chia đoạn, Bảng 400px với thread thật luôn hiện cạnh
+  bên trên desktop.
+- 13 lỗi thi công §4 của panel revote (ghế 2+3) đã xử lý: bỏ
+  vòng tròn đỏ lơ lửng trên sợi chỉ, thống nhất một quy tắc
+  avatar, nút «Dán» đọc như bấm được, dấu hiệu cuộn ở mép danh
+  sách (fade), tách dòng xoá toàn bộ khỏi nhóm câu mẫu, dấu ×
+  thuộc rõ từng mục, hàng số thang đo thẳng cột, bỏ nhãn người
+  gửi trùng, nền chấm bi giảm mật độ sau cột Bảng…
+- Panel pack 5 ghế chấm thuần bằng mắt: vòng 3, 4 FAIL toàn bộ,
+  vòng 5 đạt 2/5, **vòng 6 PASS 5/5** (0 lỗi thị giác nghiêm
+  trọng, hơn hẳn bản live rõ rệt ở cả 5 biên bản thô); parent tự
+  xem pack cuối trước phát hành.
+- Service worker shell: `dichbome-shell-v5`.
+
+### Notes
+
+- Engine + golden corpus nguyên vẹn: `git diff` trên `lib/` và
+  `components/dichbome/lib/` = 0 dòng. Suite 96 pass / 0 fail /
+  2 todo (known-issue cũ); bundle 188.817 B gzip ≤ trần 190.000.
+  Accent giữ nguyên #FE2C55 byte-identical (tokens:verify PASS).
+- Impeccable detect (chế độ source, 21 file): 1 finding
+  «broken-image» ở find-out.tsx — parent phân xử FALSE POSITIVE
+  (thẻ `<img>` dùng src SVG tự host thật, có alt + kích thước cố
+  định, đã live từ v1.4.0); chế độ URL không chạy được trên VM
+  này (không có binary Chrome cho detector) — ghi đầy đủ trong
+  docs/reviews/v1.5.0-review-record.md.
+
 ## [1.4.1] — 2026-10-24 — đóng 7 MINOR của Panel #05
 
 ### Fixed

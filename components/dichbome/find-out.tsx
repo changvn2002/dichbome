@@ -96,6 +96,10 @@ export function FindOutContent({ swUpdateAvailable }: { swUpdateAvailable: boole
         </div>
       ) : null}
 
+      {/* Đồng bộ hệ trình bày: tab mở bằng kicker caps xám như các
+          bề mặt khác của hệ; nội dung và thứ tự giữ nguyên. */}
+      <p className="kicker mb-3">Tìm hiểu</p>
+
       <figure>
         {/* Hero «Hai Lượt Một Nhịp» (REDESIGN-V4) — banner cũ đã chết cùng
             hệ ấm V2; lớp hình của V4 chỉ phóng hình học của chính mark.
@@ -137,7 +141,7 @@ export function FindOutContent({ swUpdateAvailable }: { swUpdateAvailable: boole
           <ol className="space-y-4">
             {STEPS.map((step) => (
               <li key={step.title}>
-                <p className="font-semibold">{step.title}</p>
+                <p className="text-[15px] font-semibold text-ink">{step.title}</p>
                 <p className="mt-0.5 text-sm leading-relaxed text-muted">{step.body}</p>
               </li>
             ))}
