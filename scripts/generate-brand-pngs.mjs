@@ -1,23 +1,24 @@
 /**
- * Sinh các bản PNG phục vụ SEO/PWA từ SVG brand CHÍNH THỨC trong public/products/brand/:
- *   public/og.png                        1200×630 — ảnh Open Graph / Twitter card
- *   public/icons/icon-192.png            192×192  — icon PWA (nền trong suốt)
- *   public/icons/icon-512.png            512×512  — icon PWA (nền trong suốt)
- *   public/icons/icon-maskable-512.png   512×512  — icon maskable (logo 80% trên nền kem)
- *   public/icons/apple-touch-icon.png    180×180  — icon iOS (logo 88% trên nền kem)
+ * Sinh các bản PNG phục vụ SEO/PWA từ SVG brand CHÍNH THỨC (REDESIGN-V4)
+ * trong public/products/brand/ — assets chép nguyên bản từ hồ sơ
+ * redesign-v4/dichbome/assets/, artwork KHÔNG sửa:
+ *   public/og.png                        1200×630 — Open Graph (VISUAL-LAYER §5)
+ *   public/icons/icon-192.png            192×192  — icon PWA (từ app-icon.svg)
+ *   public/icons/icon-512.png            512×512  — icon PWA
+ *   public/icons/icon-maskable-512.png   512×512  — maskable (app-icon là tile
+ *                                        đen full-bleed, mark đã ở 0,8× trong
+ *                                        vùng an toàn — dùng nguyên bản)
+ *   public/icons/apple-touch-icon.png    180×180  — iOS (nguyên bản app-icon)
  *
- * Nguyên tắc brand (xem BRAND.md): artwork KHÔNG bị sửa — không đổi màu, không vẽ lại,
- * không cắt xén. Script chỉ (1) raster hoá nguyên bản SVG ở kích thước đích, và
- * (2) khi nền tảng bắt buộc nền đục (maskable, iOS), đặt nguyên bản logo vào giữa
- * một nền kem #FAF6EF (màu nền app). Riêng og.png: banner chính thức 1600×900 được
- * thu nguyên tỉ lệ vào khung 1200×630, phần thừa hai bên là đúng màu nền #F6F1E7
- * mà banner tự vẽ — không crop mất chi tiết nào của tranh.
+ * OG theo VISUAL-LAYER §5: nền đen tuyệt đối, hero biến thể tối (phiến A
+ * stroke trắng trên đen + counter seed), tối đa 3 chấm cyan r=6 dọc cạnh
+ * trên, lockup với wordmark đổi sang trắng CHỈ ở bản OG (wordmark là chữ —
+ * trên nền đen phải là trắng/trung tính theo §5; file lockup gốc giữ mực đen).
  *
- * Cách chạy (cần @resvg/resvg-js — chỉ là tool sinh ảnh một lần, KHÔNG phải
- * dependency runtime của app nên không nằm trong package.json):
- *   mkdir -p /tmp/resvg && cd /tmp/resvg && npm init -y && npm i @resvg/resvg-js
- *   RESVG_DIR=/tmp/resvg node scripts/generate-brand-pngs.mjs
- * Nếu đã cài @resvg/resvg-js ngay trong repo thì chỉ cần: node scripts/generate-brand-pngs.mjs
+ * Cách chạy (cần @resvg/resvg-js — tool sinh ảnh một lần, KHÔNG phải
+ * dependency runtime nên không nằm trong package.json):
+ *   RESVG_DIR=~/workspace/mini-apps/resvg-tool node scripts/generate-brand-pngs.mjs
+ * Nếu đã cài @resvg/resvg-js ngay trong repo thì: node scripts/generate-brand-pngs.mjs
  */
 import { createRequire } from 'node:module';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -29,9 +30,6 @@ const anchor = process.env.RESVG_DIR
   ? path.join(process.env.RESVG_DIR, 'package.json')
   : path.join(root, 'package.json');
 const { Resvg } = createRequire(anchor)('@resvg/resvg-js');
-
-const CREAM = '#FAF6EF'; // nền app (BRAND.md) — nền bắt buộc cho icon maskable/iOS
-const BANNER_BG = '#F6F1E7'; // màu rect nền mà banner chính thức tự vẽ
 
 function readBrand(file) {
   return readFileSync(path.join(root, 'public/products/brand', file), 'utf8');
@@ -55,39 +53,34 @@ function render(svg, width, outFile) {
   console.log(`✓ ${outFile} (${png.length} bytes)`);
 }
 
-const logo = readBrand('dichbome-logo.svg');
-const banner = readBrand('dichbome-banner.svg');
+const appIcon = readBrand('dichbome-app-icon.svg');
+const hero = readBrand('dichbome-hero-stage.svg');
+const lockup = readBrand('dichbome-wordmark.svg');
 
-// Icon PWA thường: raster nguyên bản logo, giữ nền trong suốt.
-render(logo, 192, 'icons/icon-192.png');
-render(logo, 512, 'icons/icon-512.png');
+// Icons: nguyên bản app-icon (mark seed trên tile đen) ở mọi kích thước.
+render(appIcon, 192, 'icons/icon-192.png');
+render(appIcon, 512, 'icons/icon-512.png');
+render(appIcon, 512, 'icons/icon-maskable-512.png');
+render(appIcon, 180, 'icons/apple-touch-icon.png');
 
-// Icon maskable 512: logo chiếm 80% trong vùng an toàn, trên nền kem.
-render(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">` +
-    `<rect width="512" height="512" fill="${CREAM}"/>` +
-    nest(logo, { x: 51, y: 51, width: 410, height: 410 }) +
-    `</svg>`,
-  512,
-  'icons/icon-maskable-512.png',
-);
-
-// Apple touch icon 180: iOS không hỗ trợ nền trong suốt nên cũng đặt trên nền kem, logo 88%.
-render(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">` +
-    `<rect width="180" height="180" fill="${CREAM}"/>` +
-    nest(logo, { x: 11, y: 11, width: 158, height: 158 }) +
-    `</svg>`,
-  180,
-  'icons/apple-touch-icon.png',
-);
-
-// OG 1200×630: banner 1600×900 thu nguyên tỉ lệ theo chiều cao (×0.7 = 1120×630),
-// căn giữa trên nền đúng màu banner tự vẽ — không crop.
+// OG 1200×630 (VISUAL-LAYER §5): nền đen; hero biến thể tối = phiến của
+// hero-stage được vẽ lại trên đen (phiến A stroke trắng, phiến B stroke
+// trắng nền trong suốt, counter giữ seed) chiếm vùng phải-trên; 3 chấm
+// cyan r=6 dọc cạnh trên; lockup (wordmark trắng) ở góc dưới-trái.
+const ogHeroDark = hero
+  .replaceAll('fill="#FFFFFF"', 'fill="none"')
+  .replaceAll('fill="#F5F5F5"', 'fill="none"')
+  .replaceAll('stroke="#212121"', 'stroke="#FFFFFF"')
+  .replaceAll('fill="#212121"', 'fill="#FFFFFF"');
+const ogLockup = lockup.replaceAll('fill="#000000"', 'fill="#FFFFFF"');
 render(
   `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">` +
-    `<rect width="1200" height="630" fill="${BANNER_BG}"/>` +
-    nest(banner, { x: 40, y: 0, width: 1120, height: 630 }) +
+    `<rect width="1200" height="630" fill="#000000"/>` +
+    `<circle cx="72" cy="36" r="6" fill="#25F4EE"/>` +
+    `<circle cx="108" cy="36" r="6" fill="#25F4EE"/>` +
+    `<circle cx="144" cy="36" r="6" fill="#25F4EE"/>` +
+    nest(ogHeroDark, { x: 330, y: 84, width: 780, height: 234 }) +
+    nest(ogLockup, { x: 72, y: 420, width: 660, height: 125 }) +
     `</svg>`,
   1200,
   'og.png',

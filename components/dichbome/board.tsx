@@ -7,6 +7,7 @@ import { RELATION_GROUPS, type ParentExample } from './lib/translate';
 import type { BoardTab, StoredItem } from './lib/ui-types';
 import { ConfirmDialog, UndoBar, useFocusTrap } from './sheets';
 import { FindOutContent } from './find-out';
+import { ContactAvatar } from './avatar';
 
 /**
  * Board — bề mặt phụ duy nhất của redesign-v2 (LAYOUT-SPEC §4–§6).
@@ -72,27 +73,29 @@ function wholeTeaser(tease: string): string {
   return cut > 0 ? body.slice(0, cut).trim() : body;
 }
 
-/** Khung trạng thái trống dùng chung cho các tab (LAYOUT-SPEC §5) — chữ và hành động riêng từng tab. */
+/** Khung trạng thái trống dùng chung cho các tab (LAYOUT-SPEC §5) — chữ và hành động riêng từng tab.
+ *  Art = «Phiến Chưa Ghim» (VISUAL-LAYER §3): Board trống hiện tối đa
+ *  280×140; tab Đã lưu dùng bản thu nhỏ 160×80 (prop `artSmall`). */
 function BoardEmptyState({
   title,
   description,
   action,
+  artSmall = false,
 }: {
   title: string;
   description?: string;
   action?: ReactNode;
+  artSmall?: boolean;
 }) {
   return (
     <div className="py-4">
-      {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
-      {/* PERF-09 (vòng 4): cùng file 360×240 như sân khấu; khai attrs đúng
-          khung hiển thị 120×80 để trình duyệt giữ chỗ chống CLS. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
       <img
-        src="/products/brand/dichbome-empty-stage.webp"
+        src="/products/brand/dichbome-empty-board.svg"
         alt=""
-        width={120}
-        height={80}
-        className="w-[120px]"
+        width={480}
+        height={240}
+        className={artSmall ? 'w-[160px]' : 'w-[280px] max-w-full'}
       />
       <p className="mt-3 font-semibold text-ink">{title}</p>
       {description ? (
@@ -162,12 +165,12 @@ export function Board({
       ref={asideRef}
       aria-label="Bảng"
       className={cn(
-        'fixed inset-0 z-[60] flex flex-col bg-paper transition-[opacity,transform] duration-200',
+        'fixed inset-0 z-[60] flex flex-col bg-canvas transition-[opacity,transform] duration-200',
         open ? 'visible opacity-100' : 'pointer-events-none invisible translate-y-3 opacity-0',
-        'min-[1280px]:pointer-events-auto min-[1280px]:visible min-[1280px]:static min-[1280px]:z-auto min-[1280px]:flex min-[1280px]:w-[380px] min-[1280px]:shrink-0 min-[1280px]:translate-y-0 min-[1280px]:border-l min-[1280px]:border-line-strong min-[1280px]:opacity-100',
+        'min-[1280px]:pointer-events-auto min-[1280px]:visible min-[1280px]:static min-[1280px]:z-auto min-[1280px]:flex min-[1280px]:w-[380px] min-[1280px]:shrink-0 min-[1280px]:translate-y-0 min-[1280px]:border-l min-[1280px]:border-line-control min-[1280px]:opacity-100',
       )}
     >
-      <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-line px-4">
+      <div className="flex h-[52px] shrink-0 items-center gap-2 border-b border-hairline px-4">
         {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
         <img src="/products/brand/dichbome-logo.svg" alt="" className="size-6 shrink-0" />
         {/* N-6 (Panel #02): tiêu đề là div, không phải h2 — Board là aside
@@ -190,7 +193,7 @@ export function Board({
       <div
         role="tablist"
         aria-label="Nội dung Bảng"
-        className="flex shrink-0 gap-1 overflow-x-auto border-b border-line px-3 py-2"
+        className="flex shrink-0 gap-1 overflow-x-auto border-b border-hairline px-3 py-2"
       >
         {tabs.map((t) => (
           <button
@@ -204,7 +207,7 @@ export function Board({
             className={cn(
               'min-h-11 shrink-0 rounded-full px-3.5 text-sm',
               tab === t.id
-                ? 'bg-crimson-tint font-semibold text-crimson-ink'
+                ? 'border-l-2 border-l-brand-seed bg-surface-selected font-semibold text-ink'
                 : 'text-muted hover:text-ink',
             )}
           >
@@ -221,7 +224,7 @@ export function Board({
           aria-labelledby="board-tab-examples"
           className={cn(tab !== 'examples' && 'hidden')}
         >
-          <div className="sticky -top-4 z-10 bg-paper py-2">
+          <div className="sticky -top-4 z-10 bg-canvas py-2">
             <div
               className="flex gap-2 overflow-x-auto"
               role="group"
@@ -236,8 +239,8 @@ export function Board({
                   className={cn(
                     'min-h-11 shrink-0 rounded-full border px-3.5 text-sm',
                     exampleGroup === label
-                      ? 'border-crimson bg-crimson-tint font-semibold text-crimson-ink'
-                      : 'border-line-strong bg-card text-muted hover:text-ink',
+                      ? 'border-line-control border-l-2 border-l-brand-seed bg-surface-selected font-semibold text-ink'
+                      : 'border-line-control bg-canvas text-muted hover:text-ink',
                   )}
                 >
                   {label}
@@ -253,7 +256,7 @@ export function Board({
               value={exampleQuery}
               onChange={(e) => setExampleQuery(e.target.value)}
               placeholder="Tìm trong bảng"
-              className="mt-2 min-h-11 w-full rounded-xl border border-line-strong bg-card px-3 text-base text-ink placeholder:text-placeholder"
+              className="mt-2 min-h-11 w-full rounded-xl border border-line-control bg-canvas px-3 text-base text-ink placeholder:text-placeholder"
             />
           </div>
 
@@ -266,7 +269,7 @@ export function Board({
                   setExampleGroup(ALL_GROUPS);
                   setExampleQuery('');
                 }}
-                className="min-h-11 text-sm font-semibold text-crimson-ink"
+                className="min-h-11 text-sm font-semibold text-ink"
               >
                 Xem tất cả
               </button>
@@ -276,9 +279,9 @@ export function Board({
               {filteredExamples.map((ex) => (
                 <div
                   key={`${ex.speaker}-${ex.message}`}
-                  className="mb-3 break-inside-avoid rounded-[14px] border border-line-strong bg-card p-3.5 shadow-[var(--shadow-card)]"
+                  className="mb-3 break-inside-avoid rounded-[14px] border border-line-control bg-canvas p-3.5 shadow-[var(--shadow-card)]"
                 >
-                  <p className="font-display text-base leading-relaxed italic">“{ex.message}”</p>
+                  <p className="text-[15px] leading-relaxed font-medium">“{ex.message}”</p>
                   <p className="mt-1.5 text-xs text-muted">
                     {ex.speaker} · {ex.context}
                   </p>
@@ -293,14 +296,14 @@ export function Board({
                     <button
                       type="button"
                       onClick={() => onUseExample(ex, false)}
-                      className="min-h-11 w-full whitespace-nowrap rounded-lg bg-crimson px-2 text-sm font-semibold text-white hover:bg-crimson-deep"
+                      className="min-h-11 w-full whitespace-nowrap rounded-lg bg-action-bg px-2 text-sm font-semibold text-action-fg"
                     >
                       Dùng câu này
                     </button>
                     <button
                       type="button"
                       onClick={() => onUseExample(ex, true)}
-                      className="min-h-11 w-full whitespace-nowrap rounded-lg px-2 text-sm font-semibold text-crimson-ink hover:bg-crimson-tint"
+                      className="min-h-11 w-full whitespace-nowrap rounded-lg px-2 text-sm font-semibold text-ink hover:bg-bubble"
                     >
                       Dịch ngay
                     </button>
@@ -319,20 +322,21 @@ export function Board({
           className={cn(tab !== 'saved' && 'hidden')}
         >
           {saved.length >= 20 ? (
-            <p className="mb-3 rounded-xl bg-warn-bg px-4 py-3 text-sm text-ink">
+            <p className="mb-3 rounded-xl bg-warning-bg px-4 py-3 text-sm text-ink">
               Đã đủ 20 — xoá bớt để lưu thêm.
             </p>
           ) : null}
 
           {saved.length === 0 ? (
             <BoardEmptyState
+              artSmall
               title="Chưa lưu kết quả nào."
               description="Sau khi dịch, bấm Lưu kết quả để giữ lại trên thiết bị này."
               action={
                 <button
                   type="button"
                   onClick={onClose}
-                  className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-line-strong bg-card px-4 text-sm font-semibold text-ink"
+                  className="mt-3 inline-flex min-h-11 items-center rounded-lg border border-line-control bg-canvas px-4 text-sm font-semibold text-ink"
                 >
                   Về sân khấu
                 </button>
@@ -349,7 +353,7 @@ export function Board({
                 value={savedQuery}
                 onChange={(e) => setSavedQuery(e.target.value)}
                 placeholder="Tìm trong bảng"
-                className="mb-3 min-h-11 w-full rounded-xl border border-line-strong bg-card px-3 text-base text-ink placeholder:text-placeholder"
+                className="mb-3 min-h-11 w-full rounded-xl border border-line-control bg-canvas px-3 text-base text-ink placeholder:text-placeholder"
               />
               {filteredSaved.length === 0 ? (
                 <p className="text-[15px] text-muted">
@@ -365,11 +369,16 @@ export function Board({
                   {filteredSaved.map((item) => (
                     <div
                       key={item.id}
-                      className="rounded-[14px] border border-line-strong bg-card p-3.5 shadow-[var(--shadow-card)]"
+                      className="rounded-[14px] border border-line-control bg-canvas p-3.5 shadow-[var(--shadow-card)]"
                     >
-                      <p className="line-clamp-3 text-[15px] font-medium text-ink">
-                        “{item.message}”
-                      </p>
+                      {/* Avatar DiceBear (ĐK-D4): CHỈ ở hàng mục đã lưu có
+                          id ổn định; nhãn vai/chữ thật đi kèm ở meta dưới. */}
+                      <div className="flex items-start gap-3">
+                        <ContactAvatar id={item.id} speaker={item.speaker} size={36} />
+                        <p className="line-clamp-3 min-w-0 flex-1 text-[15px] font-medium text-ink">
+                          “{item.message}”
+                        </p>
+                      </div>
                       <p className="mt-1.5 line-clamp-2 text-[13px] text-muted">
                         {item.result.meaning}
                       </p>
@@ -381,7 +390,7 @@ export function Board({
                         <button
                           type="button"
                           onClick={() => onRestore(item)}
-                          className="min-h-11 flex-1 whitespace-nowrap rounded-lg border border-line-strong bg-card px-3 text-sm font-semibold text-ink"
+                          className="min-h-11 flex-1 whitespace-nowrap rounded-lg border border-line-control bg-canvas px-3 text-sm font-semibold text-ink"
                         >
                           Mở trên sân khấu
                         </button>
@@ -401,7 +410,7 @@ export function Board({
               <button
                 type="button"
                 onClick={() => setConfirmClearSavedOpen(true)}
-                className="mt-1 min-h-11 text-sm font-semibold text-crimson-ink"
+                className="mt-1 min-h-11 text-sm font-semibold text-error-ink"
               >
                 Xoá toàn bộ kết quả đã lưu
               </button>
@@ -420,7 +429,7 @@ export function Board({
             <BoardEmptyState title="Chưa có câu nào được dịch trên thiết bị này." />
           ) : (
             <>
-              <ul className="divide-y divide-line">
+              <ul className="divide-y divide-hairline">
                 {history.map((item) => (
                   <li key={item.id}>
                     <button
@@ -428,6 +437,8 @@ export function Board({
                       onClick={() => onRestore(item)}
                       className="flex min-h-14 w-full items-center gap-3 py-3 text-left"
                     >
+                      {/* Avatar DiceBear (ĐK-D4): chỉ ở hàng Lịch sử có id ổn định. */}
+                      <ContactAvatar id={item.id} speaker={item.speaker} size={32} />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[15px] font-medium text-ink">
                           “{item.message}”
@@ -445,7 +456,7 @@ export function Board({
               <button
                 type="button"
                 onClick={() => setConfirmClearHistoryOpen(true)}
-                className="mt-1 min-h-11 text-sm font-semibold text-crimson-ink"
+                className="mt-1 min-h-11 text-sm font-semibold text-error-ink"
               >
                 Xoá toàn bộ lịch sử
               </button>

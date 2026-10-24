@@ -526,8 +526,10 @@ export function DichbomeApp() {
 
   /* Chỉ báo «còn nội dung ở dưới» (M-3): phiếu điển hình vẫn dài hơn một khung
    * sân khấu (xem ngân sách thật ở LAYOUT-SPEC §1) — khi người dùng chưa cuộn
-   * tới cuối phiếu, một nút dính đáy sân khấu nói rõ còn phần dưới và bấm là
-   * cuộn xuống. Trước đây không có chỉ báo nào, phần dưới nếp gấp bị mất hút. */
+   * tới cuối phiếu, một thanh trong luồng (in-flow, xem N-04-1 ở JSX dưới)
+   * nói rõ còn phần dưới và bấm là cuộn xuống. Trước M-3 không có chỉ báo
+   * nào, phần dưới nếp gấp bị mất hút; bản overlay tuyệt đối của M-3 bị
+   * Panel #04 bắt lỗi giao thước (N-04-1) và đã thay bằng in-flow ở V4. */
   const [showMoreHint, setShowMoreHint] = useState(false);
   const updateMoreHint = useCallback(() => {
     const el = stageScrollRef.current;
@@ -547,9 +549,9 @@ export function DichbomeApp() {
   }, [stage, updateMoreHint]);
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-paper text-ink">
+    <div className="flex h-dvh flex-col overflow-hidden bg-canvas text-ink">
       {/* Thanh app ghim trên */}
-      <header className="flex h-[52px] shrink-0 items-center gap-3 border-b border-line-strong bg-paper px-4 min-[1280px]:h-14">
+      <header className="flex h-[52px] shrink-0 items-center gap-3 border-b border-hairline bg-canvas px-4 min-[1280px]:h-14">
         {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
         <img
           src="/products/brand/dichbome-logo.svg"
@@ -564,7 +566,7 @@ export function DichbomeApp() {
         <button
           type="button"
           onClick={() => setBoardOpen(true)}
-          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-line-strong bg-card px-3 text-sm font-semibold min-[1280px]:hidden"
+          className="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-xl border border-line-control bg-canvas px-3 text-sm font-semibold min-[1280px]:hidden"
         >
           <Layers className="size-4" aria-hidden />
           Bảng
@@ -572,7 +574,7 @@ export function DichbomeApp() {
       </header>
 
       {!isOnline ? (
-        <div className="shrink-0 bg-warn-bg px-4 py-2 text-center text-[13px] font-medium text-ink">
+        <div className="shrink-0 bg-warning-bg px-4 py-2 text-center text-[13px] font-medium text-ink">
           Đang offline — app dịch ngay trên thiết bị.
         </div>
       ) : null}
@@ -589,23 +591,28 @@ export function DichbomeApp() {
               <div className="mx-auto w-full max-w-[640px]">
                 {stage.kind === 'idle' ? (
                   <div className="flex flex-col items-center pt-6 text-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
-                    {/* PERF-09 (vòng 4): file đã xuất lại 360×240 (@2x của
-                        khung hiển thị 180×120) thay cho bản 1080×720 cũ;
-                        attrs khai đúng tỉ lệ 3:2 thật của ảnh. */}
+                    {/* Hero «Hai Lượt Một Nhịp» (REDESIGN-V4, VISUAL-LAYER
+                        §2): SVG tĩnh in-flow ở đầu vùng cuộn, CHỈ ở trạng
+                        thái trống — lượt đầu đến là unmount. Khung 720×216
+                        khai trước bằng attrs (aspect 10:3, CLS = 0); hiển
+                        thị 358×107 ở 390px, tối đa 592×178 ở desktop. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
                     <img
-                      src="/products/brand/dichbome-empty-stage.webp"
+                      src="/products/brand/dichbome-hero-stage.svg"
                       alt=""
-                      width={180}
-                      height={120}
-                      className="w-[180px]"
+                      width={720}
+                      height={216}
+                      className="h-auto w-full max-w-[592px]"
                     />
-                    {/* M-4: Stage display về đúng DESIGN-LANGUAGE §3 đã duyệt —
-                      30/37 mobile · 40/48 desktop (trước đây render 26/34 ở cả hai).
-                      D-4(a) (Panel #03): text-balance — trước đây dòng cuối
-                      «thế?» đứng mồ côi ở 19,6% bề rộng dòng tại 390px
-                      (ngưỡng §10.1: dòng cuối ≥40%). */}
-                    <h2 className="mt-4 font-display text-[30px] leading-[37px] font-semibold text-balance min-[1280px]:text-[40px] min-[1280px]:leading-[48px]">
+                    {/* M-4: Stage display về đúng thang đã duyệt — 30/37
+                      mobile · 40/48 desktop. V4: Fraunces weight 680 TƯỜNG
+                      MINH (trước đây class font-semibold = 600 — sai toạ độ
+                      trục variable; F-6 đo lại trên render thật).
+                      D-4(a) (Panel #03): text-balance giữ nguyên. */}
+                    <h2
+                      style={{ fontWeight: 680 }}
+                      className="mt-4 font-display text-[30px] leading-[37px] text-balance min-[1280px]:text-[40px] min-[1280px]:leading-[48px]"
+                    >
                       Người nhà vừa nhắn gì thế?
                     </h2>
                     {/* R4-F1: phụ đề rút 23 → 17 từ (bù hồi quy ngân sách chữ
@@ -621,7 +628,7 @@ export function DichbomeApp() {
                           key={ex.message}
                           type="button"
                           onClick={() => fillExample(ex, false)}
-                          className="min-h-11 max-w-full truncate rounded-full border border-line-strong bg-card px-4 text-sm"
+                          className="min-h-11 max-w-full truncate rounded-full border border-line-control bg-canvas px-4 text-sm"
                         >
                           “{excerpt(ex.message)}”
                         </button>
@@ -700,7 +707,22 @@ export function DichbomeApp() {
                 ) : null}
               </div>
             </div>
-            {showMoreHint ? (
+          </div>
+
+          {/* N-04-1 (Panel #04 → cách đóng đã chốt ở V4-IMPL-STATE §5):
+              pill «Còn nội dung ở dưới» KHÔNG còn là overlay tuyệt đối
+              neo đáy vùng cuộn. Bản cũ (absolute bottom-3) chồng lên nội
+              dung phiếu: ở các vai có composer cao, hàng số + nhãn thước
+              rơi vào dải pill → giao 270–276 px², và mọi cách đóng bằng
+              «dịch nội dung» đều phụ thuộc chiều cao composer (biến thiên
+              theo vai/số dòng/lỗi) nên không thành định lý được. Nay pill
+              là THANH TRONG LUỒNG (in-flow) nằm giữa viewport sân khấu và
+              composer — pill ở NGOÀI vùng cuộn nên giao với mọi nội dung
+              phiếu bằng 0 px² theo cấu trúc, ở mọi vai/viewport/chiều cao
+              composer. Giữ nguyên: nhãn, chiều cao 44px, hành vi bấm cuộn
+              0,8×clientHeight, điều kiện hiện (còn >24px chưa xem). */}
+          {showMoreHint ? (
+            <div className="flex shrink-0 justify-center px-4 pt-2 pb-1">
               <button
                 type="button"
                 onClick={() =>
@@ -709,13 +731,13 @@ export function DichbomeApp() {
                     behavior: 'smooth',
                   })
                 }
-                className="absolute bottom-3 left-1/2 z-10 inline-flex min-h-11 -translate-x-1/2 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-semibold whitespace-nowrap text-paper shadow-[var(--shadow-lift)]"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-ink px-4 text-sm font-semibold whitespace-nowrap text-canvas shadow-[var(--shadow-lift)]"
               >
                 Còn nội dung ở dưới
                 <ChevronDown className="size-4" aria-hidden />
               </button>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
 
           {pendingDeletion && !boardOpen ? (
             <div className="shrink-0 px-4 pb-2 min-[1280px]:hidden">

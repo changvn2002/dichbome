@@ -1,61 +1,59 @@
-# Giải Mã Gia Đình (`dichbome`) — Brand kit
+# Giải Mã Gia Đình (`dichbome`) — Brand kit · REDESIGN-V4
 
-> **Tên hiển thị mới (2026-10-09): Giải Mã Gia Đình.** Tên cũ "Dịch Tiếng Bố Mẹ" được mở rộng vì app nay dịch tin nhắn cho mọi quan hệ trong nhà — bố mẹ dịch con, mẹ chồng ⇄ nàng dâu, vợ chồng, anh em, sếp/bạn. **Slug/route giữ nguyên `dichbome`** (`/p/dichbome`) để không vỡ link, lịch sử local và API.
->
-> **Hướng thiết kế đã chốt: "Mẫu E"** — tạp chí ấm áp: banner tranh lớn ở đầu trang, nền kem ấm rất nhạt (`#FAF6EF`), tiêu đề serif biên tập, thẻ trắng viền hairline `#E7DDD0`, nút chính đỏ đậm `#C22A44`, thanh điều hướng dưới kiểu PWA trên di động. Chốt này thay cho hướng phẳng trung tính trước đó nhưng vẫn giữ kỷ luật enterprise: không gradient pastel, không chip nhiều màu, không icon trang trí cute.
+> Nguồn sự thật của đợt V4: hồ sơ `~/workspace/mini-apps/redesign-v4/dichbome/`
+> (IDENTITY.md · COLOR-SYSTEM.md · VISUAL-LAYER.md · TYPE-AND-ICON.md ·
+> INTERFACE-SPEC.md) + `design/tokens.dichbome-v4.json` trong repo này.
+> Mọi tài sản cũ của hệ ấm V2 (mascot mặt nháy, kem, đỏ cũ) đã CHẾT và bị
+> cấm hồi sinh ở mọi sink — danh sách hex cấm nằm trong tokens.json
+> (`bannedHex`) và được máy kiểm ở `pnpm tokens:verify`.
 
-## Concept: "Bong bóng chat biết ý"
+## Căn cước trong một câu
 
-Mascot là một bong bóng chat đỏ đậm có hồn: một mắt mở, một mắt nháy — nó **nghe được điều bố mẹ nói và hiểu cả điều chưa nói**. Trái tim trắng ở giữa ngực chứa dấu ngoặc kép: tình thương nằm trong từng câu chữ. Kính lúp kem ở góc là dấu "soi ý" — nhìn qua một câu ngắn để thấy ý thật phía sau.
+Một sân khấu **trắng–đen trung tính** nơi câu nói của bố mẹ là phần tử lớn
+nhất; một điểm **đỏ TikTok nguyên giá trị `#FE2C55`** duy nhất đánh dấu
+«đến lượt bạn đáp»; một câu «Ý thật» được đọc lại rõ ràng bằng giọng chữ
+của app. Neo duy nhất: **TikTok** (seed loại A, Δbyte = 0 — không suy ra,
+không làm trầm). Neutral là thang Grey của Google Material **vay có giấy
+tờ** (loại N-vay) — cấm gọi neutral vay là «của TikTok».
 
-Ba lớp nghĩa trong một mark:
+## Mark «Lượt Đáp»
 
-1. **Bong bóng chat** = tin nhắn của bố mẹ (điểm chạm hằng ngày).
-2. **Mặt nháy mắt** = sự tinh ý, biết ý, không máy móc.
-3. **Tim + ngoặc kép** = câu nói của bố mẹ luôn mang theo tình cảm.
+Một phiến thoại đặc bị khoét đúng một counter hình bậc thang: dải trên dài
+(câu gốc), bậc xuống, dải dưới thụt vào (lời đáp). Hình học khoá 100% từ
+V3 (lưới 96, module 8 — xem IDENTITY.md của hồ sơ); V4 chỉ đổi fill:
 
-## Bảng màu
-
-| Vai trò | Màu | Hex | Ghi chú |
-|---|---|---|---|
-| Đỏ chính (mascot, điểm nhấn) | Đỏ đậm sâu | `#C22A44` | Màu duy nhất được "lên tiếng"; không pha gradient |
-| Kem (chi tiết mặt, nền bìa) | Kem ấm | `#FBEEDB` / nền `#F6F1E7` | Chỉ đi cùng đỏ chính hoặc mực |
-| Trái tim / bong bóng phụ | Trắng | `#FFFFFF` | Luôn đặt trên nền đỏ hoặc mực |
-| Mực (chữ, bong bóng phụ, bản mono) | Đen mực | `#101418` | Dùng cho wordmark và bản đơn sắc |
-| Xám nền app | Xám giấy host | `var(--paper)` / `#ECEEF1` | Thuộc hệ host Changto, không tự pha |
-
-Quy tắc màu: **một màu nhấn duy nhất** (`#C22A44`). Không gradient, không thêm hồng/tím trang trí. Nếu cần màu thứ hai, dùng mực — không dùng màu mới.
-
-## Tài sản (assets)
-
-Tất cả nằm ở `client/public/products/brand/`:
-
-| File | Loại | Dùng ở đâu |
+| Biến thể | File | Fill |
 |---|---|---|
-| `dichbome-logo.svg` | SVG vector | Mark chính: header app, icon kệ apps/catalog, favicon, empty state |
-| `dichbome-logo-mono.svg` | SVG vector 1 màu mực | Footer, ấn phẩm in, nền ảnh bận, chỗ chỉ in được 1 màu |
-| `dichbome-wordmark.svg` | SVG vector | Lockup ngang mark + chữ: đầu banner, cover bài viết, ảnh chia sẻ |
-| `dichbome-hero.svg` | SVG vector phẳng | Cover trên kệ apps (catalog `cover`) |
-| `dichbome-banner.svg` | SVG vector ngang 1600×900 | Banner trong app (dưới header) — bản chính thức trên production |
-| `dichbome-banner.webp` | Raster | Chỉ giữ cho đăng Facebook/content, KHÔNG còn là asset bắt buộc của app |
+| Chính (≥24px) | `public/products/brand/dichbome-logo.svg` ← `assets/mark.svg` | `#FE2C55` |
+| Micro (≤20px) | `dichbome-mark-micro.svg` | `#FE2C55` |
+| Mono | `dichbome-logo-mono.svg` | `#000000` |
+| Micro mono | `dichbome-mark-micro-mono.svg` | `#000000` |
+| App icon | `dichbome-app-icon.svg` | Mark seed trên tile **đen** (0,8×) |
+| Lockup | `dichbome-wordmark.svg` | Mark seed + wordmark **mực đen** (wordmark là chữ — cấm mang seed trên nền sáng) |
 
-### Raster vs SVG khi đẩy GitHub
+- Clearspace = 24đv mọi phía. Mark chính ≥24px; micro ≤20px (vùng 21–23px
+  không tồn tại); micro không phóng >32px làm mark chính.
+- Cấm: gradient mọi dạng trên mark, opacity, bóng, viền bao, xoay/lật/
+  animate mark, thêm chi tiết vào counter, vẽ counter đối xứng, dùng
+  mark chính thay micro ở ≤20px.
+- Cấm vỏ TikTok: không nốt nhạc, không rail tim–bình luận–chia sẻ, không
+  thanh điều hướng 5 mục kiểu TikTok, không cuộn vô hạn, không glitch
+  lệch sắc trong UI thường trú (lệch sắc chỉ ở tầng asset/OG trên nền đen).
 
-- **SVG là bản repo chính.** Sáu file SVG ở trên là text, connector GitHub đẩy tốt, sửa được từng nét. App chỉ dùng SVG (`dichbome-banner.svg` cho banner đầu trang) nên production không phụ thuộc file nhị phân nào.
-- `dichbome-banner.webp` là raster chỉ giữ cho đăng Facebook/content; **bản gốc độ nét cao giữ ở** `~/workspace/repos/changtotech-stuido-shots/dichbome-brand/dichbome-banner-original.webp` (kèm bản generate mascot `dichbome-mascot-original.webp` làm nguồn vẽ lại vector). Không đẩy .webp qua connector (file nhị phân sẽ hỏng); cần bản raster thì lấy lại từ thư mục shots này — đừng generate lại, tránh lệch nhận diện.
-- Mascot vector được vẽ lại tay từ bản generate: bỏ chấm/lấp lánh trang trí, nét dày đều để đọc tốt ở cỡ nhỏ. Khi cần mascot cho ấn phẩm lớn (poster, áo), ưu tiên dựng lại từ `dichbome-logo.svg`, không phóng to raster.
+## Lớp hình
 
-## Quy tắc dùng logo
+- Hero «Hai Lượt Một Nhịp» (`dichbome-hero-stage.svg`, 720×216) — phóng
+  hình học của chính mark; chỉ ở sân khấu trống (in-flow) và Board trống
+  dạng rút gọn «Phiến Chưa Ghim» (`dichbome-empty-board.svg`); trạng thái
+  chưa-đọc-được dùng «Phiến Đứt Nét» ink-only (`dichbome-error-stage.svg`).
+  Bề mặt làm việc art = 0 tuyệt đối.
+- OG (`public/og.png`, sinh bởi `scripts/generate-brand-pngs.mjs`): nền
+  đen, hero biến thể tối, tối đa 3 chấm cyan `#25F4EE` r=6 ở cạnh trên —
+  nơi duy nhất cyan tồn tại. Cyan cấm trong UI ở mọi vai.
+- Avatar `personas` cấm ở hero/empty/OG/sân khấu/phiếu (ĐK-D4).
 
-- **Cỡ tối thiểu:** mark 24px trên màn hình, 8mm khi in. Dưới cỡ này mặt và tim sẽ dính nét — hãy dùng bản rút gọn (chỉ bong bóng + tim) khi thật cần, và báo lại để bổ sung file chính thức thay vì tự cắt.
-- **Không gian trống:** chừa quanh mark ít nhất bằng chiều cao của trái tim, mọi phía.
-- **Nền được dùng:** trắng, kem `#F6F1E7`, xám giấy host, đỏ `#C22A44` (chỉ với bản mono đảo trắng trong tương lai — hiện chưa có file, không tự đảo màu), ảnh ít chi tiết ở vùng đặt logo.
-- **Không được:** đổi màu đỏ chính, thêm gradient/bóng đổ, xoay mark, kéo giãn, đặt chữ đè lên mark, tách trái tim ra dùng riêng như icon tim chung, vẽ lại mặt theo phong cách khác (mắt/miệng phải giữ nét kem dày, bo tròn).
-- **Bản nào cho nền nào:** nền sáng → `dichbome-logo.svg`; in 1 màu/footer tối giản → `dichbome-logo-mono.svg`; cần cả tên → `dichbome-wordmark.svg` (không tự gõ chữ cạnh logo bằng font khác).
+## Raster
 
-## Dùng cho content viral
-
-- **Banner Facebook:** đăng `dichbome-banner.webp` nguyên khung kèm caption; khi cần chèn tên app lên ảnh, đặt `dichbome-wordmark.svg` ở góc dưới trái trên nền ảnh lặng (ghế sofa), không đè lên mặt người và bong bóng tim.
-- **Sticker/avatar:** mascot là tài sản nhận diện chính — dùng `dichbome-logo.svg` làm avatar Page/kênh, ảnh đại diện comment, và sticker chèn ở góc video quay màn hình app (góc dưới phải, cỡ 64–96px, không che kết quả dịch).
-- **Ảnh kết quả dịch:** khi chụp màn hình app để đăng, giữ nguyên header có logo mới; đó là cách nhận diện lan ra mà không cần đóng watermark.
-- **Nhất quán:** mọi bài về app dùng đúng đỏ `#C22A44` cho chữ nhấn trên ảnh/caption art; không phối thêm màu pastel như các template AI.
+PNG icons + OG sinh từ SVG chính thức bằng `scripts/generate-brand-pngs.mjs`
+(cần `@resvg/resvg-js` qua biến `RESVG_DIR`) — artwork chỉ được phóng/
+ghép, không sửa. `app/favicon.ico` sinh từ icon-512 (mark trên tile đen).

@@ -24,7 +24,7 @@ export function OriginalBubble({
         type="button"
         aria-expanded={expanded}
         onClick={() => setExpanded((v) => !v)}
-        className="anim-bubble-in mt-1 block max-w-[85%] rounded-[18px] rounded-bl-md bg-crimson px-4 py-3 text-left text-base leading-relaxed text-white"
+        className="anim-bubble-in focus-on-bubble mt-1 block max-w-[85%] rounded-[18px] rounded-bl-md bg-ink px-4 py-3 text-left text-base leading-relaxed text-canvas"
       >
         {expanded ? <span>{message}</span> : <span className="line-clamp-2">{message}</span>}
       </button>
@@ -37,12 +37,12 @@ export function TypingBubble() {
     <div className="flex justify-start">
       <div
         aria-live="polite"
-        className="flex items-center gap-2 self-start rounded-[18px] rounded-bl-md border border-line-strong bg-stage px-4 py-3"
+        className="flex items-center gap-2 self-start rounded-[18px] rounded-bl-md border border-line-control bg-canvas px-4 py-3"
       >
         {[0, 1, 2].map((n) => (
           <span
             key={n}
-            className="typing-dot size-2 rounded-full bg-ink"
+            className="typing-dot size-2 rounded-full bg-ink-2"
             style={{ '--i': n } as CSSProperties}
             aria-hidden
           />
@@ -106,7 +106,7 @@ export function StageSlip({
 
   return (
     <section aria-live="polite" className="anim-slip-block" style={{ '--i': 0 } as CSSProperties}>
-      <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-strong bg-stage px-4 py-4 shadow-[var(--shadow-card)] sm:px-5">
+      <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-control bg-canvas px-4 py-4 shadow-[var(--shadow-card)] sm:px-5">
         <div className="anim-slip-block" style={{ '--i': 0 } as CSSProperties}>
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
             {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
@@ -127,12 +127,12 @@ export function StageSlip({
               <span className="text-muted">(dịch qua mạng)</span>
             ) : null}
             {view.tier === 'generic' ? (
-              <span className="rounded-full bg-crimson-tint px-2 py-0.5 font-semibold text-crimson-ink">
+              <span className="rounded-full bg-surface-selected px-2 py-0.5 font-semibold text-ink">
                 Khớp câu mẫu chung
               </span>
             ) : null}
             {view.tier === 'low' ? (
-              <span className="rounded-full bg-crimson-tint px-2 py-0.5 font-semibold text-crimson-ink">
+              <span className="rounded-full bg-surface-selected px-2 py-0.5 font-semibold text-ink">
                 Độ tin cậy thấp
               </span>
             ) : null}
@@ -164,10 +164,10 @@ export function StageSlip({
             </p>
           ) : null}
           <p
-            // Slip serif theo DESIGN-LANGUAGE §3: Fraunces 560 (trước đây render
-            // 400 vì không khai weight — M-4, đưa code về đúng spec đã duyệt).
-            style={{ fontWeight: 560 }}
-            className={`font-display mt-1 text-[17px] leading-[26px] text-ink${
+            // REDESIGN-V4 (STATE §1): Ý thật về Be Vietnam Pro 400 ở 17/26 —
+            // Fraunces 560 cũ CHẾT; Fraunces 680 chỉ còn vai tuyên bố ≥24px.
+            // Ý thật là nội dung đọc dài, không phải vai tuyên bố.
+            className={`mt-1 text-[17px] leading-[26px] text-ink${
               expandedAll ? '' : ' line-clamp-3'
             }`}
           >
@@ -176,7 +176,7 @@ export function StageSlip({
         </div>
 
         <div
-          className="anim-slip-block mt-3 border-t border-line-strong pt-3"
+          className="anim-slip-block mt-3 border-t border-line-control pt-3"
           style={{ '--i': 2 } as CSSProperties}
         >
           <h3 className="text-sm font-semibold">Điều {roleName(view.speaker)} muốn nghe</h3>
@@ -195,7 +195,7 @@ export function StageSlip({
         </div>
 
         <div
-          className="anim-slip-block mt-3 border-t border-line-strong pt-3"
+          className="anim-slip-block mt-3 border-t border-line-control pt-3"
           style={{ '--i': 3 } as CSSProperties}
         >
           {view.tier === 'low' ? (
@@ -217,11 +217,13 @@ export function StageSlip({
                 aria-valuemax={5}
                 aria-label="Mức căng thẳng"
               >
-                {/* N-6: track gauge nâng từ --line (1.32:1) lên --line-strong
-                    như mọi biên phân định còn lại của hệ (đọc chặt WCAG §1.4.11). */}
-                <div className="h-2 rounded-full bg-line-strong">
+                {/* V4 (COLOR-SYSTEM §5/STATE §1): gauge fill = seed nguyên
+                    văn, track = Grey 300 (token hairline). Track là nền của
+                    một thanh tiến trình đã có nhãn chữ + số mức đi kèm nên
+                    không gánh nghĩa một mình. */}
+                <div className="h-2 rounded-full bg-hairline">
                   <div
-                    className="gauge-fill h-full rounded-full bg-crimson"
+                    className="gauge-fill h-full rounded-full bg-brand-seed"
                     style={{ width: `${result.angerLevel * 20}%` }}
                   />
                 </div>
@@ -249,7 +251,7 @@ export function StageSlip({
               type="button"
               aria-expanded={expandedAll}
               onClick={() => setExpandedAll((v) => !v)}
-              className="min-h-11 text-sm font-semibold text-crimson-ink"
+              className="min-h-11 text-sm font-semibold text-ink"
             >
               {expandedAll ? 'Thu gọn' : 'Đọc tiếp'}
             </button>
@@ -257,7 +259,7 @@ export function StageSlip({
         ) : null}
 
         {result.warning ? (
-          <div className="mt-3 border-t border-line-strong pt-2">
+          <div className="mt-3 border-t border-line-control pt-2">
             <button
               type="button"
               aria-expanded={warningOpen}
@@ -272,11 +274,11 @@ export function StageSlip({
         ) : null}
 
         <div
-          className="anim-slip-block mt-3 border-t border-line-strong pt-3"
+          className="anim-slip-block mt-3 border-t border-line-control pt-3"
           style={{ '--i': 4 } as CSSProperties}
         >
           <h3 className="text-sm font-semibold">Câu trả lời gợi ý</h3>
-          <div className="divide-y divide-line-strong">
+          <div className="divide-y divide-line-control">
             {result.replies.map((reply, idx) => (
               <div key={`${reply.label}-${idx}`} className="py-2">
                 <div className="flex items-center justify-between gap-3">
@@ -284,7 +286,7 @@ export function StageSlip({
                   <button
                     type="button"
                     onClick={() => onCopyReply(reply.text, idx)}
-                    className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-crimson-ink hover:bg-crimson-tint"
+                    className="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-ink hover:bg-bubble"
                   >
                     {copiedIdx === idx ? (
                       <Check className="size-4" aria-hidden />
@@ -309,7 +311,7 @@ export function StageSlip({
                     className="mt-1 block w-full text-left"
                   >
                     <span className="line-clamp-2 text-[15px] leading-[22px]">{reply.text}</span>
-                    <span className="mt-0.5 inline-flex items-center gap-1 text-[13px] font-semibold text-crimson-ink">
+                    <span className="mt-0.5 inline-flex items-center gap-1 text-[13px] font-semibold text-ink">
                       Đọc tiếp
                       <ChevronDown className="size-3.5" aria-hidden />
                     </span>
@@ -331,8 +333,8 @@ export function StageSlip({
             role="status"
             className={`mt-3 rounded-xl px-4 py-3 text-sm ${
               strip.kind === 'copy-fail' || strip.kind === 'saved-full'
-                ? 'bg-warn-bg text-ink'
-                : 'bg-confirm-bg text-ink'
+                ? 'bg-warning-bg text-ink'
+                : 'bg-success-bg text-ink'
             }`}
           >
             {strip.kind === 'copy-ok' ? <p>Đã sao chép câu trả lời.</p> : null}
@@ -344,7 +346,7 @@ export function StageSlip({
                   value={strip.text}
                   rows={3}
                   onFocus={(e) => e.currentTarget.select()}
-                  className="mt-2 w-full rounded-lg border border-line-strong bg-card p-2 text-[15px]"
+                  className="mt-2 w-full rounded-lg border border-line-control bg-canvas p-2 text-[15px]"
                 />
                 <p className="mt-1 text-[13px] text-muted">Chạm giữ để sao chép thủ công.</p>
               </>
@@ -365,7 +367,7 @@ export function StageSlip({
           </div>
         ) : null}
 
-        <div className="mt-3 flex flex-wrap gap-2 border-t border-line-strong pt-3">
+        <div className="mt-3 flex flex-wrap gap-2 border-t border-line-control pt-3">
           {/* N-5(a): nút này không còn là toggle — khi đã lưu, bấm «Đã lưu» MỞ
               Bảng tab Đã lưu (đúng kỳ vọng «nhãn = đường dẫn tới danh sách»);
               bỏ lưu thực hiện trong Bảng qua nút Xoá có hoàn tác. Xem app.tsx. */}
@@ -373,7 +375,7 @@ export function StageSlip({
             type="button"
             onClick={onToggleSave}
             aria-label={saved ? 'Đã lưu. Mở Bảng, tab Đã lưu' : undefined}
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
           >
             {saved ? (
               <BookmarkCheck className="size-4" aria-hidden />
@@ -385,7 +387,7 @@ export function StageSlip({
           <button
             type="button"
             onClick={onShare}
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
           >
             <Share2 className="size-4" aria-hidden />
             Chia sẻ
@@ -393,7 +395,7 @@ export function StageSlip({
           <button
             type="button"
             onClick={onTranslateAnother}
-            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
           >
             <Eraser className="size-4" aria-hidden />
             Dịch câu khác
@@ -418,7 +420,17 @@ export function NotReadCard({
   onShowFallback: () => void;
 }) {
   return (
-    <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-strong bg-stage p-4 shadow-[var(--shadow-card)]">
+    <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-control bg-canvas p-4 shadow-[var(--shadow-card)]">
+      {/* «Phiến Đứt Nét» (VISUAL-LAYER §3): hình của sự thiếu cho trạng
+          thái chưa đọc được — ink-only, 0 accent, ≤120×80 cạnh khối chữ. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
+      <img
+        src="/products/brand/dichbome-error-stage.svg"
+        alt=""
+        width={120}
+        height={80}
+        className="mb-3 w-[120px]"
+      />
       <div className="flex gap-3">
         {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
         <img
@@ -439,20 +451,20 @@ export function NotReadCard({
       </div>
       {/* N-1: thứ bậc hành động — hai lối ra chính là nút có khung; lối fallback
           độ-tin-cậy-thấp hạ xuống nút chữ yên tĩnh (không nền tint, không viền
-          crimson) ở hàng riêng full-width, nhãn nằm trọn một dòng, không còn
+          ở hàng riêng full-width, nhãn nằm trọn một dòng, không còn
           chữ vai rơi mồ côi ở dòng 2 như bản panel #02 đo. */}
       <div className="mt-3 flex flex-wrap gap-2">
         <button
           type="button"
           onClick={onEdit}
-          className="min-h-11 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
+          className="min-h-11 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
         >
           Sửa câu
         </button>
         <button
           type="button"
           onClick={onTryExample}
-          className="min-h-11 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
+          className="min-h-11 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
         >
           Thử một câu mẫu
         </button>
@@ -460,7 +472,7 @@ export function NotReadCard({
       <button
         type="button"
         onClick={onShowFallback}
-        className="mt-1 min-h-11 px-2 text-left text-sm font-semibold text-crimson-ink underline underline-offset-4"
+        className="mt-1 min-h-11 px-2 text-left text-sm font-semibold text-ink underline underline-offset-4"
       >
         Xem cách đọc chung theo <span className="whitespace-nowrap">vai {speaker}</span>
       </button>
@@ -470,14 +482,14 @@ export function NotReadCard({
 
 export function StageErrorCard({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-strong bg-stage p-4 shadow-[var(--shadow-card)]">
+    <div className="ml-auto w-full max-w-[92%] rounded-2xl border border-line-control bg-canvas p-4 shadow-[var(--shadow-card)]">
       <p className="text-[15px] leading-relaxed">
         Chưa dịch được. Câu của bạn vẫn còn trong ô bên dưới.
       </p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-3 min-h-11 rounded-xl border border-line-strong bg-card px-4 text-sm font-semibold"
+        className="mt-3 min-h-11 rounded-xl border border-line-control bg-canvas px-4 text-sm font-semibold"
       >
         Thử lại
       </button>

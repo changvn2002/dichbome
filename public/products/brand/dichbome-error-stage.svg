@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160" role="img" aria-label="Phiến Đứt Nét — trạng thái chưa đọc được dichbome (REDESIGN-V4, VISUAL-LAYER §3)">
+  <!-- Phiến A viền đứt 2 đoạn, khoảng hở 24px ở cạnh phải; ink-only, 0 accent -->
+  <path d="M44,20 L196,20 A20,20 0 0 1 216,40 L216,66" fill="#FFFFFF" stroke="#212121" stroke-width="2.5"/>
+  <path d="M216,90 L216,96 A20,20 0 0 1 196,116 L92,116 L68,138 L68,116 L44,116 A20,20 0 0 1 24,96 L24,40 A20,20 0 0 1 44,20 Z" fill="#FFFFFF" stroke="#212121" stroke-width="2.5"/>
+  <!-- Counter mất bậc giữa: chỉ còn khối thấp và khối cao, bậc giữa vắng -->
+  <rect x="52" y="88" width="20" height="10" fill="#212121"/>
+  <rect x="116" y="58" width="20" height="40" fill="#212121"/>
+</svg>

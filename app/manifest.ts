@@ -16,9 +16,10 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: '/',
     scope: '/',
     display: 'standalone',
-    // Nền kem ấm của app (màn hình chờ khi mở app đã cài) + đỏ brand cho theme.
-    background_color: '#FAF6EF',
-    theme_color: '#C22A44',
+    // Canvas trắng tuyệt đối của V4 (NEUTRAL-FIRST) cho cả nền màn hình
+    // chờ lẫn theme — khớp themeColor của layout.tsx và token neutral-canvas.
+    background_color: '#FFFFFF',
+    theme_color: '#FFFFFF',
     categories: ['lifestyle'],
     icons: [
       {

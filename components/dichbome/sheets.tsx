@@ -79,8 +79,8 @@ export function Sheet({
   if (!open) return null;
 
   const panelClassName = centered
-    ? 'anim-board-sheet absolute left-1/2 top-1/2 max-h-[85dvh] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl bg-stage p-4 pb-[max(1rem,env(safe-area-inset-bottom))]'
-    : 'anim-board-sheet absolute inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-2xl bg-stage p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl';
+    ? 'anim-board-sheet absolute left-1/2 top-1/2 max-h-[85dvh] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl bg-canvas p-4 pb-[max(1rem,env(safe-area-inset-bottom))]'
+    : 'anim-board-sheet absolute inset-x-0 bottom-0 max-h-[85dvh] overflow-y-auto rounded-t-2xl bg-canvas p-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:inset-x-auto sm:bottom-auto sm:left-1/2 sm:top-1/2 sm:w-full sm:max-w-md sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl';
 
   return (
     <div className="fixed inset-0 z-[70]">
@@ -138,7 +138,7 @@ export function ConfirmDialog({
         <button
           type="button"
           onClick={onConfirm}
-          className="min-h-11 rounded-xl bg-crimson px-4 text-sm font-semibold text-white hover:bg-crimson-deep"
+          className="min-h-11 rounded-xl bg-error-solid px-4 text-sm font-semibold text-white"
         >
           {confirmLabel}
         </button>
@@ -149,7 +149,7 @@ export function ConfirmDialog({
 
 export function UndoBar({ label, onUndo }: { label: string; onUndo: () => void }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-xl bg-ink px-4 py-3 text-paper shadow-[var(--shadow-lift)]">
+    <div className="flex items-center justify-between gap-3 rounded-xl bg-ink px-4 py-3 text-canvas shadow-[var(--shadow-lift)]">
       <span className="text-sm">{label}</span>
       <button
         type="button"

@@ -6,6 +6,35 @@ phiên bản theo [SemVer](https://semver.org/). Mỗi bản phát hành trên
 production tương ứng một git tag `vX.Y.Z` — xem
 `docs/RUNBOOK-ROLLBACK.md` cho bảng ghép đôi tag ↔ deployment.
 
+## [1.4.0] — 2026-10-24 — REDESIGN-V4 (TikTok seed, Neutral-First)
+
+### Changed
+
+- Toàn bộ giao diện theo hồ sơ REDESIGN-V4 đã khoá: canvas trắng
+  tuyệt đối + thang Material Grey vay có giấy tờ, seed TikTok
+  `#FE2C55` nguyên văn chỉ ở vai accent (CTA, bubble gốc, focus,
+  gauge, chip chọn). Hệ màu ấm cũ (kể cả `#C22A44`) biến mất khỏi
+  mọi sink; tokens:verify PASS 7/7 (bóc comment theo LK4-51).
+- Chữ hiển thị Fraunces 680 + Be Vietnam Pro; mark «Lượt Đáp» giữ
+  nguyên hình học; hero «Hai Lượt Một Nhịp» + 2 state-art mới
+  («Phiến Chưa Ghim», «Phiến Đứt Nét»); OG/icons/favicon sinh lại
+  (đen 96,02% · seed 1,27%).
+- DiceBear 9.4.3: `personas` CHỈ ở hàng Đã lưu/Lịch sử có id ổn
+  định, `initials` ở mọi nơi còn lại, render SVG inline (CSP giữ
+  nguyên); công tắc `AVATAR_PERSONAS_ENABLED` để rút nhanh.
+- WebGL KHÔNG ship: điều kiện sống G-07 (người thật) chưa chạy
+  nên theo đúng văn bản hồ sơ, hero ở dạng SVG tĩnh.
+- N-04-1 (điều kiện nghiệm thu Panel #04): pill đã chuyển từ
+  overlay sang in-flow ngoài vùng cuộn — giao phần HIỂN THỊ đo
+  0 px² ở 16/16 vai @390 và các ca lặp 320/1440 (2 verifier độc
+  lập); phán quyết cuối thuộc Panel #05 với brief cơ chế kèm
+  theo (xem review record v1.4.0).
+
+### Fixed
+
+- Record-MINOR M-3: token C nay có bộ ba OKLCH tính bằng script
+  (ΔE2000 = 36,91) — không đổi byte màu nào.
+
 ## [1.3.0] — 2026-10-24 — optimization sprint 2 (Panel #04: N-04-3 + N-04-4)
 
 ### Changed

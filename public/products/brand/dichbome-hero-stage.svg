@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 216" role="img" aria-label="Hai Lượt Một Nhịp — hero sân khấu trống dichbome (REDESIGN-V4)">
+  <!-- Lề chú: 3 chấm mốc lượt trên trục x=20 (lens-09 §2.1.4) — ink N-vay Grey 900 #212121 -->
+  <circle cx="20" cy="40" r="5" fill="#212121"/>
+  <circle cx="20" cy="108" r="5" fill="#212121"/>
+  <circle cx="20" cy="176" r="5" fill="#212121"/>
+  <!-- Phiến A (chủ — câu gốc): trắng, stroke ink 2.5, đuôi dưới-trái hướng về người nhà -->
+  <path d="M88,28 L440,28 A24,24 0 0 1 464,52 L464,122 A24,24 0 0 1 440,146 L140,146 L104,178 L104,146 L88,146 A24,24 0 0 1 64,122 L64,52 A24,24 0 0 1 88,28 Z" fill="#FFFFFF" stroke="#212121" stroke-width="2.5"/>
+  <!-- Counter bậc thang trong phiến A (hồi âm mark): 3 khối 28px, đáy thẳng hàng y=128, fill accent #FE2C55 literal — phần tử accent duy nhất của hình -->
+  <rect x="96" y="114" width="28" height="14" fill="#FE2C55"/>
+  <rect x="132" y="100" width="28" height="28" fill="#FE2C55"/>
+  <rect x="168" y="86" width="28" height="42" fill="#FE2C55"/>
+  <!-- Phiến B (đáp): neutral N-vay Grey 100 #F5F5F5, vẽ sau — viền B liên tục cắt viền A ở vùng giao (xen-lượt) -->
+  <path d="M292,76 L636,76 A24,24 0 0 1 660,100 L660,170 A24,24 0 0 1 636,194 L616,194 L616,210 L588,194 L292,194 A24,24 0 0 1 268,170 L268,100 A24,24 0 0 1 292,76 Z" fill="#F5F5F5" stroke="#212121" stroke-width="2.5"/>
+</svg>

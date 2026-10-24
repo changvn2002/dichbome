@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 240" role="img" aria-label="Phiến Chưa Ghim — Board trống dichbome (REDESIGN-V4, VISUAL-LAYER §3)">
+  <!-- Phiến A đơn độc (bỏ phiến B + counter của hero): trắng, stroke mực 2.5, đuôi dưới-trái như hero -->
+  <path d="M88,28 L416,28 A24,24 0 0 1 440,52 L440,122 A24,24 0 0 1 416,146 L140,146 L104,178 L104,146 L88,146 A24,24 0 0 1 64,122 L64,52 A24,24 0 0 1 88,28 Z" fill="#FFFFFF" stroke="#212121" stroke-width="2.5"/>
+  <!-- Hairline đứt nét (dash 6/6, mực 1.5) ngang dưới phiến — vị trí thẻ đầu tiên sẽ nằm -->
+  <path d="M64,214 L416,214" stroke="#212121" stroke-width="1.5" stroke-dasharray="6 6"/>
+</svg>

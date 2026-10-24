@@ -6,3 +6,6 @@ pnpm-lock.yaml
 next-env.d.ts
 public
 *.md
+
+# GENERATED from design/tokens.dichbome-v4.json (pnpm tokens:verify) — format owned by the generator, hex case is part of the token bytes
+app/tokens.css

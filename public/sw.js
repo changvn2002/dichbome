@@ -3,7 +3,9 @@
    không bao giờ vào SW cache). Cập nhật không tự reload giữa phiên:
    skipWaiting chỉ chạy khi trang gửi message { type: 'SKIP_WAITING' }. */
 
-const CACHE_NAME = 'dichbome-shell-v2';
+// v3 (REDESIGN-V4): bộ asset brand thay toàn bộ (mark/hero/icons/OG) —
+// bump cache cùng đợt đổi asset theo luật IDENTITY của hồ sơ.
+const CACHE_NAME = 'dichbome-shell-v3';
 
 const PRECACHE_URLS = [
   '/',
@@ -14,7 +16,7 @@ const PRECACHE_URLS = [
   '/icons/icon-maskable-512.png',
   '/icons/apple-touch-icon.png',
   '/products/brand/dichbome-logo.svg',
-  '/products/brand/dichbome-empty-stage.webp',
+  '/products/brand/dichbome-hero-stage.svg',
 ];
 
 self.addEventListener('install', (event) => {

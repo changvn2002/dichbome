@@ -1,0 +1,741 @@
+{
+  "app": "dichbome",
+  "designVersion": "REDESIGN-V4 (chỉ thiết kế — chưa implementation)",
+  "anchorSystem": "TikTok",
+  "anchorSeed": "#FE2C55",
+  "anchorNote": "Seed loại A, Δbyte = 0 (NEO-0). TikTok không công bố thang neutral → neutral là N-VAY từ thang Grey của Google Material (vay có giấy tờ, xem COLOR-SYSTEM §3). CẤM gọi neutral vay là 'của TikTok' hay 'Meta gray nguyên giá trị'.",
+  "tokens": [
+    {
+      "name": "brand-seed",
+      "cssVar": "--brand-seed",
+      "$value": "#FE2C55",
+      "$type": "color",
+      "class": "A",
+      "source": {
+        "system": "TikTok",
+        "sourceName": "Razzmatazz (TikTok Red)",
+        "sourceValue": "#FE2C55",
+        "url": "TikTok for Business Brand Guidelines (guideline lưu hành qua kênh đối tác — lens-12 §1.2, cấp B+ có điều kiện lưu trữ file)",
+        "evidenceGrade": "B+"
+      },
+      "roles": ["mark", "cta-solid", "filled-state", "focus-ring", "hero-counter"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 3.68,
+          "verdict": "non-text-pass / text-fail"
+        },
+        {
+          "against": "#000000",
+          "ratio": 5.71,
+          "verdict": "AA-text-pass (đỏ trên đen)"
+        }
+      ]
+    },
+    {
+      "name": "brand-cyan",
+      "cssVar": "--brand-cyan",
+      "$value": "#25F4EE",
+      "$type": "color",
+      "class": "A",
+      "source": {
+        "system": "TikTok",
+        "sourceName": "Splash (TikTok Cyan)",
+        "sourceValue": "#25F4EE",
+        "url": "TikTok for Business Brand Guidelines (guideline lưu hành qua kênh đối tác — lens-12 §1.2, cấp B+ có điều kiện lưu trữ file)",
+        "evidenceGrade": "B+"
+      },
+      "roles": ["asset-only-on-black"],
+      "contrast": [
+        {
+          "against": "#000000",
+          "ratio": 15.25,
+          "verdict": "AA-pass trên đen"
+        },
+        {
+          "against": "#FFFFFF",
+          "ratio": 1.38,
+          "verdict": "FAIL mọi vai trên sáng — CẤM trong UI"
+        }
+      ]
+    },
+    {
+      "name": "brand-black",
+      "cssVar": "--brand-black",
+      "$value": "#000000",
+      "$type": "color",
+      "class": "A",
+      "source": {
+        "system": "TikTok",
+        "sourceName": "TikTok Black",
+        "sourceValue": "#000000",
+        "url": "TikTok for Business Brand Guidelines (guideline lưu hành qua kênh đối tác — lens-12 §1.2, cấp B+ có điều kiện lưu trữ file)",
+        "evidenceGrade": "B+"
+      },
+      "roles": ["cta-label-on-seed", "wordmark", "mono-mark"],
+      "contrast": [
+        {
+          "against": "#FE2C55",
+          "ratio": 5.71,
+          "verdict": "AA-text-pass (nhãn đen trên đỏ)"
+        },
+        {
+          "against": "#FFFFFF",
+          "ratio": 21.0,
+          "verdict": "AAA"
+        }
+      ]
+    },
+    {
+      "name": "neutral-canvas",
+      "cssVar": "--neutral-canvas",
+      "$value": "#FFFFFF",
+      "$type": "color",
+      "class": "A",
+      "source": {
+        "system": "TikTok",
+        "sourceName": "TikTok White",
+        "sourceValue": "#FFFFFF",
+        "url": "TikTok for Business Brand Guidelines (guideline lưu hành qua kênh đối tác — lens-12 §1.2, cấp B+ có điều kiện lưu trữ file)",
+        "evidenceGrade": "B+"
+      },
+      "roles": ["canvas", "surface"],
+      "contrast": [
+        {
+          "against": "#212121",
+          "ratio": 16.1,
+          "verdict": "AAA (mực chính trên canvas)"
+        }
+      ]
+    },
+    {
+      "name": "neutral-50",
+      "cssVar": "--neutral-50",
+      "$value": "#FAFAFA",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 50",
+        "sourceValue": "#FAFAFA",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["surface-subtle"],
+      "contrast": []
+    },
+    {
+      "name": "neutral-100",
+      "cssVar": "--neutral-100",
+      "$value": "#F5F5F5",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 100",
+        "sourceValue": "#F5F5F5",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["bubble"],
+      "contrast": [
+        {
+          "against": "#212121",
+          "ratio": 14.77,
+          "verdict": "AAA"
+        }
+      ]
+    },
+    {
+      "name": "neutral-200",
+      "cssVar": "--neutral-200",
+      "$value": "#EEEEEE",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 200",
+        "sourceValue": "#EEEEEE",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["surface-selected/disabled-bg"],
+      "contrast": [
+        {
+          "against": "#212121",
+          "ratio": 13.88,
+          "verdict": "AAA"
+        }
+      ]
+    },
+    {
+      "name": "neutral-300",
+      "cssVar": "--neutral-300",
+      "$value": "#E0E0E0",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 300",
+        "sourceValue": "#E0E0E0",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["hairline-decorative-only"],
+      "contrast": []
+    },
+    {
+      "name": "neutral-400",
+      "cssVar": "--neutral-400",
+      "$value": "#BDBDBD",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 400",
+        "sourceValue": "#BDBDBD",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["disabled-decoration-only"],
+      "contrast": []
+    },
+    {
+      "name": "neutral-500",
+      "cssVar": "--neutral-500",
+      "$value": "#9E9E9E",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 500",
+        "sourceValue": "#9E9E9E",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["no-text-role"],
+      "contrast": []
+    },
+    {
+      "name": "neutral-600",
+      "cssVar": "--neutral-600",
+      "$value": "#757575",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 600",
+        "sourceValue": "#757575",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["line-control"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 4.61,
+          "verdict": "AA-text-pass / non-text-pass"
+        },
+        {
+          "against": "#F5F5F5",
+          "ratio": 4.23,
+          "verdict": "non-text-pass"
+        }
+      ]
+    },
+    {
+      "name": "neutral-700",
+      "cssVar": "--neutral-700",
+      "$value": "#616161",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 700",
+        "sourceValue": "#616161",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["muted/placeholder"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 6.19,
+          "verdict": "AA-pass"
+        },
+        {
+          "against": "#F5F5F5",
+          "ratio": 5.68,
+          "verdict": "AA-pass"
+        }
+      ]
+    },
+    {
+      "name": "neutral-800",
+      "cssVar": "--neutral-800",
+      "$value": "#424242",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 800",
+        "sourceValue": "#424242",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["ink-2"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 10.05,
+          "verdict": "AAA"
+        },
+        {
+          "against": "#EEEEEE",
+          "ratio": 8.66,
+          "verdict": "AAA (cặp disabled)"
+        }
+      ]
+    },
+    {
+      "name": "neutral-900",
+      "cssVar": "--neutral-900",
+      "$value": "#212121",
+      "$type": "color",
+      "class": "N-vay",
+      "source": {
+        "system": "Google Material — VAY (không phải hệ neo)",
+        "sourceName": "Material Grey 900",
+        "sourceValue": "#212121",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "B (thang vay: nguồn thang cấp A− tại MUI; quyết định vay ghi cấp B)"
+      },
+      "roles": ["ink"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 16.1,
+          "verdict": "AAA"
+        },
+        {
+          "against": "#FAFAFA",
+          "ratio": 15.43,
+          "verdict": "AAA"
+        }
+      ]
+    },
+    {
+      "name": "success-bg",
+      "cssVar": "--success-bg",
+      "$value": "#E8F5E9",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Green 50",
+        "sourceValue": "#E8F5E9",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": []
+    },
+    {
+      "name": "success-border",
+      "cssVar": "--success-border",
+      "$value": "#A5D6A7",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Green 200",
+        "sourceValue": "#A5D6A7",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": []
+    },
+    {
+      "name": "success-solid",
+      "cssVar": "--success-solid",
+      "$value": "#2E7D32",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Green 800",
+        "sourceValue": "#2E7D32",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 5.13,
+          "verdict": "AA (trắng trên solid)"
+        }
+      ]
+    },
+    {
+      "name": "success-ink",
+      "cssVar": "--success-ink",
+      "$value": "#1B5E20",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Green 900",
+        "sourceValue": "#1B5E20",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 7.87,
+          "verdict": "AAA"
+        },
+        {
+          "against": "#E8F5E9",
+          "ratio": 7.0,
+          "verdict": "AAA"
+        }
+      ]
+    },
+    {
+      "name": "error-bg",
+      "cssVar": "--error-bg",
+      "$value": "#FFEBEE",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Red 50",
+        "sourceValue": "#FFEBEE",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": []
+    },
+    {
+      "name": "error-border",
+      "cssVar": "--error-border",
+      "$value": "#EF9A9A",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Red 200",
+        "sourceValue": "#EF9A9A",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": []
+    },
+    {
+      "name": "error-solid",
+      "cssVar": "--error-solid",
+      "$value": "#C62828",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Red 800",
+        "sourceValue": "#C62828",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 5.62,
+          "verdict": "AA (trắng trên solid)"
+        }
+      ]
+    },
+    {
+      "name": "error-ink",
+      "cssVar": "--error-ink",
+      "$value": "#B71C1C",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Red 900",
+        "sourceValue": "#B71C1C",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 6.57,
+          "verdict": "AA"
+        },
+        {
+          "against": "#FFEBEE",
+          "ratio": 5.75,
+          "verdict": "AA"
+        }
+      ]
+    },
+    {
+      "name": "info-bg",
+      "cssVar": "--info-bg",
+      "$value": "#E3F2FD",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Blue 50",
+        "sourceValue": "#E3F2FD",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": []
+    },
+    {
+      "name": "info-border",
+      "cssVar": "--info-border",
+      "$value": "#90CAF9",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Blue 200",
+        "sourceValue": "#90CAF9",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": []
+    },
+    {
+      "name": "info-solid",
+      "cssVar": "--info-solid",
+      "$value": "#1565C0",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Blue 800",
+        "sourceValue": "#1565C0",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 5.75,
+          "verdict": "AA (trắng trên solid)"
+        }
+      ]
+    },
+    {
+      "name": "info-ink",
+      "cssVar": "--info-ink",
+      "$value": "#0D47A1",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Blue 900",
+        "sourceValue": "#0D47A1",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": [
+        {
+          "against": "#FFFFFF",
+          "ratio": 8.63,
+          "verdict": "AAA"
+        },
+        {
+          "against": "#E3F2FD",
+          "ratio": 7.56,
+          "verdict": "AAA"
+        }
+      ]
+    },
+    {
+      "name": "warning-bg",
+      "cssVar": "--warning-bg",
+      "$value": "#FFECB3",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Amber 100",
+        "sourceValue": "#FFECB3",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": [
+        {
+          "against": "#212121",
+          "ratio": 13.73,
+          "verdict": "AAA (mực trên warning-bg)"
+        }
+      ]
+    },
+    {
+      "name": "warning-solid",
+      "cssVar": "--warning-solid",
+      "$value": "#FF6F00",
+      "$type": "color",
+      "class": "B",
+      "source": {
+        "system": "Google Material (thang semantic công bố)",
+        "sourceName": "Material Amber 900",
+        "sourceValue": "#FF6F00",
+        "url": "https://mui.com/material-ui/customization/color/",
+        "evidenceGrade": "A−"
+      },
+      "roles": ["semantic"],
+      "contrast": [
+        {
+          "against": "#000000",
+          "ratio": 7.53,
+          "verdict": "AA (nhãn ĐEN trên solid — cùng luật CTA)"
+        },
+        {
+          "against": "#FFFFFF",
+          "ratio": 2.79,
+          "verdict": "FAIL — cấm nhãn trắng, cấm chữ trên trắng"
+        }
+      ]
+    },
+    {
+      "name": "avatar-tint-rose",
+      "cssVar": "--avatar-tint-rose",
+      "$value": "#FFE6EB",
+      "$type": "color",
+      "class": "C",
+      "source": {
+        "system": "Suy ra từ brand-seed (TikTok)",
+        "sourceName": "mix của #FE2C55",
+        "sourceValue": "#FFE6EB",
+        "url": "TikTok for Business Brand Guidelines (guideline lưu hành qua kênh đối tác — lens-12 §1.2, cấp B+ có điều kiện lưu trữ file)",
+        "evidenceGrade": "C"
+      },
+      "roles": ["avatar-background-only"],
+      "contrast": [
+        {
+          "against": "#212121",
+          "ratio": 13.63,
+          "verdict": "AAA (initials dự phòng trên cùng nền)"
+        }
+      ],
+      "derivation": {
+        "from": "brand-seed #FE2C55",
+        "formula": "sRGB mix: 12% #FE2C55 + 88% #FFFFFF (trộn trắng 88% ≥ 85% theo lens-07 §4.1)",
+        "resultHex": "#FFE6EB",
+        "deltaE2000": 36.91,
+        "deltaL": 0.2992,
+        "deltaC": -0.21,
+        "deltaCpct": -88.2,
+        "deltaNote": "deltaE2000 = CIEDE2000(CIE Lab D65) giữa #FFE6EB và #FE2C55; deltaL/deltaC = chênh OKLCH (L: 0.647343→0.946531; C: 0.238097→0.028076, tức −88.2% chroma). Script tái lập: scripts/token-c-delta.mjs.",
+        "note": "Token C duy nhất của app (1 token — dưới trần 1/3 bậc brand của lens-10). CẤM mọi vai ngoài nền avatar personas."
+      }
+    }
+  ],
+  "semanticAliases": [
+    {
+      "cssVar": "--color-canvas",
+      "value": "var(--neutral-canvas)"
+    },
+    {
+      "cssVar": "--color-surface-subtle",
+      "value": "var(--neutral-50)"
+    },
+    {
+      "cssVar": "--color-bubble",
+      "value": "var(--neutral-100)"
+    },
+    {
+      "cssVar": "--color-surface-selected",
+      "value": "var(--neutral-200)"
+    },
+    {
+      "cssVar": "--color-ink",
+      "value": "var(--neutral-900)"
+    },
+    {
+      "cssVar": "--color-ink-2",
+      "value": "var(--neutral-800)"
+    },
+    {
+      "cssVar": "--color-muted",
+      "value": "var(--neutral-700)"
+    },
+    {
+      "cssVar": "--color-placeholder",
+      "value": "var(--neutral-700)"
+    },
+    {
+      "cssVar": "--color-hairline",
+      "value": "var(--neutral-300)"
+    },
+    {
+      "cssVar": "--color-line-control",
+      "value": "var(--neutral-600)"
+    },
+    {
+      "cssVar": "--color-disabled-bg",
+      "value": "var(--neutral-200)"
+    },
+    {
+      "cssVar": "--color-disabled-ink",
+      "value": "var(--neutral-800)"
+    },
+    {
+      "cssVar": "--color-action-bg",
+      "value": "var(--brand-seed)"
+    },
+    {
+      "cssVar": "--color-action-fg",
+      "value": "var(--brand-black)"
+    },
+    {
+      "cssVar": "--color-focus-ring",
+      "value": "var(--brand-seed)"
+    },
+    {
+      "cssVar": "--color-mark",
+      "value": "var(--brand-seed)"
+    },
+    {
+      "cssVar": "--color-warning-ink",
+      "value": "var(--neutral-900)"
+    }
+  ],
+  "motion": {
+    "--ease-turn": "cubic-bezier(0.25, 1, 0.4, 1)",
+    "--ease-leave": "cubic-bezier(0.4, 0, 1, 1)",
+    "--dur-stage3d": "640ms (token THỬ VIỆC của khoảnh khắc WebGL hero — lens-08 §4.1, lấy mẫu easing từ --ease-turn)"
+  },
+  "bannedHex": [
+    "#AF424D",
+    "#1C2B33",
+    "#EEF3F7",
+    "#E8EEF1",
+    "#EE1D52",
+    "#69C9D0",
+    "#C9003A",
+    "#C22A44",
+    "#F3EAD3"
+  ],
+  "bannedNote": "#AF424D = seed suy-ra-xa V3 (ΔE2000 14,80 khỏi gốc). #1C2B33 = 'Meta gray' nguồn rác cấp F (lens-12) — chết ở mọi vai 'giá trị gốc'. #EEF3F7/#E8EEF1 = wash/bubble nhuộm lạnh V3, chết theo NEUTRAL-FIRST. #EE1D52/#69C9D0 = bộ TikTok cũ lấy mẫu raster, cấp F.",
+  "_repoCopyNote": "Bản sao trong repo của tokens.json hồ sơ REDESIGN-V4 (redesign-v4/dichbome/assets/tokens.json). Chênh lệch CÓ CHỦ ĐÍCH duy nhất so với bản hồ sơ: derivation của token C avatar-tint-rose được bổ sung bộ ba deltaE2000/deltaL/deltaC theo V4-IMPL-STATE §3 (fix record-MINOR M-3) — tính bằng scripts/token-c-delta.mjs. Không byte màu nào khác hồ sơ."
+}

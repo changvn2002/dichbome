@@ -146,7 +146,7 @@ export function Composer({
   return (
     <section
       aria-label="Soạn câu cần dịch"
-      className="border-t border-line-strong bg-stage px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+      className="border-t border-line-control bg-canvas px-4 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
       onKeyDown={(e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
           e.preventDefault();
@@ -185,7 +185,7 @@ export function Composer({
         {RELATION_GROUPS.map((group, groupIdx) => (
           <Fragment key={group.label}>
             {groupIdx > 0 ? (
-              <span className="mx-1 w-px shrink-0 self-stretch bg-line-strong" aria-hidden />
+              <span className="mx-1 w-px shrink-0 self-stretch bg-hairline" aria-hidden />
             ) : null}
             <span className="shrink-0 text-xs whitespace-nowrap text-muted">{group.label}</span>
             {group.roles.map((role) => (
@@ -198,8 +198,8 @@ export function Composer({
                 onClick={() => onSpeakerChange(role)}
                 className={
                   speaker === role
-                    ? 'min-h-11 shrink-0 rounded-full border border-crimson bg-crimson-tint px-4 text-sm font-semibold whitespace-nowrap text-crimson-ink'
-                    : 'min-h-11 shrink-0 rounded-full border border-line-strong bg-card px-4 text-sm whitespace-nowrap text-muted hover:text-ink'
+                    ? 'min-h-11 shrink-0 rounded-full border border-line-control border-l-2 border-l-brand-seed bg-surface-selected px-4 text-sm font-semibold whitespace-nowrap text-ink'
+                    : 'min-h-11 shrink-0 rounded-full border border-line-control bg-canvas px-4 text-sm whitespace-nowrap text-muted hover:text-ink'
                 }
               >
                 {role}
@@ -225,15 +225,15 @@ export function Composer({
           onInput={autoGrow}
           maxLength={500}
           placeholder={placeholder}
-          className={`mt-2 w-full resize-none rounded-xl border bg-card py-3 pr-24 pl-4 text-base leading-relaxed text-ink placeholder:text-placeholder focus:border-crimson-ink ${
-            error ? 'border-crimson-ink' : 'border-line-strong'
+          className={`mt-2 w-full resize-none rounded-xl border bg-canvas py-3 pr-24 pl-4 text-base leading-relaxed text-ink placeholder:text-placeholder focus:border-line-control ${
+            error ? 'border-error-solid' : 'border-line-control'
           }`}
         />
         {message ? (
           <button
             type="button"
             onClick={() => onMessageChange('')}
-            className="absolute right-2 bottom-2 inline-flex min-h-11 items-center gap-1.5 px-3 text-sm font-semibold text-crimson-ink"
+            className="absolute right-2 bottom-2 inline-flex min-h-11 items-center gap-1.5 px-3 text-sm font-semibold text-ink"
           >
             <Eraser className="size-4" aria-hidden />
             Xoá
@@ -242,7 +242,7 @@ export function Composer({
           <button
             type="button"
             onClick={() => void handlePaste()}
-            className="absolute right-2 bottom-2 inline-flex min-h-11 items-center gap-1.5 px-3 text-sm font-semibold text-crimson-ink"
+            className="absolute right-2 bottom-2 inline-flex min-h-11 items-center gap-1.5 px-3 text-sm font-semibold text-ink"
           >
             <ClipboardPaste className="size-4" aria-hidden />
             Dán
@@ -255,7 +255,7 @@ export function Composer({
       <p className="mt-2 text-xs text-muted">Chỉ dán khi người gửi thoải mái với việc đó.</p>
 
       {error ? (
-        <p role="alert" className="mt-2 text-sm text-crimson-ink">
+        <p role="alert" className="mt-2 text-sm text-error-ink">
           {error}
         </p>
       ) : null}
@@ -269,7 +269,7 @@ export function Composer({
         <button
           type="button"
           onClick={() => setContextOpen(true)}
-          className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl border border-line-strong bg-card px-3 text-sm font-semibold"
+          className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-xl border border-line-control bg-canvas px-3 text-sm font-semibold"
         >
           Hoàn cảnh: {context}
           <ChevronDown className="size-4" aria-hidden />
@@ -279,14 +279,14 @@ export function Composer({
             <button
               type="button"
               disabled
-              className="min-h-[52px] flex-1 whitespace-nowrap rounded-xl bg-crimson px-5 text-[15px] font-semibold text-white opacity-60"
+              className="min-h-[52px] flex-1 whitespace-nowrap rounded-xl bg-disabled-bg px-5 text-[15px] font-semibold text-disabled-ink"
             >
               Đang dịch…
             </button>
             <button
               type="button"
               onClick={onCancel}
-              className="min-h-[52px] shrink-0 rounded-xl border border-line-strong px-4 font-semibold"
+              className="min-h-[52px] shrink-0 rounded-xl border border-line-control px-4 font-semibold"
             >
               Huỷ
             </button>
@@ -295,7 +295,7 @@ export function Composer({
           <button
             type="button"
             onClick={onTranslate}
-            className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-crimson px-5 text-[15px] font-semibold text-white hover:bg-crimson-deep"
+            className="inline-flex min-h-[52px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-action-bg px-5 text-[15px] font-semibold text-action-fg"
           >
             Dịch ý {currentRole}
             <ArrowRight className="size-4" aria-hidden />
@@ -318,7 +318,7 @@ export function Composer({
                 setContextOpen(false);
               }}
               className={`flex min-h-12 w-full items-center justify-between rounded-xl px-3 text-sm ${
-                context === c ? 'bg-crimson-tint font-semibold text-crimson-ink' : ''
+                context === c ? 'bg-bubble font-semibold text-ink' : ''
               }`}
             >
               <span>{c}</span>

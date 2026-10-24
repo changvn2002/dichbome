@@ -1,56 +1,73 @@
 @import 'tailwindcss';
+@import './tokens.css';
 
 @source "../components";
 @source "../lib";
 @source "../app";
 
-/* Token hệ ấm duy nhất của app — nguồn sự thật: DESIGN.md (gốc repo).
-   Hệ lạnh cũ của host không được xuất hiện trên bất kỳ bề mặt nào. */
+/* Hệ token REDESIGN-V4 — nguồn sự thật: design/tokens.dichbome-v4.json
+   (bản sao của tokens.json trong hồ sơ redesign-v4/dichbome) + DESIGN.md.
+   File tokens.css cạnh file này là FILE SINH từ tokens.json (kiểm bằng
+   `pnpm tokens:verify`) — không sửa tay. Mọi màu ở đây đều là var() trỏ
+   vào token; hex chỉ sống trong tokens.css đã sinh.
+   Canvas trắng tuyệt đối (NEUTRAL-FIRST); neutrals là thang Grey của
+   Google Material vay có giấy tờ (loại N-vay); seed TikTok chỉ ở các vai
+   COLOR-SYSTEM §5 cho phép. Hệ ấm V2 đã chết — mọi hex của nó nằm trong
+   danh sách cấm của scripts/verify-tokens.mjs. */
 :root {
   color-scheme: light;
-  --crimson: #c22a44;
-  --crimson-deep: #a8243b;
-  --crimson-ink: #8c1d31;
-  --crimson-tint: #f7e3e7;
-  --paper: #faf6ef;
-  --stage: #fffdf8;
-  --card: #ffffff;
-  --ink: #101418;
-  --muted: #49525c;
-  --placeholder: #6b5f52;
-  --line: #e7ddd0;
-  --line-strong: #8a744a;
-  --warn-bg: #fff6d8;
-  --warn-ink: #8a6414;
-  --confirm-bg: #f3ead3;
-  --shadow-card: 0 1px 2px rgba(16, 20, 24, 0.05), 0 8px 24px rgba(16, 20, 24, 0.06);
-  --shadow-lift: 0 2px 4px rgba(16, 20, 24, 0.06), 0 16px 40px rgba(16, 20, 24, 0.1);
+  /* Bóng đổ: color-mix trên mực neutral-900 (không literal rgb/rgba —
+     luật sink của tokens:verify nhóm 3). */
+  --shadow-card:
+    0 1px 2px color-mix(in srgb, var(--neutral-900) 5%, transparent),
+    0 8px 24px color-mix(in srgb, var(--neutral-900) 6%, transparent);
+  --shadow-lift:
+    0 2px 4px color-mix(in srgb, var(--neutral-900) 6%, transparent),
+    0 16px 40px color-mix(in srgb, var(--neutral-900) 10%, transparent);
 }
 
 @theme inline {
-  --color-crimson: var(--crimson);
-  --color-crimson-deep: var(--crimson-deep);
-  --color-crimson-ink: var(--crimson-ink);
-  --color-crimson-tint: var(--crimson-tint);
-  --color-paper: var(--paper);
-  --color-stage: var(--stage);
-  --color-card: var(--card);
-  --color-ink: var(--ink);
-  --color-muted: var(--muted);
-  --color-placeholder: var(--placeholder);
-  --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
-  --color-warn-bg: var(--warn-bg);
-  --color-warn-ink: var(--warn-ink);
-  --color-confirm-bg: var(--confirm-bg);
+  --color-brand-seed: var(--brand-seed);
+  --color-brand-cyan: var(--brand-cyan);
+  --color-brand-black: var(--brand-black);
+  --color-canvas: var(--neutral-canvas);
+  --color-surface-subtle: var(--neutral-50);
+  --color-bubble: var(--neutral-100);
+  --color-surface-selected: var(--neutral-200);
+  --color-hairline: var(--neutral-300);
+  --color-line-control: var(--neutral-600);
+  --color-ink: var(--neutral-900);
+  --color-ink-2: var(--neutral-800);
+  --color-muted: var(--neutral-700);
+  --color-placeholder: var(--neutral-700);
+  --color-disabled-bg: var(--neutral-200);
+  --color-disabled-ink: var(--neutral-800);
+  --color-action-bg: var(--brand-seed);
+  --color-action-fg: var(--brand-black);
+  --color-success-bg: var(--success-bg);
+  --color-success-border: var(--success-border);
+  --color-success-solid: var(--success-solid);
+  --color-success-ink: var(--success-ink);
+  --color-error-bg: var(--error-bg);
+  --color-error-border: var(--error-border);
+  --color-error-solid: var(--error-solid);
+  --color-error-ink: var(--error-ink);
+  --color-info-bg: var(--info-bg);
+  --color-info-border: var(--info-border);
+  --color-info-solid: var(--info-solid);
+  --color-info-ink: var(--info-ink);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-solid: var(--warning-solid);
+  --color-warning-ink: var(--neutral-900);
+  --color-avatar-tint: var(--avatar-tint-rose);
   --font-sans: var(--font-sans);
   --font-display: var(--font-display);
 }
 
 html,
 body {
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--neutral-canvas);
+  color: var(--neutral-900);
 }
 
 body {
@@ -61,23 +78,39 @@ body {
 }
 
 /* Display serif duy nhất: Fraunces (nạp ở layout.tsx, subset vietnamese).
-   Fallback là serif thường của hệ — không dùng serif hệ thống có tên riêng
-   vì thiếu glyph tiền hợp tiếng Việt. */
+   CHỈ vai tuyên bố ≥24px với font-weight 680 tường minh (TYPE-AND-ICON §1);
+   cấm dùng cho Ý thật/body. Fallback là serif thường của hệ — không dùng
+   serif hệ thống có tên riêng vì thiếu glyph tiền hợp tiếng Việt. */
 .font-display {
   font-family: var(--font-display), 'Fraunces', serif;
+  /* Weight 680 ghim tại đây cho MỌI vai display (xem layout.tsx): Fraunces
+     chỉ được dùng ở vai tuyên bố ≥24px và luôn ở đúng toạ độ 680. */
+  font-weight: 680;
 }
 
-/* Focus discipline (DESIGN.md): mọi phần tử tương tác có ring này.
+/* Focus discipline (COLOR-SYSTEM §5.4): outline 2px seed + offset 2px.
+   Trên bề mặt Grey 100 (bubble) cộng vòng mực qua .focus-on-bubble.
    Rule này cố ý KHÔNG nằm trong layer: nó thắng mọi utility đã-layer của
    Tailwind v4 (kể cả outline-none) — vì vậy đừng thêm class dập outline ở
    component; N-2 (Panel #02) đã dọn một class outline-none chết trong
    slip.tsx vì lý do này. Muốn đổi hành vi ring thì đổi tại đây. */
 :focus-visible {
-  outline: 2px solid var(--crimson);
+  outline: 2px solid var(--brand-seed);
   outline-offset: 2px;
 }
 
-/* Motion — danh sách đặt tên duy nhất của DESIGN.md, chỉ transform/opacity. */
+/* Phần tử đứng trên nền Grey 100 (bong bóng câu gốc): seed trên Grey 100
+   chỉ đạt 3,38:1 — mỏng; cộng vòng ngoài 1px mực để focus không phụ thuộc
+   một mình vào đỏ (COLOR-SYSTEM §5.4). */
+.focus-on-bubble:focus-visible {
+  box-shadow:
+    0 0 0 4px var(--neutral-canvas),
+    0 0 0 5px var(--neutral-900);
+}
+
+/* Motion — danh sách đặt tên duy nhất của DESIGN.md, chỉ transform/opacity.
+   Số giữ nguyên hệ D1–D8 của V3 (INTERFACE-SPEC V4 §5: neutral-first
+   không đổi một con số nào của hệ motion). */
 @keyframes bubble-in {
   from {
     opacity: 0;

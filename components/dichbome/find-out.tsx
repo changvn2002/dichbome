@@ -67,7 +67,7 @@ function Disclosure({
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="flex min-h-12 w-full items-center justify-between border-t border-line py-3 text-left text-[15px] font-semibold text-ink"
+        className="flex min-h-12 w-full items-center justify-between border-t border-hairline py-3 text-left text-[15px] font-semibold text-ink"
       >
         {title}
         <ChevronDown
@@ -84,7 +84,7 @@ export function FindOutContent({ swUpdateAvailable }: { swUpdateAvailable: boole
   return (
     <div>
       {swUpdateAvailable ? (
-        <div className="mb-4 rounded-xl bg-warn-bg px-4 py-3 text-sm text-ink" role="status">
+        <div className="mb-4 rounded-xl bg-warning-bg px-4 py-3 text-sm text-ink" role="status">
           Có bản mới của app — tải lại trang để dùng bản mới nhất.
           <button
             type="button"
@@ -97,11 +97,15 @@ export function FindOutContent({ swUpdateAvailable }: { swUpdateAvailable: boole
       ) : null}
 
       <figure>
-        {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG/WebP đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
+        {/* Hero «Hai Lượt Một Nhịp» (REDESIGN-V4) — banner cũ đã chết cùng
+            hệ ấm V2; lớp hình của V4 chỉ phóng hình học của chính mark. */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- ảnh brand tĩnh tự host (SVG đã tối ưu từ asset pack, kích thước cố định chống CLS); next/image không thêm giá trị ở đây */}
         <img
-          src="/products/brand/dichbome-banner.svg"
-          alt="Gia đình ngồi cạnh nhau xem điện thoại, trên đầu là bong bóng chat hình trái tim"
-          className="aspect-[3/1] w-full rounded-xl border border-line-strong bg-stage object-contain"
+          src="/products/brand/dichbome-hero-stage.svg"
+          alt="Hai phiến thoại nối nhau bằng bậc thang: câu gốc của người nhà và lời đáp êm chuyện"
+          width={720}
+          height={216}
+          className="aspect-[10/3] w-full rounded-xl border border-hairline bg-canvas object-contain"
         />
       </figure>
 
@@ -128,7 +132,7 @@ export function FindOutContent({ swUpdateAvailable }: { swUpdateAvailable: boole
           <div className="space-y-4">
             {CLASSIC_PHRASES.map((item) => (
               <article key={item.phrase}>
-                <h4 className="font-display text-base italic">{item.phrase}</h4>
+                <h4 className="text-[15px] font-semibold">{item.phrase}</h4>
                 <p className="mt-1 text-sm leading-relaxed text-muted">{item.gloss}</p>
               </article>
             ))}

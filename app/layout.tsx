@@ -18,9 +18,14 @@ const sans = Be_Vietnam_Pro({
   preload: false,
 });
 
-/* Display serif duy nhất của app (DESIGN.md): Fraunces variable —
-   không ghim weight tĩnh; chỉ mở trục opsz, WONK/SOFT giữ mặc định 0.
-   Cấm serif hệ thống: thiếu glyph tiền hợp tiếng Việt. */
+/* Display serif duy nhất của app (DESIGN.md): Fraunces variable, toàn
+   dải trục wght (next/font không nhận literal '680' — type chỉ cho các
+   bậc trăm hoặc 'variable'). Weight 680 được GHIM TƯỜNG MINH tại nơi
+   dùng: class .font-display trong globals.css đặt font-weight: 680 và
+   heading sân khấu khai thêm style 680 (REDESIGN-V4, TYPE-AND-ICON §1:
+   680 là toạ độ thật trên trục variable; cấm 560/400 cho vai tuyên bố).
+   Chỉ mở trục opsz, WONK/SOFT giữ mặc định 0. Cấm serif hệ thống: thiếu
+   glyph tiền hợp tiếng Việt. */
 const display = Fraunces({
   subsets: ['latin', 'vietnamese'],
   variable: '--font-display',
@@ -29,8 +34,9 @@ const display = Fraunces({
 });
 
 export const viewport: Viewport = {
-  // Màu brand — thanh trạng thái/trình duyệt trên mobile nhuộm theo app.
-  themeColor: '#C22A44',
+  // Canvas trắng tuyệt đối của V4 (NEUTRAL-FIRST) — thanh trạng thái/
+  // trình duyệt trên mobile theo canvas, không nhuộm seed.
+  themeColor: '#FFFFFF',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
