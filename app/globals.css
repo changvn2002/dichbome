@@ -68,6 +68,15 @@ html,
 body {
   background: var(--neutral-canvas);
   color: var(--neutral-900);
+  /* PWA native-feel (audit pwa-native-2026-10-25/dichbome.md mục 9 — FAIL):
+     chặn pull-to-refresh / scroll-chaining ở cấp trang. Trước bản vá: 0
+     khai báo overscroll-behavior trong toàn CSS, computed = auto khắp nơi —
+     kéo quá đà ở vùng kết quả có nguy cơ reload trang. Mẫu dùng chung đã
+     chạy ở sodam v1.4.0 (PWA-FIX-REPORT.md, gói dùng chung). */
+  overscroll-behavior-y: none;
+  /* Mục 20 (UNKNOWN — CSS có 0 khai báo touch-action, body computed = auto):
+     manipulation khử trễ chạm 300ms + double-tap zoom ngoài ý muốn. */
+  touch-action: manipulation;
 }
 
 body {
@@ -133,6 +142,30 @@ body {
   box-shadow:
     0 0 0 4px var(--neutral-canvas),
     0 0 0 5px var(--neutral-900);
+}
+
+/* PWA native-feel — kỷ luật chạm (mẫu dùng chung sodam v1.4.0).
+   touch-action KHÔNG kế thừa nên phải phủ tường minh mọi phần tử tương
+   tác (audit mục 20: trước bản vá 0 khai báo trong toàn CSS). */
+button,
+a,
+[role='button'],
+input,
+select,
+textarea,
+label {
+  touch-action: manipulation;
+}
+
+/* Phản hồi nhấn tức thời (audit mục 19 — FAIL: 0 rule :active trong toàn
+   CSS theo 2 nguồn kiểm chứng độc lập; 63 mục tiêu chạm không có phản hồi
+   thị giác khi nhấn). Chỉ transform/opacity theo luật motion của DESIGN.md;
+   người dùng reduced-motion được tắt transform ở khối @media cuối file. */
+button:active,
+a:active,
+[role='button']:active {
+  opacity: 0.82;
+  transform: scale(0.98);
 }
 
 /* Motion — danh sách đặt tên duy nhất của DESIGN.md, chỉ transform/opacity.
@@ -205,6 +238,31 @@ body {
   transition: width 400ms ease-out;
 }
 
+/* PWA native-feel — safe-area top cho thanh app (audit mục 5 — UNKNOWN:
+   headless không mô phỏng được notch; tín hiệu liên quan là CSS chỉ có
+   safe-area-inset-bottom, chưa từng có inset-top). Thanh app là phần tử
+   <header> DUY NHẤT của app (components/dichbome/app.tsx): nó không dùng
+   position fixed/sticky mà là con flex đầu tiên của cột h-dvh
+   overflow-hidden (audit mục 6) nên luôn dính mép trên màn hình; layout
+   lại khai viewport-fit=cover — trên máy có tai thỏ, nội dung header nằm
+   dưới vùng notch/thanh trạng thái nếu không cộng inset-top. Cộng inset
+   vào chiều cao: preflight đặt border-box nên vùng nội dung giữ đúng
+   52px (56px ở ≥1280px) như hiện tại; inset = 0 trên máy không notch /
+   tab trình duyệt thường → không đổi một pixel. Các rule ở đây cố ý
+   KHÔNG nằm trong layer để thắng utility h-[52px] / min-[1280px]:h-14
+   (cùng kỷ luật với :focus-visible ở trên). Nếu sau này app có thêm
+   <header> thứ hai, phải thu hẹp selector này về đúng thanh app. */
+header {
+  padding-top: env(safe-area-inset-top, 0px);
+  height: calc(52px + env(safe-area-inset-top, 0px));
+}
+
+@media (min-width: 1280px) {
+  header {
+    height: calc(56px + env(safe-area-inset-top, 0px));
+  }
+}
+
 /* «Chat» (redesign vòng 3, hướng thắng panel bỏ phiếu lại mù — parent
    phán quyết 2026-10-24, hồ sơ dichbome-redesign/panel/mock-revote):
    toàn app là MỘT cuộc hội thoại — câu gốc là bong bóng chat mực, bản
@@ -228,6 +286,10 @@ body {
    nhưng vẫn cuộn được — đúng kỷ luật «1 hàng nowrap» của bản thắng. */
 .scroll-row {
   scrollbar-width: none;
+  /* PWA native-feel (mẫu dùng chung: scroller nội bộ = contain): hàng chip
+     ngang là vùng cuộn có chủ đích (audit mục 11 — PASS), contain giữ cử
+     chỉ cuộn không chaining ra trang khi chạm mép hàng. */
+  overscroll-behavior: contain;
 }
 .scroll-row::-webkit-scrollbar {
   display: none;
@@ -244,5 +306,14 @@ body {
   .typing-dot {
     animation: none;
     opacity: 0.55;
+  }
+
+  /* Reduced-motion: tắt transform của phản hồi :active ở trên (giữ opacity
+     làm tín hiệu nhấn) — đúng override của mẫu sodam v1.4.0; khối @media
+     này đã có sẵn trong file cho các animation nên chỉ nối thêm rule. */
+  button:active,
+  a:active,
+  [role='button']:active {
+    transform: none;
   }
 }
