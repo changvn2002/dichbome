@@ -44,8 +44,30 @@ jobs:
 
       # CQ-04 (fix wave 4): KHÔNG continue-on-error — audit đỏ là pipeline
       # đỏ. Vòng 4 chỉ còn đúng điểm này để CQ-04 đóng hẳn (r4 dossier).
+      # SEC-10 điều kiện (iii): cùng lần chạy này ghi thêm báo cáo JSON
+      # để upload thành artifact ở step ngay dưới. Exit code của audit
+      # được giữ nguyên và trả lại ở cuối script — cổng chặn không đổi.
       - name: Dependency audit (prod)
-        run: pnpm audit --prod
+        id: dependency-audit
+        run: |
+          set +e
+          pnpm audit --prod --json > audit.json
+          audit_exit=$?
+          cat audit.json
+          exit "$audit_exit"
+
+      # Chạy cả khi step audit ở trên fail (if: always()) để một lần
+      # audit đỏ vẫn để lại artifact JSON làm bằng chứng cho lần chấm.
+      # Job vẫn đỏ: step upload thành công không xoá được failure của
+      # step audit, và các step sau (Build) vẫn bị bỏ qua như hiện nay.
+      - name: Upload audit report (JSON)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report-${{ github.sha }}
+          path: audit.json
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Build
         run: pnpm build
