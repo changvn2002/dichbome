@@ -62,7 +62,7 @@ jobs:
       # step audit, và các step sau (Build) vẫn bị bỏ qua như hiện nay.
       - name: Upload audit report (JSON)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: audit-report-${{ github.sha }}
           path: audit.json
