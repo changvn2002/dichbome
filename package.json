@@ -9,7 +9,7 @@
     "next": "^16.4.2",
     "react": "19.2.1",
     "react-dom": "19.2.1",
-    "web-vitals": "^5.3.0"
+    "web-vitals": "^6.2.3"
   },
   "description": "Giải Mã Gia Đình — dịch ý thật đằng sau tin nhắn của bố mẹ, người thân, vợ chồng, sếp... bằng engine rule-based tiếng Việt (không cần AI, không cần đăng nhập).",
   "devDependencies": {
